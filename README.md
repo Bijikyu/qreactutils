@@ -1,4 +1,5 @@
 
+# QRECTUTILS
 # React Hooks Utility Library
 
 A comprehensive React hooks library providing common functionality for async actions, dropdown management, form editing, mobile detection, toast notifications, and authentication redirects.
