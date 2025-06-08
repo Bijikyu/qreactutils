@@ -65,22 +65,25 @@ const mockAxios = {
     request: async (requestConfig) => {
       const { url, method, data } = requestConfig;
       
+      // Convert relative URLs to absolute for testing
+      const absoluteUrl = url.startsWith('/') ? `http://localhost:3000${url}` : url;
+      
       // Simulate different API responses based on URL patterns
-      if (url.includes('/error')) {
+      if (absoluteUrl.includes('/error')) {
         const error = new Error('Network error');
         error.isAxiosError = true;
         error.response = { status: 500, data: 'Server error' };
         throw error;
       }
       
-      if (url.includes('/401')) {
+      if (absoluteUrl.includes('/401')) {
         const error = new Error('Unauthorized');
         error.isAxiosError = true;
         error.response = { status: 401, data: 'Unauthorized' };
         throw error;
       }
       
-      if (url.includes('/timeout')) {
+      if (absoluteUrl.includes('/timeout')) {
         const error = new Error('Timeout');
         error.isAxiosError = true;
         error.code = 'ECONNABORTED';
@@ -89,7 +92,7 @@ const mockAxios = {
       
       // Default successful response - return the response structure that axios actually returns
       return {
-        data: { success: true, url, method, requestData: data },
+        data: { success: true, url: absoluteUrl, method, requestData: data },
         status: 200,
         statusText: 'OK'
       };
