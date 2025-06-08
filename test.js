@@ -215,6 +215,44 @@ function assertAsync(asyncFn, message) {
   });
 }
 
+/**
+ * Helper for testing function exports with consistent patterns
+ * 
+ * Reduces duplication in export validation tests while maintaining
+ * clear individual test responsibilities.
+ * 
+ * @param {Array} functionNames - Names of functions to validate
+ * @param {string} category - Category name for error messages
+ */
+function assertFunctionsExported(functionNames, category) {
+  functionNames.forEach(functionName => {
+    const fn = eval(functionName);
+    assert(typeof fn === 'function', `${functionName} should be a function`);
+    assert(fn.length >= 0, `${functionName} should be callable`);
+  });
+}
+
+/**
+ * Helper for testing API request scenarios with consistent error patterns
+ * 
+ * Standardizes the common pattern of testing API calls with expected errors
+ * while keeping individual test logic separate.
+ * 
+ * @param {string} endpoint - API endpoint to test
+ * @param {string} expectedErrorPattern - Pattern expected in error message
+ * @param {string} testDescription - Description for error messages
+ */
+async function assertApiError(endpoint, expectedErrorPattern, testDescription) {
+  try {
+    await apiRequest(endpoint);
+    throw new Error(`Should have thrown for ${testDescription}`);
+  } catch (error) {
+    assert(error instanceof Error, `Should throw Error object for ${testDescription}`);
+    assert(error.message.includes(expectedErrorPattern), 
+           `Should include ${expectedErrorPattern} for ${testDescription}`);
+  }
+}
+
 console.log('🚀 Starting Enhanced Comprehensive Test Suite...\n');
 
 // =============================================================================
