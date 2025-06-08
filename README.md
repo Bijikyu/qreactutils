@@ -76,6 +76,53 @@ function MyComponent() {
 }
 ```
 
+### useDropdownData(fetcher, toast, user)
+Generic React hook for managing dropdown state with loading and error handling.
+
+**Parameters:**
+- `fetcher` (Function): Async function that returns array data
+- `toast` (Object): Toast instance with error method for notifications
+- `user` (Object): User object that triggers data fetch when available
+
+**Returns:** Object - `{items, isLoading, fetchData}` where:
+- `items` (Array): The fetched dropdown data
+- `isLoading` (boolean): Loading state indicator
+- `fetchData` (Function): Function to manually trigger data fetch
+
+### createDropdownListHook(fetcher)
+Factory function that creates typed dropdown hooks.
+
+**Parameters:**
+- `fetcher` (Function): Async function that returns array data
+
+**Returns:** Function - Custom hook that accepts `(toast, user)` parameters
+
+**Example:**
+```javascript
+const { useDropdownData, createDropdownListHook } = require('your-module-name');
+
+// Direct usage
+function MyDropdown() {
+  const { items, isLoading, fetchData } = useDropdownData(
+    async () => fetch('/api/items').then(r => r.json()),
+    toast,
+    user
+  );
+  
+  return isLoading ? 'Loading...' : items.map(item => <div key={item.id}>{item.name}</div>);
+}
+
+// Factory usage
+const useProductList = createDropdownListHook(
+  async () => fetch('/api/products').then(r => r.json())
+);
+
+function ProductDropdown() {
+  const { items, isLoading } = useProductList(toast, user);
+  return /* render dropdown */;
+}
+```
+
 ## License
 
 ISC
