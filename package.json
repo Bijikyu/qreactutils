@@ -4,7 +4,7 @@
   "description": "A comprehensive React hooks utility library for managing async actions, dropdowns, forms, mobile detection, toast notifications, and authentication redirects.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node test.js"
   },
   "keywords": [
     "react",
