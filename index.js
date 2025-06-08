@@ -1,7 +1,7 @@
 /**
  * Main entry point for the npm module
  */
-const { useAsyncAction, useDropdownData, createDropdownListHook, useDropdownToggle, useEditForm, useIsMobile, useToast, toast, useToastAction, useAuthRedirect } = require('./lib/hooks');
+const { useAsyncAction, useDropdownData, createDropdownListHook, useDropdownToggle, useEditForm, useIsMobile, useToast, toast, useToastAction, useAuthRedirect, showToast, stopEvent } = require('./lib/hooks');
 
 // Export all functions for use as a module
 module.exports = {
@@ -14,5 +14,7 @@ module.exports = {
   useToast,
   toast,
   useToastAction,
-  useAuthRedirect
+  useAuthRedirect,
+  showToast,
+  stopEvent
 };
