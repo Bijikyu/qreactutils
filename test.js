@@ -21,7 +21,7 @@ const {
   useAsyncAction, useDropdownData, createDropdownListHook, useDropdownToggle,
   useEditForm, useIsMobile, useToast, toast, useToastAction, useAuthRedirect,
   showToast, stopEvent, apiRequest, getQueryFn, queryClient, formatAxiosError, axiosClient
-} = require('./index.js');
+} = require('./index.js'); // import library under test
 
 // Enhanced React mocks for more comprehensive testing
 const mockReact = {

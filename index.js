@@ -15,11 +15,11 @@
 
 // Import all hooks, utilities, and API functions from the consolidated hooks module
 // The hooks module acts as an aggregator, pulling together functionality from multiple internal modules
-const { 
-  useAsyncAction, useDropdownData, createDropdownListHook, useDropdownToggle, 
-  useEditForm, useIsMobile, useToast, toast, useToastAction, useAuthRedirect, 
-  showToast, stopEvent, apiRequest, getQueryFn, queryClient, formatAxiosError, axiosClient 
-} = require('./lib/hooks');
+const {
+  useAsyncAction, useDropdownData, createDropdownListHook, useDropdownToggle,
+  useEditForm, useIsMobile, useToast, toast, useToastAction, useAuthRedirect,
+  showToast, stopEvent, apiRequest, getQueryFn, queryClient, formatAxiosError, axiosClient
+} = require('./lib/hooks'); // aggregated exports from internal modules
 
 /**
  * Export all functions for use as a module
