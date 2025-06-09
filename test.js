@@ -23,41 +23,20 @@ const {
   showToast, stopEvent, apiRequest, getQueryFn, queryClient, formatAxiosError, axiosClient
 } = require('./index.js'); // import library under test
 
-// Enhanced React mocks for more comprehensive testing
-const mockReact = {
-  useState: (initial) => {
-    let value = initial;
-    const setValue = (newValue) => {
-      value = typeof newValue === 'function' ? newValue(value) : newValue;
-    };
-    return [value, setValue];
-  },
-  useCallback: (fn, deps) => {
-    // Return a wrapped function that tracks calls for testing
-    const wrappedFn = (...args) => fn(...args);
-    wrappedFn._isCallback = true;
-    wrappedFn._deps = deps;
-    return wrappedFn;
-  },
-  useEffect: (fn, deps) => {
-    // Track effect calls for testing
-    const effectCall = { fn, deps, cleanup: null };
-    mockReact._lastEffect = effectCall;
-    
-    // Execute effect immediately for certain dependency patterns
-    if (deps && deps.length === 0) {
-      const cleanup = fn();
-      if (typeof cleanup === 'function') {
-        effectCall.cleanup = cleanup;
-      }
-    }
-    return effectCall;
-  },
-  _lastEffect: null, // For testing effect behavior
-  _resetMocks: () => {
-    mockReact._lastEffect = null;
+const React = require('react'); // Load real React for hook rendering //(replace mock React with real module)
+const TestRenderer = require('react-test-renderer'); // Renderer for executing hooks //(provide test renderer for hook execution)
+
+function renderHook(hookFn) { // Utility to render hooks within React environment
+  let value; // Holds hook return value
+  function TestComponent() { // Minimal component to invoke hook
+    value = hookFn();
+    return null;
   }
-};
+  TestRenderer.act(() => { // Use act to satisfy React hook rules
+    TestRenderer.create(React.createElement(TestComponent));
+  });
+  return { result: { current: value } }; // Mimic Testing Library return structure
+} //
 
 // Enhanced axios mock for API testing
 const mockAxios = {
@@ -104,6 +83,10 @@ const mockAxios = {
   isAxiosError: (error) => error && error.isAxiosError === true
 };
 
+const mockedAxiosClient = mockAxios.create(); // Create axios stub instance for API calls
+axiosClient.request = mockedAxiosClient.request; // Override request with stub
+axiosClient.get = mockedAxiosClient.get; // Override get with stub
+
 // Mock window object for browser API testing
 const mockWindow = {
   innerWidth: 1024,
@@ -141,15 +124,14 @@ const mockWindow = {
 };
 
 // Patch require and global objects for testing
-const originalRequire = require;
-const originalWindow = global.window;
-const originalAxios = require('axios');
+const originalRequire = require; // Preserve original require for restoration //(save original require)
+const originalWindow = global.window; // Keep original window for cleanup //(preserve original window)
+const originalAxios = require('axios'); // Save axios instance before mocking //(keep axios)
 
-require = function(id) {
-  if (id === 'react') return mockReact;
-  if (id === 'axios') return mockAxios;
-  return originalRequire.apply(this, arguments);
-};
+require = function(id) { // Intercept require calls to stub axios only
+  if (id === 'axios') return mockAxios; // Provide axios mock for network isolation
+  return originalRequire.apply(this, arguments); // Fallback to original require
+}; //
 
 global.window = mockWindow;
 
@@ -167,8 +149,7 @@ function runTest(name, testFn) {
     console.log(`\n🧪 Test ${testCount}: ${name}`);
     
     // Reset mocks before each test
-    mockReact._resetMocks();
-    mockWindow._resetMocks();
+    mockWindow._resetMocks(); // Reset window state for isolation
     
     testFn();
     
@@ -610,21 +591,16 @@ runTest('useAsyncAction integrates with error handling', async () => {
   let capturedResult = null;
   let capturedError = null;
   
-  const [runSuccess] = useAsyncAction(
-    async (data) => {
-      return { result: data };
-    },
-    {
-      onSuccess: (result) => {
-        successCallbackCalled = true;
-        capturedResult = result;
-      },
-      onError: (error) => {
-        errorCallbackCalled = true;
-        capturedError = error;
+  const { result: resultSuccess } = renderHook(() =>
+    useAsyncAction(
+      async (data) => { return { result: data }; },
+      {
+        onSuccess: (result) => { successCallbackCalled = true; capturedResult = result; },
+        onError: (error) => { errorCallbackCalled = true; capturedError = error; }
       }
-    }
-  );
+    )
+  ); // Execute hook inside React environment
+  const [runSuccess] = resultSuccess.current; // Retrieve run function
   
   // Test successful execution
   const result = await runSuccess('test data');
@@ -636,18 +612,16 @@ runTest('useAsyncAction integrates with error handling', async () => {
   successCallbackCalled = false;
   errorCallbackCalled = false;
   
-  const [runError] = useAsyncAction(
-    async () => {
-      throw new Error('Test error');
-    },
-    {
-      onSuccess: () => { successCallbackCalled = true; },
-      onError: (error) => {
-        errorCallbackCalled = true;
-        capturedError = error;
+  const { result: resultError } = renderHook(() =>
+    useAsyncAction(
+      async () => { throw new Error('Test error'); },
+      {
+        onSuccess: () => { successCallbackCalled = true; },
+        onError: (error) => { errorCallbackCalled = true; capturedError = error; }
       }
-    }
-  );
+    )
+  ); // Execute hook with failing async function
+  const [runError] = resultError.current; // Retrieve run function
   
   // Test error execution
   try {
@@ -715,33 +689,20 @@ runTest('createDropdownListHook integration with useDropdownData', () => {
   const mockToast = { error: () => {} };
   const mockUser = { id: 'test-user' };
   
-  try {
-    useCustomDropdown(mockToast, mockUser);
-    // In Node.js environment, this will fail due to React hooks
-    // but integration structure should be correct
-  } catch (error) {
-    // Expected in Node.js environment
-    assert(error.message.includes('React') || error.message.includes('hook') || 
-           error.message.includes('useState'), 
-           'Should fail due to React context, not integration issues');
-  }
+  const { result } = renderHook(() => useCustomDropdown(mockToast, mockUser)); // Render hook with React renderer
+  assert(Array.isArray(result.current.items), 'Should expose items array'); // Verify return structure
 });
 
 runTest('useIsMobile integration with window API', () => {
-  // Test that useIsMobile is properly exported
-  assert(typeof useIsMobile === 'function', 'useIsMobile should be a function');
-  
-  // Test media query setup with mock window
-  mockWindow.innerWidth = 500;
-  const mediaQuery = mockWindow.matchMedia('(max-width: 767px)');
-  assert(typeof mediaQuery.addEventListener === 'function', 'Should have event listener');
-  assert(typeof mediaQuery.removeEventListener === 'function', 'Should have remove listener');
-  assert(mediaQuery.matches === true, 'Should detect mobile width correctly');
-  
-  // Test desktop width
-  mockWindow.innerWidth = 1200;
-  const desktopQuery = mockWindow.matchMedia('(max-width: 767px)');
-  assert(desktopQuery.matches === false, 'Should detect desktop width correctly');
+  assert(typeof useIsMobile === 'function', 'useIsMobile should be a function'); // Export validation
+
+  mockWindow.innerWidth = 500; // Simulate mobile width
+  const { result: mobile } = renderHook(() => useIsMobile()); // Execute hook for mobile state
+  assert(mobile.current === true, 'Should detect mobile width correctly');
+
+  mockWindow.innerWidth = 1200; // Switch to desktop width
+  const { result: desktop } = renderHook(() => useIsMobile()); // Execute hook for desktop state
+  assert(desktop.current === false, 'Should detect desktop width correctly');
 });
 
 // =============================================================================
