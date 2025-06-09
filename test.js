@@ -40,8 +40,8 @@ function renderHook(hookFn) { // Utility to render hooks within React environmen
 
 // Enhanced axios mock for API testing
 const mockAxios = {
-  create: (config) => ({
-    request: async (requestConfig) => {
+  create: (config) => ({ // mimic axios.create so library code stays unchanged
+    request: async (requestConfig) => { // simulate axios.request behaviour
       const { url, method, data } = requestConfig;
       
       // Convert relative URLs to absolute for testing
@@ -76,11 +76,11 @@ const mockAxios = {
         statusText: 'OK'
       };
     },
-    get: async (url) => {
+    get: async (url) => { // simple wrapper used by getQueryFn tests
       return mockAxios.create().request({ url, method: 'GET' });
     }
   }),
-  isAxiosError: (error) => error && error.isAxiosError === true
+  isAxiosError: (error) => error && error.isAxiosError === true // mirror axios.isAxiosError for compatibility
 };
 
 const mockedAxiosClient = mockAxios.create(); // Create axios stub instance for API calls
@@ -90,13 +90,13 @@ axiosClient.get = mockedAxiosClient.get; // Override get with stub
 // Mock window object for browser API testing
 const mockWindow = {
   innerWidth: 1024,
-  matchMedia: (query) => ({
+  matchMedia: (query) => ({ // minimal MediaQueryList mock used by useIsMobile
     matches: query.includes('max-width') && mockWindow.innerWidth <= 767,
-    addEventListener: (event, handler) => {
+    addEventListener: (event, handler) => { // record listeners for cleanup
       mockWindow._mediaListeners = mockWindow._mediaListeners || [];
       mockWindow._mediaListeners.push({ event, handler, query });
     },
-    removeEventListener: (event, handler) => {
+    removeEventListener: (event, handler) => { // remove stored listener
       if (mockWindow._mediaListeners) {
         mockWindow._mediaListeners = mockWindow._mediaListeners.filter(
           l => l.handler !== handler
@@ -105,7 +105,7 @@ const mockWindow = {
     }
   }),
   history: {
-    pushState: (state, title, url) => {
+    pushState: (state, title, url) => { // track SPA navigations for assertions
       mockWindow._lastPushState = { state, title, url };
     }
   },
@@ -115,7 +115,7 @@ const mockWindow = {
   _mediaListeners: [],
   _lastPushState: null,
   _lastEvent: null,
-  _resetMocks: () => {
+  _resetMocks: () => { // helper to restore window to initial state
     mockWindow._mediaListeners = [];
     mockWindow._lastPushState = null;
     mockWindow._lastEvent = null;
