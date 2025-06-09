@@ -149,6 +149,9 @@ function MyComponent() {
 }
 ```
 
+## Offline Mode
+Set the `OFFLINE_MODE` environment variable to `true` to mock network requests with `codexRequest`. //(document new offline mode)
+
 ## License
 
 ISC
