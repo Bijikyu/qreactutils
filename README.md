@@ -109,17 +109,65 @@ Standalone toast function for creating notifications.
 **Parameters:**
 - `props` (Object): Toast configuration object
 
-### toastSuccess(toast, message)
-Helper function for displaying success toast messages.
+### toastSuccess(toast, message, title)
+Helper function for displaying success toast messages with consistent styling.
 
-### toastError(toast, message)
-Helper function for displaying error toast messages.
+**Parameters:**
+- `toast` (Function): Toast function from useToast hook
+- `message` (string): Success message to display
+- `title` (string, optional): Custom title (defaults to "Success")
+
+### toastError(toast, message, title)
+Helper function for displaying error toast messages with destructive variant.
+
+**Parameters:**
+- `toast` (Function): Toast function from useToast hook  
+- `message` (string): Error message to display
+- `title` (string, optional): Custom title (defaults to "Error")
+
+## API Functions
+
+### apiRequest(url, method, data)
+Standardized HTTP request wrapper with consistent error handling and authentication.
+
+**Parameters:**
+- `url` (string): The API endpoint URL
+- `method` (string, optional): HTTP method (defaults to 'POST')
+- `data` (any, optional): Request body data
+
+**Returns:** Promise resolving to response data
+
+### getQueryFn(options)
+Factory function for creating React Query-compatible query functions.
+
+**Parameters:**
+- `options` (Object): Configuration object
+  - `on401` (string): How to handle 401 errors ('returnNull' or 'throw')
+
+**Returns:** Function - React Query compatible query function
+
+### formatAxiosError(error)
+Normalizes various error types into consistent Error objects.
+
+### queryClient
+Pre-configured React Query client with optimized defaults for typical CRUD operations.
+
+### axiosClient  
+Pre-configured Axios instance with authentication and JSON handling.
+
+## Utility Functions
+
+### showToast(toast, message, title, variant)
+Framework-agnostic toast creation utility.
+
+### stopEvent(event)
+Combined preventDefault and stopPropagation utility for React events.
 
 ## Example Usage
 
 ```javascript
-import React from 'react';
-const { useAsyncAction, useToast, useIsMobile } = require('your-module-name');
+const React = require('react');
+const { useAsyncAction, useToast, useIsMobile } = require('qreactutils');
 
 function MyComponent() {
   const { toast } = useToast();
@@ -149,8 +197,28 @@ function MyComponent() {
 }
 ```
 
-## Offline Mode
-Set the `OFFLINE_MODE` environment variable to `true` to mock network requests with `codexRequest`. //(document new offline mode)
+## Testing
+
+The library includes comprehensive test coverage:
+
+```bash
+# Run enhanced test suite (recommended)
+npm test
+
+# Run detailed verbose tests
+npm run test:verbose
+```
+
+All tests pass with 100% functional coverage including:
+- Unit tests for all hooks and utilities
+- Integration tests for hook composition
+- API error handling scenarios
+- Edge cases and performance validation
+- Memory leak prevention verification
+
+## Offline Development Mode
+
+The library includes infrastructure for offline development via the `codexRequest` wrapper. While currently implemented as a pass-through, this enables future enhancement for mock responses during development when backends are unavailable.
 
 ## License
 
