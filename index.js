@@ -16,9 +16,9 @@
 // Import all hooks, utilities, and API functions from the consolidated hooks module
 // The hooks module acts as an aggregator, pulling together functionality from multiple internal modules
 const {
-  useAsyncAction, useDropdownData, createDropdownListHook, useDropdownToggle,
-  useEditForm, useIsMobile, useToast, toast, useToastAction, useAuthRedirect,
-  showToast, stopEvent, apiRequest, getQueryFn, queryClient, formatAxiosError, axiosClient
+  useAsyncAction, useDropdownData, createDropdownListHook, useDropdownToggle, //(grab hook utilities)
+  useEditForm, useIsMobile, useToast, toast, useToastAction, useAuthRedirect, //(grab UI helpers)
+  showToast, stopEvent, apiRequest, getQueryFn, queryClient, formatAxiosError, axiosClient //(grab API utilities)
 } = require('./lib/hooks'); // aggregated exports from internal modules
 
 /**
@@ -31,7 +31,7 @@ const {
  * 3. Provides better tooling support for IDEs and documentation generators
  * 4. Makes it clear to maintainers what the intended public surface is
  */
-module.exports = {
+module.exports = { // expose library functions
   // Core async functionality hooks
   useAsyncAction,        // Primary hook for async operations with loading states
   useToastAction,        // Combination of async action with automatic toast notifications
@@ -60,4 +60,4 @@ module.exports = {
   queryClient,           // Pre-configured React Query client instance
   formatAxiosError,      // Error normalization for consistent error handling
   axiosClient            // Pre-configured axios instance with sensible defaults
-};
+}; // export object
