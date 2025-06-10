@@ -1,19 +1,19 @@
 
-# QRECTUTILS
-# React Hooks Utility Library
+# QReactUtils
+## React Hooks Utility Library
 
 A comprehensive React hooks library providing common functionality for async actions, dropdown management, form editing, mobile detection, toast notifications, and authentication redirects.
 
 ## Installation
 
 ```bash
-npm install your-module-name
+npm install qreactutils
 ```
 
 ## Usage
 
 ```javascript
-const { useAsyncAction, useDropdownData, useToast } = require('your-module-name');
+const { useAsyncAction, useDropdownData, useToast } = require('qreactutils');
 ```
 
 ## Hooks API
