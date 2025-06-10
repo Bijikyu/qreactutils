@@ -256,5 +256,23 @@ npm ci --only=production
 3. **Bundle monitoring**: Track bundle size changes
 4. **Performance testing**: Monitor impact of dependency updates
 
+### Custom Code vs Dependencies Analysis
+
+#### Opportunities to Replace Custom Code with Dependencies
+1. **useIsMobile Hook**: Could use `react-responsive` (1.1M weekly downloads)
+   - **Benefit**: Better browser support and edge case handling
+   - **Trade-off**: +2KB bundle size
+   - **Recommendation**: Consider for enhanced reliability
+
+2. **Error Handling Utilities**: Could use `verror` or `@hapi/boom`
+   - **Benefit**: Standardized error handling patterns
+   - **Trade-off**: Additional dependency and learning curve
+   - **Recommendation**: Keep custom - current implementation is optimal
+
+#### Well-Utilized Dependencies
+- **React Query**: Fully leveraged for server state management
+- **Axios**: Properly configured with authentication and interceptors
+- **React**: All hooks follow React best practices
+
 ### Custom Code vs Dependencies
 **Current approach is optimal**: The custom utilities are lightweight and specific to the library's needs. Existing dependencies are well-utilized without over-engineering.
