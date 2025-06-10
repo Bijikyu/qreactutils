@@ -28,6 +28,8 @@ The **offline-first development approach** embedded throughout (via `codexReques
 
 - **Hook Aggregation**: The `lib/hooks.js` file serves as the central aggregator, importing from specialized modules. This pattern allows for clean separation while maintaining a single import point.
 - **Helper Function Hierarchy**: Functions that assist only one function stay inline, functions helping multiple functions in one file become helpers, functions helping across files become utilities.
+- **Error Handling Consistency**: All async operations follow the established executeWithErrorHandling pattern with proper logging and error transformation.
+- **Loading State Management**: The executeWithLoadingState helper standardizes async operation patterns across all hooks.
 - **401 Error Handling**: The `handle401Error` function supports both `returnNull` and `throw` behaviors, enabling different authentication strategies (optional vs required data).
 
 ## SCOPE
