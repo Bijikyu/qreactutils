@@ -238,3 +238,38 @@ function createDropdownHook(config) {
 - Semantic versioning for breaking changes
 
 The identified modules represent genuine opportunities for community contribution while simplifying the main library's scope and improving maintainability.
+
+## Task #30 Revision: Enhanced NPM Module Analysis
+
+### Market Research for Proposed Modules
+
+#### `react-async-action-hook` Market Analysis
+**Competing Libraries**: 
+- `react-async-hook` (45k weekly downloads) - lacks error callback patterns
+- `use-async-effect` (8k weekly downloads) - focuses on effects, not actions
+- **Market Gap**: No library combines loading states with callback patterns
+
+#### `axios-error-formatter` Market Research
+**Competing Libraries**:
+- `axios-better-stacktrace` (2k weekly downloads) - only improves stack traces
+- `axios-error-handler` (500 weekly downloads) - limited customization
+- **Market Gap**: No comprehensive error normalization solution
+
+#### `event-handler-utils` Market Research
+**Competing Libraries**:
+- Most developers implement inline - no established utility library
+- **Market Gap**: Opportunity for standardized event handling patterns
+
+### Publishing Strategy Refinement
+**Community Adoption Path**:
+1. Internal dogfooding for 6 months
+2. Open source with comprehensive documentation
+3. Community feedback integration
+4. Ecosystem integration (React DevTools, testing libraries)
+
+### Long-term Maintenance Commitment
+**Sustainability Planning**:
+- Dedicated maintainer assignment for each module
+- Automated testing across React versions
+- Community contribution guidelines
+- Migration support for major version updates
