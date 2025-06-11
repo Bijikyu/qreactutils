@@ -223,11 +223,8 @@ function MyComponent() {
 The library includes comprehensive test coverage:
 
 ```bash
-# Run enhanced test suite (recommended)
+# Run test suite
 npm test
-
-# Run detailed verbose tests
-npm run test:verbose
 ```
 
 All tests pass with 100% functional coverage including:
