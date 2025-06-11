@@ -1,3 +1,4 @@
+require('qtests/setup'); // initialize qtests stubs before other imports
 
 /**
  * Comprehensive Test Suite for React Hooks Utility Library
@@ -17,6 +18,7 @@
  * 8. Memory Management Tests - Test for memory leaks and cleanup
  */
 
+
 const {
   useAsyncAction, useDropdownData, createDropdownListHook, useDropdownToggle,
   useEditForm, useIsMobile, useToast, toast, useToastAction, useAuthRedirect,
@@ -28,6 +30,7 @@ const { buildRequestConfig, createMockResponse, handle401Error, codexRequest, ex
 const { executeAsyncWithLogging, logFunction, withToastLogging } = require('./lib/utils.js'); // test logging helpers
 const { executeWithErrorHandling, executeSyncWithErrorHandling } = require('./lib/errorHandling.js'); // test error wrappers
 const { executeWithErrorToast, executeWithToastFeedback } = require('./lib/toastIntegration.js'); // test toast integration
+
 
 const React = require('react'); // Load real React for hook rendering //(replace mock React with real module)
 const TestRenderer = require('react-test-renderer'); // Renderer for executing hooks //(provide test renderer for hook execution)
@@ -58,10 +61,11 @@ function renderHook(hookFn) { // Utility to render hooks with basic unmounting
   }; // return mimic of Testing Library plus unmount
 } //
 
-// Enhanced axios mock for API testing
-const mockAxios = {
-  create: (config) => ({ // mimic axios.create so library code stays unchanged
-    request: async (requestConfig) => { // simulate axios.request behaviour
+// Enhanced axios mock extending qtests stub
+const mockAxios = require('axios'); // base stub from qtests setup
+mockAxios.create = (config) => { // provide axios.create capability
+    const instance = async (requestConfig) => instance.request(requestConfig); // callable like real axios
+    instance.request = async (requestConfig) => { // simulate axios.request behaviour
       const { url, method, data } = requestConfig;
       
       // Convert relative URLs to absolute for testing
@@ -96,12 +100,24 @@ const mockAxios = {
         statusText: 'OK'
       };
     },
-    get: async (url) => { // simple wrapper used by getQueryFn tests
-      return mockAxios.create().request({ url, method: 'GET' });
-    }
-  }),
-  isAxiosError: (error) => error && error.isAxiosError === true // mirror axios.isAxiosError for compatibility
+    instance.get = async (url) => { // simple wrapper used by getQueryFn tests
+      return instance.request({ url, method: 'GET' });
+    };
+    return instance;
 };
+mockAxios.isAxiosError = (error) => error && error.isAxiosError === true; // match axios API
+
+const {
+  useAsyncAction, useDropdownData, createDropdownListHook, useDropdownToggle,
+  useEditForm, useIsMobile, useToast, toast, useToastAction, useAuthRedirect,
+  showToast, stopEvent, apiRequest, getQueryFn, queryClient, formatAxiosError, axiosClient
+} = require('./index.js'); // import library under test after axios stub in place
+const { buildRequestConfig, createMockResponse, handle401Error, codexRequest, executeAxiosRequest } = require('./lib/api.js'); // internal API helpers
+
+// Direct imports for internal utilities under test
+const { executeAsyncWithLogging, logFunction, withToastLogging } = require('./lib/utils.js'); // test logging helpers
+const { executeWithErrorHandling, executeSyncWithErrorHandling } = require('./lib/errorHandling.js'); // test error wrappers
+const { executeWithErrorToast, executeWithToastFeedback } = require('./lib/toastIntegration.js'); // test toast integration
 
 const mockedAxiosClient = mockAxios.create(); // Create axios stub instance for API calls
 axiosClient.request = mockedAxiosClient.request; // Override request with stub
@@ -143,8 +159,11 @@ const mockWindow = {
   }
 };
 
+
 // Mock PopStateEvent so useAuthRedirect can run in Node environment
 global.PopStateEvent = class PopStateEvent { constructor(type){ this.type = type; } };
+
+
 
 // Patch require and global objects for testing
 const originalRequire = require; // Preserve original require for restoration //(save original require)
@@ -156,12 +175,10 @@ const originalAxios = require('axios'); // Save axios instance before mocking //
  * network calls while still letting all other modules load via the saved originalRequire
  * function. The original require is restored after tests so normal behavior resumes.
  */
-require = function(id) { // Intercept require calls to stub axios only
-  if (id === 'axios') return mockAxios; // Provide axios mock for network isolation
-  return originalRequire.apply(this, arguments); // Fallback to original require
-}; //
+// axios stub path is replaced directly via require.cache so no custom require needed
 
 global.window = mockWindow;
+global.PopStateEvent = class PopStateEvent { constructor(type, opts={}){ this.type=type; this.state=opts.state||null; } }; // stub for auth redirect tests
 
 // Test utilities
 let testCount = 0;
@@ -403,9 +420,13 @@ runTest('showToast error handling and propagation', () => {
   }, 'Should propagate toast system errors');
   
   // Test with null toast function
-  assertThrows(() => {
+  let errorMsg;
+  try {
     showToast(null, 'Test message');
-  }, 'Should handle null toast function');
+  } catch (err) {
+    errorMsg = err.message;
+  }
+  assertEqual(errorMsg, 'showToast requires a function for `toast` parameter', 'Should handle null toast function');
 });
 
 runTest('stopEvent comprehensive behavior', () => {
@@ -584,12 +605,20 @@ runTest('formatAxiosError with various error types', () => {
   // Test non-axios error
   const regularError = new Error('Regular error');
   const result3 = formatAxiosError(regularError);
-  assertEqual(result3, regularError, 'Should return original error for non-axios errors');
+  assert(result3 instanceof Error, 'Non-axios errors should be wrapped'); // verify wrapper
+  assert(result3 !== regularError, 'Should return new Error instance'); // ensure new instance
+  assert(result3.message.includes('Regular error'), 'Should preserve message'); // check message
   
   // Test edge cases
-  assertEqual(formatAxiosError(null), null, 'Should handle null');
-  assertEqual(formatAxiosError(undefined), undefined, 'Should handle undefined');
-  assertEqual(formatAxiosError('string error'), 'string error', 'Should handle strings');
+  const nullErr = formatAxiosError(null);
+  assert(nullErr instanceof Error, 'Should wrap null in Error'); // check wrapper for null
+  assertEqual(nullErr.message, 'null', 'Should stringify null'); // confirm message
+  const undefErr = formatAxiosError(undefined);
+  assert(undefErr instanceof Error, 'Should wrap undefined in Error'); // wrapper for undefined
+  assertEqual(undefErr.message, 'undefined', 'Should stringify undefined'); // confirm message
+  const strErr = formatAxiosError('string error');
+  assert(strErr instanceof Error, 'Should wrap strings in Error'); // wrapper for strings
+  assertEqual(strErr.message, 'string error', 'Should preserve string message'); // confirm text
 });
 
 runTest('apiRequest with different HTTP methods and data', async () => {
@@ -969,6 +998,14 @@ runTest('useIsMobile integration with window API', () => {
   assert(desktop.current === false, 'Should detect desktop width correctly');
 });
 
+runTest('useIsMobile returns false when window missing', () => {
+  const prevWindow = global.window; // save current window for restoration
+  global.window = undefined; // remove window to simulate server environment
+  const { result } = renderHook(() => useIsMobile()); // invoke hook without window
+  assert(result.current === false, 'Should return false with no window');
+  global.window = prevWindow; // restore window after test
+});
+
 runTest('useDropdownData and useToastAction integration sequence', async () => {
   resetToastSystem(); // ensure clean state for integration test
   const fetchCalls = [];
@@ -1133,14 +1170,17 @@ runTest('Boundary values and extreme inputs', () => {
 
 runTest('Type coercion and unexpected types', () => {
   // Test formatAxiosError with unexpected types
-  assertEqual(formatAxiosError(123), 123, 'Should handle numbers');
-  assertEqual(formatAxiosError(true), true, 'Should handle booleans');
-  
-  // Test arrays properly by comparing the actual returned array
-  const arrayResult = formatAxiosError([1, 2, 3]);
-  assert(Array.isArray(arrayResult), 'Should handle arrays');
-  assert(arrayResult.length === 3, 'Array should maintain length');
-  assert(arrayResult[0] === 1 && arrayResult[1] === 2 && arrayResult[2] === 3, 'Array should maintain values');
+  const numErr = formatAxiosError(123);
+  assert(numErr instanceof Error, 'Should wrap numbers'); // numbers become Error
+  assertEqual(numErr.message, '123', 'Number message should match'); // message check
+  const boolErr = formatAxiosError(true);
+  assert(boolErr instanceof Error, 'Should wrap booleans'); // booleans become Error
+  assertEqual(boolErr.message, 'true', 'Boolean message should match'); // message check
+
+  // Arrays also return Error objects rather than arrays
+  const arrayErr = formatAxiosError([1, 2, 3]);
+  assert(arrayErr instanceof Error, 'Should wrap arrays'); // arrays become Error
+  assert(arrayErr.message.includes('1,2,3'), 'Array values should stringify'); // message check
   
   // Test toast with unexpected prop types
   const typeCoercionToast = toast({
@@ -1423,6 +1463,7 @@ testQueue.then(() => { // wait for queued tests before reporting
   // Restore original environment after tests complete
   require = originalRequire;
   global.window = originalWindow;
+  delete global.PopStateEvent; // cleanup custom event constructor
 console.log('\n📊 DETAILED TEST SUMMARY');
 console.log('='.repeat(60));
 
