@@ -19,17 +19,6 @@ require('qtests/setup'); // initialize qtests stubs before other imports
  */
 
 
-const {
-  useAsyncAction, useDropdownData, createDropdownListHook, useDropdownToggle,
-  useEditForm, useIsMobile, useToast, toast, useToastAction, useAuthRedirect,
-  showToast, stopEvent, apiRequest, getQueryFn, queryClient, formatAxiosError, axiosClient, getToastListenerCount, resetToastSystem
-} = require('./index.js'); // import library under test
-const { buildRequestConfig, createMockResponse, handle401Error, codexRequest, executeAxiosRequest } = require('./lib/api.js'); // import internal API helpers for unit tests
-
-// Direct imports for internal utilities under test
-const { executeAsyncWithLogging, logFunction, withToastLogging } = require('./lib/utils.js'); // test logging helpers
-const { executeWithErrorHandling, executeSyncWithErrorHandling } = require('./lib/errorHandling.js'); // test error wrappers
-const { executeWithErrorToast, executeWithToastFeedback } = require('./lib/toastIntegration.js'); // test toast integration
 
 
 const React = require('react'); // Load real React for hook rendering //(replace mock React with real module)
@@ -110,8 +99,8 @@ mockAxios.isAxiosError = (error) => error && error.isAxiosError === true; // mat
 const {
   useAsyncAction, useDropdownData, createDropdownListHook, useDropdownToggle,
   useEditForm, useIsMobile, useToast, toast, useToastAction, useAuthRedirect,
-  showToast, stopEvent, apiRequest, getQueryFn, queryClient, formatAxiosError, axiosClient
-} = require('./index.js'); // import library under test after axios stub in place
+  showToast, stopEvent, apiRequest, getQueryFn, queryClient, formatAxiosError, axiosClient, getToastListenerCount, resetToastSystem
+} = require('./index.js'); // import library after axios stub so axiosClient can be overridden
 const { buildRequestConfig, createMockResponse, handle401Error, codexRequest, executeAxiosRequest } = require('./lib/api.js'); // internal API helpers
 
 // Direct imports for internal utilities under test
