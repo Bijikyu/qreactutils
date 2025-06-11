@@ -824,6 +824,12 @@ runTest('toast system memory management', () => {
   assert(typeof useToast === 'function', 'useToast function should exist for memory management');
 });
 
+runTest('toast IDs restart after resetToastSystem', () => {
+  resetToastSystem(); // ensure counter resets
+  const first = toast({ title: 'a' });
+  assertEqual(first.id, '1', 'First toast ID after reset should be 1');
+});
+
 runTest('executeWithErrorToast displays error toast', async () => {
   const calls = [];
   const toastFn = (params) => { calls.push(params); };
@@ -1028,6 +1034,22 @@ runTest('useIsMobile returns false when window missing', () => {
   const { result } = renderHook(() => useIsMobile()); // invoke hook without window
   assert(result.current === false, 'Should return false with no window');
   global.window = prevWindow; // restore window after test
+});
+
+runTest('useIsMobile falls back to addListener', () => {
+  const originalMatchMedia = mockWindow.matchMedia; // keep existing matchMedia
+  mockWindow.matchMedia = (query) => ({
+    matches: query.includes('max-width') && mockWindow.innerWidth <= 767,
+    addListener: (handler) => {
+      mockWindow._mediaListeners.push({ handler, query });
+    },
+    removeListener: (handler) => {
+      mockWindow._mediaListeners = mockWindow._mediaListeners.filter(l => l.handler !== handler);
+    }
+  });
+  const { result } = renderHook(() => useIsMobile());
+  assert(typeof result.current === 'boolean', 'Should not throw when using addListener API');
+  mockWindow.matchMedia = originalMatchMedia; // restore implementation
 });
 
 runTest('useDropdownData and useToastAction integration sequence', async () => {
