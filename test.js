@@ -25,7 +25,7 @@ const {
 const { buildRequestConfig, createMockResponse, handle401Error, codexRequest, executeAxiosRequest } = require('./lib/api.js'); // import internal API helpers for unit tests
 
 // Direct imports for internal utilities under test
-const { executeAsyncWithLogging, logFunction, withToastLogging } = require('./lib/utils.js'); // test logging helpers
+const { executeAsyncWithLogging, logFunction, withToastLogging, debugLog } = require('./lib/utils.js'); // test logging helpers and debugLog
 const { executeWithErrorHandling, executeSyncWithErrorHandling } = require('./lib/errorHandling.js'); // test error wrappers
 const { executeWithErrorToast, executeWithToastFeedback } = require('./lib/toastIntegration.js'); // test toast integration
 
@@ -483,6 +483,21 @@ runTest('logFunction outputs expected messages', () => {
   assert(messages.some(m => m.includes('testFn is returning')), 'Exit log expected');
   assert(messages.some(m => m.includes('final value of value')), 'Completion log expected');
   assert(messages.some(m => m.includes('final value of failure')), 'Error log expected');
+});
+
+runTest('debugLog obeys NODE_ENV setting', () => {
+  const logs = [];
+  const orig = console.log;
+  const origEnv = process.env.NODE_ENV;
+  console.log = (m) => logs.push(m);
+  process.env.NODE_ENV = 'development';
+  debugLog('dev');
+  process.env.NODE_ENV = 'production';
+  debugLog('prod');
+  process.env.NODE_ENV = origEnv;
+  console.log = orig;
+  assert(logs.includes('dev'), 'Should log in dev mode');
+  assert(!logs.includes('prod'), 'Should not log in production');
 });
 
 runTest('withToastLogging wraps function and preserves errors', () => {
