@@ -17,11 +17,16 @@
  * 8. Memory Management Tests - Test for memory leaks and cleanup
  */
 
-const { 
+const {
   useAsyncAction, useDropdownData, createDropdownListHook, useDropdownToggle,
   useEditForm, useIsMobile, useToast, toast, useToastAction, useAuthRedirect,
   showToast, stopEvent, apiRequest, getQueryFn, queryClient, formatAxiosError, axiosClient
 } = require('./index.js'); // import library under test
+
+// Direct imports for internal utilities under test
+const { executeAsyncWithLogging, logFunction, withToastLogging } = require('./lib/utils.js'); // test logging helpers
+const { executeWithErrorHandling, executeSyncWithErrorHandling } = require('./lib/errorHandling.js'); // test error wrappers
+const { executeWithErrorToast, executeWithToastFeedback } = require('./lib/toastIntegration.js'); // test toast integration
 
 const React = require('react'); // Load real React for hook rendering //(replace mock React with real module)
 const TestRenderer = require('react-test-renderer'); // Renderer for executing hooks //(provide test renderer for hook execution)
@@ -440,6 +445,58 @@ runTest('stopEvent edge cases and error conditions', () => {
   }, 'Should propagate preventDefault errors');
 });
 
+// -----------------------------------------------------------------------------
+// ADDITIONAL UTILITY WRAPPER TESTS
+// -----------------------------------------------------------------------------
+
+runTest('executeAsyncWithLogging handles success and error', async () => {
+  const successOp = async () => 'ok';
+  const result = await executeAsyncWithLogging(successOp, 'successOp');
+  assertEqual(result, 'ok', 'Should return result on success');
+
+  const failOp = async () => { throw new Error('fail'); };
+  const handlerResult = await executeAsyncWithLogging(failOp, 'failOp', () => 'handled');
+  assertEqual(handlerResult, 'handled', 'Should return handler result when provided');
+
+  let thrown = false;
+  try {
+    await executeAsyncWithLogging(failOp, 'failOpNoHandler');
+  } catch (err) {
+    thrown = err instanceof Error;
+  }
+  assert(thrown, 'Should rethrow error when no handler');
+});
+
+runTest('logFunction outputs expected messages', () => {
+  const messages = [];
+  const orig = console.log;
+  console.log = (msg) => { messages.push(msg); };
+
+  logFunction('testFn', 'entry', 'param');
+  logFunction('testFn', 'exit', 'result');
+  logFunction('testFn', 'completion', 'value');
+  logFunction('testFn', 'error');
+
+  console.log = orig;
+  assert(messages.some(m => m.includes('testFn is running with param')), 'Entry log expected');
+  assert(messages.some(m => m.includes('testFn is returning')), 'Exit log expected');
+  assert(messages.some(m => m.includes('final value of value')), 'Completion log expected');
+  assert(messages.some(m => m.includes('final value of failure')), 'Error log expected');
+});
+
+runTest('withToastLogging wraps function and preserves errors', () => {
+  const calls = [];
+  const wrapped = withToastLogging('demo', (t, msg) => { calls.push(msg); return 'done'; });
+  const result = wrapped(() => {}, 'hi');
+  assertEqual(result, 'done', 'Wrapped function should return result');
+  assertEqual(calls[0], 'hi', 'Wrapped function should receive args');
+
+  const errorWrap = withToastLogging('demoErr', () => { throw new Error('boom'); });
+  let threw = false;
+  try { errorWrap(); } catch (e) { threw = e instanceof Error; }
+  assert(threw, 'Wrapped errors should propagate');
+});
+
 // =============================================================================
 // UNIT TESTS - API FUNCTIONS
 // =============================================================================
@@ -640,6 +697,44 @@ runTest('toast system memory management', () => {
   assert(typeof useToast === 'function', 'useToast function should exist for memory management');
 });
 
+runTest('executeWithErrorToast displays error toast', async () => {
+  const calls = [];
+  const toastFn = (params) => { calls.push(params); };
+  const success = await executeWithErrorToast(async () => 'hi', toastFn);
+  assertEqual(success, 'hi', 'Should return result when no error');
+  assertEqual(calls.length, 0, 'Toast should not fire on success');
+
+  const failOp = async () => { throw new Error('bad'); };
+  try {
+    await executeWithErrorToast(failOp, toastFn, 'Oops');
+    throw new Error('should have thrown');
+  } catch (err) {
+    assert(calls.length === 1, 'Toast should fire on error');
+    assertEqual(calls[0].title, 'Oops', 'Title should match');
+    assertEqual(calls[0].description, 'bad', 'Message should come from error');
+    assertEqual(calls[0].variant, 'destructive', 'Variant should be destructive');
+  }
+});
+
+runTest('executeWithToastFeedback shows success and error toasts', async () => {
+  const calls = [];
+  const toastFn = (params) => { calls.push(params); };
+  const result = await executeWithToastFeedback(async () => 1, toastFn, 'Great');
+  assertEqual(result, 1, 'Should return result');
+  assertEqual(calls.length, 1, 'Success toast should fire');
+  assertEqual(calls[0].title, 'Success', 'Success title should be used');
+
+  calls.length = 0;
+  try {
+    await executeWithToastFeedback(async () => { throw new Error('oops'); }, toastFn, 'ok', 'Fail');
+    throw new Error('should have thrown');
+  } catch (err) {
+    assertEqual(calls[0].title, 'Fail', 'Error toast title should be used');
+    assertEqual(calls[0].description, 'oops', 'Error message should propagate');
+    assertEqual(calls[0].variant, 'destructive', 'Error variant expected');
+  }
+});
+
 // =============================================================================
 // INTEGRATION TESTS
 // =============================================================================
@@ -817,6 +912,40 @@ runTest('Error propagation through API chain', async () => {
   } catch (error) {
     assert(error instanceof Error, 'Query function should propagate errors');
   }
+});
+
+runTest('executeWithErrorHandling manages async operations', async () => {
+  const res = await executeWithErrorHandling(async () => 'value', 'asyncTest');
+  assertEqual(res, 'value', 'Should return result on success');
+
+  const errFn = async () => { throw new Error('boom'); };
+  try {
+    await executeWithErrorHandling(errFn, 'errTest');
+    throw new Error('should have thrown');
+  } catch (e) {
+    assert(e instanceof Error, 'Should rethrow original error');
+  }
+
+  try {
+    await executeWithErrorHandling(errFn, 'errTrans', () => new Error('wrapped'));
+    throw new Error('should have thrown');
+  } catch (e) {
+    assert(e.message === 'wrapped', 'Should throw transformed error');
+  }
+});
+
+runTest('executeSyncWithErrorHandling manages sync operations', () => {
+  const result = executeSyncWithErrorHandling(() => 2, 'syncTest');
+  assertEqual(result, 2, 'Should return sync result');
+
+  const failFn = () => { throw new Error('fail'); };
+  assertThrows(() => {
+    executeSyncWithErrorHandling(failFn, 'syncFail');
+  }, 'Should rethrow sync error');
+
+  assertThrows(() => {
+    executeSyncWithErrorHandling(failFn, 'syncTrans', () => new Error('wrapped'));
+  }, 'Should throw transformed sync error');
 });
 
 runTest('Toast system error recovery', () => {
