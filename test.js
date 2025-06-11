@@ -17,7 +17,7 @@
  * 8. Memory Management Tests - Test for memory leaks and cleanup
  */
 
-const { 
+const {
   useAsyncAction, useDropdownData, createDropdownListHook, useDropdownToggle,
   useEditForm, useIsMobile, useToast, toast, useToastAction, useAuthRedirect,
   showToast, stopEvent, apiRequest, getQueryFn, queryClient, formatAxiosError, axiosClient
@@ -293,10 +293,13 @@ async function assertApiError(endpoint, expectedErrorPattern, testDescription) {
     throw new Error(`Should have thrown for ${testDescription}`);
   } catch (error) {
     assert(error instanceof Error, `Should throw Error object for ${testDescription}`);
-    assert(error.message.includes(expectedErrorPattern), 
+    assert(error.message.includes(expectedErrorPattern),
            `Should include ${expectedErrorPattern} for ${testDescription}`);
   }
 }
+
+// Import validation utilities after axios mock is in place so axios.isAxiosError uses the stub
+const { isFunction, isObject, safeStringify, isAxiosErrorWithStatus } = require('./lib/validation.js');
 
 console.log('🚀 Starting Enhanced Comprehensive Test Suite...\n');
 
@@ -438,6 +441,50 @@ runTest('stopEvent edge cases and error conditions', () => {
       stopPropagation: () => {}
     });
   }, 'Should propagate preventDefault errors');
+});
+
+// =============================================================================
+// UNIT TESTS - VALIDATION UTILITIES
+// =============================================================================
+
+console.log('\n🛡️  UNIT TESTS - VALIDATION UTILITIES');
+
+runTest('isFunction boolean return for valid and invalid inputs', () => {
+  assertEqual(isFunction(() => {}), true, 'Should return true for arrow function');
+  assertEqual(isFunction(function() {}), true, 'Should return true for function expression');
+  assertEqual(isFunction(async function() {}), true, 'Should return true for async function');
+  assertEqual(isFunction(null), false, 'Should return false for null');
+  assertEqual(isFunction({}), false, 'Should return false for object');
+  assertEqual(isFunction(123), false, 'Should return false for number');
+});
+
+runTest('isObject boolean return for valid and invalid inputs', () => {
+  assertEqual(isObject({ a: 1 }), true, 'Should detect plain object');
+  assertEqual(isObject(Object.create(null)), true, 'Should detect object without prototype');
+  assertEqual(isObject(null), false, 'Should return false for null');
+  assertEqual(isObject([1, 2]), false, 'Should return false for array');
+  assertEqual(isObject('text'), false, 'Should return false for string');
+});
+
+runTest('isAxiosErrorWithStatus boolean return for valid and invalid errors', () => {
+  const error401 = { isAxiosError: true, response: { status: 401 } };
+  const error500 = { isAxiosError: true, response: { status: 500 } };
+  const regularError = new Error('oops');
+
+  assertEqual(isAxiosErrorWithStatus(error401, 401), true, 'Should match 401 status');
+  assertEqual(isAxiosErrorWithStatus(error500, 401), false, 'Should not match different status');
+  assertEqual(isAxiosErrorWithStatus(regularError, 401), false, 'Should return false for non-axios error');
+});
+
+runTest('safeStringify handles circular references gracefully', () => {
+  const obj = { name: 'test' };
+  obj.self = obj; // create circular reference
+
+  const result = safeStringify(obj);
+  assertEqual(result, '[Circular Reference]', 'Should return fallback for circular object');
+
+  const normal = { a: 1 };
+  assertEqual(safeStringify(normal), JSON.stringify(normal), 'Should stringify non-circular objects');
 });
 
 // =============================================================================
