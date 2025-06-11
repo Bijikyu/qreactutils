@@ -577,12 +577,20 @@ runTest('formatAxiosError with various error types', () => {
   // Test non-axios error
   const regularError = new Error('Regular error');
   const result3 = formatAxiosError(regularError);
-  assertEqual(result3, regularError, 'Should return original error for non-axios errors');
+  assert(result3 instanceof Error, 'Non-axios errors should be wrapped'); // verify wrapper
+  assert(result3 !== regularError, 'Should return new Error instance'); // ensure new instance
+  assert(result3.message.includes('Regular error'), 'Should preserve message'); // check message
   
   // Test edge cases
-  assertEqual(formatAxiosError(null), null, 'Should handle null');
-  assertEqual(formatAxiosError(undefined), undefined, 'Should handle undefined');
-  assertEqual(formatAxiosError('string error'), 'string error', 'Should handle strings');
+  const nullErr = formatAxiosError(null);
+  assert(nullErr instanceof Error, 'Should wrap null in Error'); // check wrapper for null
+  assertEqual(nullErr.message, 'null', 'Should stringify null'); // confirm message
+  const undefErr = formatAxiosError(undefined);
+  assert(undefErr instanceof Error, 'Should wrap undefined in Error'); // wrapper for undefined
+  assertEqual(undefErr.message, 'undefined', 'Should stringify undefined'); // confirm message
+  const strErr = formatAxiosError('string error');
+  assert(strErr instanceof Error, 'Should wrap strings in Error'); // wrapper for strings
+  assertEqual(strErr.message, 'string error', 'Should preserve string message'); // confirm text
 });
 
 runTest('apiRequest with different HTTP methods and data', async () => {
@@ -1125,14 +1133,17 @@ runTest('Boundary values and extreme inputs', () => {
 
 runTest('Type coercion and unexpected types', () => {
   // Test formatAxiosError with unexpected types
-  assertEqual(formatAxiosError(123), 123, 'Should handle numbers');
-  assertEqual(formatAxiosError(true), true, 'Should handle booleans');
-  
-  // Test arrays properly by comparing the actual returned array
-  const arrayResult = formatAxiosError([1, 2, 3]);
-  assert(Array.isArray(arrayResult), 'Should handle arrays');
-  assert(arrayResult.length === 3, 'Array should maintain length');
-  assert(arrayResult[0] === 1 && arrayResult[1] === 2 && arrayResult[2] === 3, 'Array should maintain values');
+  const numErr = formatAxiosError(123);
+  assert(numErr instanceof Error, 'Should wrap numbers'); // numbers become Error
+  assertEqual(numErr.message, '123', 'Number message should match'); // message check
+  const boolErr = formatAxiosError(true);
+  assert(boolErr instanceof Error, 'Should wrap booleans'); // booleans become Error
+  assertEqual(boolErr.message, 'true', 'Boolean message should match'); // message check
+
+  // Arrays also return Error objects rather than arrays
+  const arrayErr = formatAxiosError([1, 2, 3]);
+  assert(arrayErr instanceof Error, 'Should wrap arrays'); // arrays become Error
+  assert(arrayErr.message.includes('1,2,3'), 'Array values should stringify'); // message check
   
   // Test toast with unexpected prop types
   const typeCoercionToast = toast({
