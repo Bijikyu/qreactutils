@@ -37,6 +37,7 @@ React hook for handling async actions with loading state and error handling.
 - `options` (Object, optional): Configuration object
   - `onSuccess` (Function): Callback invoked when async operation succeeds
   - `onError` (Function): Callback invoked when async operation fails
+  - Callbacks may return Promises and will be awaited so errors propagate
 
 **Returns:** Array - `[run, isLoading]`
 
@@ -74,6 +75,8 @@ Factory function that creates typed dropdown hooks.
 
 ### useDropdownToggle()
 React hook for managing dropdown open/close state.
+
+This hook uses a functional state update when toggling to ensure rapid consecutive calls remain consistent.
 
 **Returns:** Object - `{isOpen, toggleOpen, close}`
 
