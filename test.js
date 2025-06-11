@@ -26,6 +26,15 @@ const {
 const React = require('react'); // Load real React for hook rendering //(replace mock React with real module)
 const TestRenderer = require('react-test-renderer'); // Renderer for executing hooks //(provide test renderer for hook execution)
 
+/**
+ * Render a hook via react-test-renderer to keep tests lightweight.
+ *
+ * This method avoids full UI frameworks but still executes hook logic,
+ * allowing simple assertions without DOM complexity.
+ *
+ * @param {Function} hookFn - Hook function being tested
+ * @returns {{result: {current: any}}} - Structure mimicking Testing Library
+ */
 function renderHook(hookFn) { // Utility to render hooks within React environment
   let value; // Holds hook return value
   function TestComponent() { // Minimal component to invoke hook
@@ -146,6 +155,15 @@ let passedTests = 0;
 let failedTests = 0;
 const testResults = [];
 
+/**
+ * Execute a test with detailed logging.
+ *
+ * Mocks reset before each run to avoid cross-test state leaks,
+ * providing repeatable results.
+ *
+ * @param {string} name - Description of the test
+ * @param {Function} testFn - The test logic to run
+ */
 function runTest(name, testFn) {
   testCount++;
   const testStart = Date.now();
@@ -174,18 +192,46 @@ function runTest(name, testFn) {
   }
 }
 
+/**
+ * Basic truthy assertion helper.
+ *
+ * Provides consistent error messages so failing conditions are clear,
+ * improving readability in the test output.
+ *
+ * @param {boolean} condition - Value to evaluate
+ * @param {string} message - Message when assertion fails
+ */
 function assert(condition, message) {
   if (!condition) {
     throw new Error(message);
   }
 }
 
+/**
+ * Assert two values are strictly equal.
+ *
+ * This helper streamlines comparisons and reports mismatched values,
+ * making failures easier to diagnose.
+ *
+ * @param {*} actual - Value produced by the test
+ * @param {*} expected - Expected value
+ * @param {string} message - Message prefix for errors
+ */
 function assertEqual(actual, expected, message) {
   if (actual !== expected) {
     throw new Error(`${message}: expected ${expected}, got ${actual}`);
   }
 }
 
+/**
+ * Assert that a function throws an error.
+ *
+ * By capturing thrown errors we present clearer test intent and
+ * messages when expectations are not met.
+ *
+ * @param {Function} fn - Function expected to throw
+ * @param {string} message - Message used when no error is thrown
+ */
 function assertThrows(fn, message) {
   try {
     fn();
@@ -198,6 +244,16 @@ function assertThrows(fn, message) {
   }
 }
 
+/**
+ * Wrapper for async assertions to surface errors.
+ *
+ * Helps maintain readable async tests by turning rejections into
+ * assertion failures with clear messages.
+ *
+ * @param {Function} asyncFn - Async function returning a promise
+ * @param {string} message - Message prefix for rejected promise
+ * @returns {Promise<void>} promise that rejects with formatted error
+ */
 function assertAsync(asyncFn, message) {
   return asyncFn().catch(error => {
     throw new Error(`${message}: ${error.message}`);
