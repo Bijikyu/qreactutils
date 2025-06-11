@@ -128,6 +128,11 @@ const originalRequire = require; // Preserve original require for restoration //
 const originalWindow = global.window; // Keep original window for cleanup //(preserve original window)
 const originalAxios = require('axios'); // Save axios instance before mocking //(keep axios)
 
+/**
+ * Override Node's require to supply the axios stub. This keeps tests from making real
+ * network calls while still letting all other modules load via the saved originalRequire
+ * function. The original require is restored after tests so normal behavior resumes.
+ */
 require = function(id) { // Intercept require calls to stub axios only
   if (id === 'axios') return mockAxios; // Provide axios mock for network isolation
   return originalRequire.apply(this, arguments); // Fallback to original require
