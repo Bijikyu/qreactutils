@@ -997,6 +997,14 @@ runTest('useAuthRedirect reacts to auth state changes', async () => {
   assertEqual(mockWindow._lastPushState.url, '/dashboard', 'Redirect should occur after login');
 });
 
+runTest('useAuthRedirect handles missing pushState gracefully', () => {
+  const originalPushState = mockWindow.history.pushState; // store original function to restore after test
+  delete mockWindow.history.pushState; // simulate environment without pushState
+  renderHook(() => useAuthRedirect('/fallback', true));
+  assert(mockWindow._lastPushState === null, 'Redirect should be skipped when pushState is unavailable');
+  mockWindow.history.pushState = originalPushState; // restore original pushState for subsequent tests
+});
+
 // =============================================================================
 // ERROR HANDLING TESTS
 // =============================================================================
