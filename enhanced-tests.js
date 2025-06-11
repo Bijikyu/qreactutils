@@ -13,7 +13,15 @@ const {
 const React = require('react');
 const TestRenderer = require('react-test-renderer');
 
-// Test utilities
+/**
+ * Render a hook without React Testing Library to keep tests lightweight
+ *
+ * Executes the provided hook inside a minimal component and returns
+ * a structure compatible with Testing Library's result for easy asserts.
+ *
+ * @param {Function} hookFn - Hook function to execute
+ * @returns {{result: {current: any}}} Current hook state for assertions
+ */
 function renderHook(hookFn) {
   let value;
   function TestComponent() {
@@ -26,6 +34,15 @@ function renderHook(hookFn) {
   return { result: { current: value } };
 }
 
+/**
+ * Simple assertion helper for framework agnostic tests
+ *
+ * Throws an Error when the condition is false so the runner can
+ * continue executing remaining tests while reporting failures.
+ *
+ * @param {boolean} condition - Expression expected to be true
+ * @param {string} message - Error message when assertion fails
+ */
 function assert(condition, message) {
   if (!condition) {
     throw new Error(`Assertion failed: ${message}`);
@@ -77,6 +94,15 @@ global.PopStateEvent = class PopStateEvent {
 let testCount = 0;
 let passedTests = 0;
 
+/**
+ * Execute a single test with logging and failure isolation
+ *
+ * Increments counters for reporting and catches errors to ensure
+ * one failing test doesn't halt the suite.
+ *
+ * @param {string} name - Test description for output
+ * @param {Function} testFn - Test implementation
+ */
 function runTest(name, testFn) {
   testCount++;
   try {
