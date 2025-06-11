@@ -34,18 +34,19 @@ globalThis.IS_REACT_ACT_ENVIRONMENT = true; // flag React act environment for wa
  * @param {Function} hookFn - Hook function being tested
  * @returns {{result: {current: any}}} - Structure mimicking Testing Library
  */
-function renderHook(hookFn) { // Utility to render hooks with basic unmounting
+function renderHook(hookFn, props = {}) { // Utility to render hooks with basic rerendering
   const result = { current: null }; // store latest hook value
   let root; // store renderer instance for cleanup
-  function TestComponent() { // Minimal component to invoke hook
-    result.current = hookFn(); // capture value on each render
+  function TestComponent(innerProps) { // Minimal component to invoke hook with props
+    result.current = hookFn(innerProps); // capture value on each render
     return null;
   }
   TestRenderer.act(() => {
-    root = TestRenderer.create(React.createElement(TestComponent));
+    root = TestRenderer.create(React.createElement(TestComponent, props));
   });
   return {
     result,
+    rerender: (newProps = props) => TestRenderer.act(() => root.update(React.createElement(TestComponent, newProps))), // allow prop updates for effects
     unmount: () => TestRenderer.act(() => root.unmount()) // expose unmount for cleanup tests
   }; // return mimic of Testing Library plus unmount
 } //
@@ -973,6 +974,40 @@ runTest('createDropdownListHook integration with useDropdownData', () => {
   
   const { result } = renderHook(() => useCustomDropdown(mockToast, mockUser)); // Render hook with React renderer
   assert(Array.isArray(result.current.items), 'Should expose items array'); // Verify return structure
+});
+
+runTest('useDropdownData refetches when fetcher changes', async () => {
+  let firstCalls = 0;
+  let secondCalls = 0;
+  const fetcherOne = async () => { firstCalls++; return ['a']; };
+  const fetcherTwo = async () => { secondCalls++; return ['b']; };
+
+  const { rerender } = renderHook(
+    (p) => useDropdownData(p.fetcher, null, { id: 'u1' }),
+    { fetcher: fetcherOne }
+  );
+  await TestRenderer.act(async () => { await Promise.resolve(); });
+  assertEqual(firstCalls, 1, 'First fetcher should run once');
+
+  rerender({ fetcher: fetcherTwo });
+  await TestRenderer.act(async () => { await Promise.resolve(); });
+  assertEqual(secondCalls, 1, 'Second fetcher should run after rerender');
+});
+
+runTest('useDropdownData refetches when toast changes', async () => {
+  let calls = 0;
+  const fetcher = async () => { calls++; return ['item']; };
+
+  const { rerender } = renderHook(
+    (p) => useDropdownData(fetcher, p.toast, { id: 'u2' }),
+    { toast: { error: () => {} } }
+  );
+  await TestRenderer.act(async () => { await Promise.resolve(); });
+  assertEqual(calls, 1, 'Initial fetch should run once');
+
+  rerender({ toast: { error: () => {} } });
+  await TestRenderer.act(async () => { await Promise.resolve(); });
+  assertEqual(calls, 2, 'Fetch should run again when toast instance changes');
 });
 
 runTest('useIsMobile integration with window API', () => {
