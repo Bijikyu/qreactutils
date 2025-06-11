@@ -31,6 +31,7 @@ const { executeWithErrorToast, executeWithToastFeedback } = require('./lib/toast
 
 const React = require('react'); // Load real React for hook rendering //(replace mock React with real module)
 const TestRenderer = require('react-test-renderer'); // Renderer for executing hooks //(provide test renderer for hook execution)
+globalThis.IS_REACT_ACT_ENVIRONMENT = true; // flag React act environment for warnings
 
 /**
  * Render a hook via react-test-renderer to keep tests lightweight.
@@ -959,6 +960,41 @@ runTest('useIsMobile integration with window API', () => {
   mockWindow.innerWidth = 1200; // Switch to desktop width
   const { result: desktop } = renderHook(() => useIsMobile()); // Execute hook for desktop state
   assert(desktop.current === false, 'Should detect desktop width correctly');
+});
+
+runTest('useDropdownData and useToastAction integration sequence', async () => {
+  const fetchCalls = [];
+  const mockFetcher = async () => { fetchCalls.push('called'); return ['one', 'two']; };
+
+  function useCombo() {
+    const toastStore = useToast();
+    const dropdown = useDropdownData(mockFetcher, { error: (msg) => showToast(toastStore.toast, msg, 'Error', 'destructive') }, null);
+    const [trigger] = useToastAction(dropdown.fetchData, 'Loaded');
+    return { dropdown, trigger };
+  }
+
+  const { result } = renderHook(() => useCombo());
+  await TestRenderer.act(async () => { await result.current.trigger(); });
+
+  const { result: toastResult } = renderHook(() => useToast());
+  assertEqual(fetchCalls.length, 1, 'Fetcher should run via toast action');
+  assert(result.current.dropdown.items.length === 2, 'Dropdown should update after fetch');
+  assert(toastResult.current.toasts.length === 1, 'Toast should be shown after fetch');
+  assertEqual(toastResult.current.toasts[0].description, 'Loaded', 'Toast message should match');
+});
+
+runTest('useAuthRedirect reacts to auth state changes', async () => {
+  function useAuthFlow() {
+    const [user, setUser] = React.useState(null);
+    useAuthRedirect('/dashboard', !!user);
+    const [login] = useAsyncAction(async () => { setUser({ id: 'u1' }); });
+    return { login, user };
+  }
+
+  const { result } = renderHook(() => useAuthFlow());
+  await TestRenderer.act(async () => { await result.current.login(); });
+  assert(result.current.user !== null, 'User state should update after login');
+  assertEqual(mockWindow._lastPushState.url, '/dashboard', 'Redirect should occur after login');
 });
 
 // =============================================================================
