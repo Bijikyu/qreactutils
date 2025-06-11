@@ -17,11 +17,12 @@
  * 8. Memory Management Tests - Test for memory leaks and cleanup
  */
 
-const { 
+const {
   useAsyncAction, useDropdownData, createDropdownListHook, useDropdownToggle,
   useEditForm, useIsMobile, useToast, toast, useToastAction, useAuthRedirect,
   showToast, stopEvent, apiRequest, getQueryFn, queryClient, formatAxiosError, axiosClient
 } = require('./index.js'); // import library under test
+const { buildRequestConfig, createMockResponse, handle401Error, codexRequest, executeAxiosRequest } = require('./lib/api.js'); // import internal API helpers for unit tests
 
 const React = require('react'); // Load real React for hook rendering //(replace mock React with real module)
 const TestRenderer = require('react-test-renderer'); // Renderer for executing hooks //(provide test renderer for hook execution)
@@ -164,32 +165,28 @@ const testResults = [];
  * @param {string} name - Description of the test
  * @param {Function} testFn - The test logic to run
  */
+let testQueue = Promise.resolve(); // ensures tests run sequentially
 function runTest(name, testFn) {
-  testCount++;
-  const testStart = Date.now();
-  
-  try {
-    console.log(`\n🧪 Test ${testCount}: ${name}`);
-    
-    // Reset mocks before each test
-    mockWindow._resetMocks(); // Reset window state for isolation
-    
-    testFn();
-    
-    const duration = Date.now() - testStart;
-    passedTests++;
-    testResults.push({ name, status: 'PASSED', duration });
-    console.log(`✅ PASSED: ${name} (${duration}ms)`);
-  } catch (error) {
-    const duration = Date.now() - testStart;
-    failedTests++;
-    testResults.push({ name, status: 'FAILED', error: error.message, duration });
-    console.log(`❌ FAILED: ${name} (${duration}ms)`);
-    console.log(`   Error: ${error.message}`);
-    if (process.env.DEBUG_TESTS) {
-      console.log(`   Stack: ${error.stack}`);
+  testQueue = testQueue.then(async () => { // chain test onto queue
+    testCount++;
+    const testStart = Date.now();
+    try {
+      console.log(`\n🧪 Test ${testCount}: ${name}`);
+      mockWindow._resetMocks(); // reset window state for isolation
+      await testFn(); // await async test bodies
+      const duration = Date.now() - testStart;
+      passedTests++;
+      testResults.push({ name, status: 'PASSED', duration });
+      console.log(`✅ PASSED: ${name} (${duration}ms)`);
+    } catch (error) {
+      const duration = Date.now() - testStart;
+      failedTests++;
+      testResults.push({ name, status: 'FAILED', error: error.message, duration });
+      console.log(`❌ FAILED: ${name} (${duration}ms)`);
+      console.log(`   Error: ${error.message}`);
+      if (process.env.DEBUG_TESTS) { console.log(`   Stack: ${error.stack}`); }
     }
-  }
+  });
 }
 
 /**
@@ -563,6 +560,62 @@ runTest('queryClient configuration and methods', () => {
   assert(typeof defaultOptions === 'object', 'Should have default options');
   assert(defaultOptions.queries.retry === false, 'Should have retry disabled');
   assert(defaultOptions.queries.refetchOnWindowFocus === false, 'Should disable window focus refetch');
+});
+
+runTest('buildRequestConfig returns correct structure', () => {
+  const cfg = buildRequestConfig('/api/x', 'PUT', { a: 1 });
+  assertEqual(cfg.url, '/api/x', 'URL should match');
+  assertEqual(cfg.method, 'PUT', 'Method should match');
+  assertEqual(cfg.data.a, 1, 'Data should match');
+});
+
+runTest('createMockResponse produces expected mock data', () => {
+  const mock = createMockResponse('/api/x', 'POST', { b: 2 });
+  assertEqual(mock.status, 200, 'Status should be 200');
+  assert(mock.data.mocked === true, 'Should flag as mocked');
+  assertEqual(mock.data.url, '/api/x', 'URL should match');
+  assertEqual(mock.data.method, 'POST', 'Method should match');
+  assertEqual(mock.data.requestData.b, 2, 'Request data should match');
+});
+
+runTest('handle401Error logic across behaviors', () => {
+  const err401 = { isAxiosError: true, response: { status: 401 } };
+  const handled = handle401Error(err401, 'returnNull');
+  assert(handled === true, '401 should be handled when configured');
+  const notHandled = handle401Error(err401, 'throw');
+  assert(notHandled === false, '401 should propagate when set to throw');
+  const err500 = { isAxiosError: true, response: { status: 500 } };
+  assert(handle401Error(err500, 'returnNull') === false, 'Non-401 should not be handled');
+});
+
+runTest('codexRequest offline and online behavior', async () => {
+  process.env.OFFLINE_MODE = 'true';
+  let called = false;
+  const resultOffline = await codexRequest(() => { called = true; }, { data: 1 });
+  assert(resultOffline.data === 1, 'Should return mock when offline');
+  assert(called === false, 'Request function should not run offline');
+  process.env.OFFLINE_MODE = 'false';
+  const resultOnline = await codexRequest(() => { called = true; return { ok: true }; }, { data: 2 });
+  assert(resultOnline.ok === true, 'Should return real response when online');
+  assert(called === true, 'Request function should run online');
+});
+
+runTest('executeAxiosRequest integrates codexRequest and errors', async () => {
+  process.env.OFFLINE_MODE = 'true';
+  const resOffline = await executeAxiosRequest(() => ({ data: 5 }), 'throw', { data: { value: 5 } });
+  assertEqual(resOffline.data.value, 5, 'Should return mock in offline mode');
+  process.env.OFFLINE_MODE = 'false';
+  const res = await executeAxiosRequest(() => Promise.resolve({ data: { ok: true } }), 'throw');
+  assert(res.data.ok === true, 'Should pass through real response');
+  const err401 = { isAxiosError: true, response: { status: 401 } };
+  try {
+    await executeAxiosRequest(() => Promise.reject(err401), 'throw');
+    throw new Error('Should have thrown');
+  } catch (e) {
+    assert(e instanceof Error, 'Should throw formatted error');
+  }
+  const nullRes = await executeAxiosRequest(() => Promise.reject(err401), 'returnNull');
+  assertEqual(nullRes.data, null, 'Should return null on 401 with returnNull');
 });
 
 // =============================================================================
@@ -1121,14 +1174,14 @@ runTest('Multi-component integration scenario', () => {
 // CLEANUP AND RESTORATION
 // =============================================================================
 
-// Restore original environment
-require = originalRequire;
-global.window = originalWindow;
-
 // =============================================================================
 // TEST SUMMARY AND REPORTING
 // =============================================================================
 
+testQueue.then(() => { // wait for queued tests before reporting
+  // Restore original environment after tests complete
+  require = originalRequire;
+  global.window = originalWindow;
 console.log('\n📊 DETAILED TEST SUMMARY');
 console.log('='.repeat(60));
 
@@ -1191,3 +1244,4 @@ if (failedTests === 0) {
 
 console.log('\n🔚 Enhanced test suite completed successfully.');
 console.log('📋 For debugging failed tests, set DEBUG_TESTS=true environment variable.');
+});
