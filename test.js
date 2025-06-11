@@ -20,7 +20,7 @@
 const {
   useAsyncAction, useDropdownData, createDropdownListHook, useDropdownToggle,
   useEditForm, useIsMobile, useToast, toast, useToastAction, useAuthRedirect,
-  showToast, stopEvent, apiRequest, getQueryFn, queryClient, formatAxiosError, axiosClient
+  showToast, stopEvent, apiRequest, getQueryFn, queryClient, formatAxiosError, axiosClient, getToastListenerCount, resetToastSystem
 } = require('./index.js'); // import library under test
 const { buildRequestConfig, createMockResponse, handle401Error, codexRequest, executeAxiosRequest } = require('./lib/api.js'); // import internal API helpers for unit tests
 
@@ -42,16 +42,20 @@ globalThis.IS_REACT_ACT_ENVIRONMENT = true; // flag React act environment for wa
  * @param {Function} hookFn - Hook function being tested
  * @returns {{result: {current: any}}} - Structure mimicking Testing Library
  */
-function renderHook(hookFn) { // Utility to render hooks within React environment
-  let value; // Holds hook return value
+function renderHook(hookFn) { // Utility to render hooks with basic unmounting
+  const result = { current: null }; // store latest hook value
+  let root; // store renderer instance for cleanup
   function TestComponent() { // Minimal component to invoke hook
-    value = hookFn();
+    result.current = hookFn(); // capture value on each render
     return null;
   }
-  TestRenderer.act(() => { // Use act to satisfy React hook rules
-    TestRenderer.create(React.createElement(TestComponent));
+  TestRenderer.act(() => {
+    root = TestRenderer.create(React.createElement(TestComponent));
   });
-  return { result: { current: value } }; // Mimic Testing Library return structure
+  return {
+    result,
+    unmount: () => TestRenderer.act(() => root.unmount()) // expose unmount for cleanup tests
+  }; // return mimic of Testing Library plus unmount
 } //
 
 // Enhanced axios mock for API testing
@@ -138,6 +142,9 @@ const mockWindow = {
     mockWindow.innerWidth = 1024;
   }
 };
+
+// Mock PopStateEvent so useAuthRedirect can run in Node environment
+global.PopStateEvent = class PopStateEvent { constructor(type){ this.type = type; } };
 
 // Patch require and global objects for testing
 const originalRequire = require; // Preserve original require for restoration //(save original require)
@@ -963,6 +970,7 @@ runTest('useIsMobile integration with window API', () => {
 });
 
 runTest('useDropdownData and useToastAction integration sequence', async () => {
+  resetToastSystem(); // ensure clean state for integration test
   const fetchCalls = [];
   const mockFetcher = async () => { fetchCalls.push('called'); return ['one', 'two']; };
 
@@ -1296,6 +1304,27 @@ runTest('Event listener cleanup simulation', () => {
   }
   
   assertEqual(listeners.length, 0, 'All event listeners should be cleaned up');
+});
+
+runTest('useToast mounts and unmounts without duplicate listeners', () => {
+  resetToastSystem(); // ensure clean state before test
+  for (let i = 0; i < 3; i++) { // mount and unmount repeatedly
+    const { unmount } = renderHook(() => useToast());
+    assertEqual(getToastListenerCount(), 1, 'Listener should register once');
+    unmount();
+    assertEqual(getToastListenerCount(), 0, 'Listener should be removed');
+  }
+});
+
+runTest('multiple useToast instances clean up correctly', () => {
+  resetToastSystem(); // ensure no listeners left from previous tests
+  const instances = [];
+  for (let i = 0; i < 3; i++) {
+    instances.push(renderHook(() => useToast()));
+  }
+  assertEqual(getToastListenerCount(), 3, 'All listeners should register');
+  instances.forEach(h => h.unmount());
+  assertEqual(getToastListenerCount(), 0, 'All listeners should unregister');
 });
 
 // =============================================================================

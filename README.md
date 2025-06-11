@@ -174,6 +174,12 @@ Framework-agnostic toast creation utility.
 ### stopEvent(event)
 Combined preventDefault and stopPropagation utility for React events.
 
+### getToastListenerCount()
+Returns the current number of registered toast listeners. Useful for tests verifying cleanup.
+
+### resetToastSystem()
+Clears all toast listeners and resets toast state. Useful for isolated testing environments.
+
 ## Example Usage
 
 ```javascript
