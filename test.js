@@ -1,3 +1,4 @@
+require('qtests/setup'); // initialize qtests stubs before other imports
 
 /**
  * Comprehensive Test Suite for React Hooks Utility Library
@@ -17,17 +18,7 @@
  * 8. Memory Management Tests - Test for memory leaks and cleanup
  */
 
-const {
-  useAsyncAction, useDropdownData, createDropdownListHook, useDropdownToggle,
-  useEditForm, useIsMobile, useToast, toast, useToastAction, useAuthRedirect,
-  showToast, stopEvent, apiRequest, getQueryFn, queryClient, formatAxiosError, axiosClient
-} = require('./index.js'); // import library under test
-const { buildRequestConfig, createMockResponse, handle401Error, codexRequest, executeAxiosRequest } = require('./lib/api.js'); // import internal API helpers for unit tests
-
-// Direct imports for internal utilities under test
-const { executeAsyncWithLogging, logFunction, withToastLogging } = require('./lib/utils.js'); // test logging helpers
-const { executeWithErrorHandling, executeSyncWithErrorHandling } = require('./lib/errorHandling.js'); // test error wrappers
-const { executeWithErrorToast, executeWithToastFeedback } = require('./lib/toastIntegration.js'); // test toast integration
+// Library imports will be loaded after axios is stubbed
 
 const React = require('react'); // Load real React for hook rendering //(replace mock React with real module)
 const TestRenderer = require('react-test-renderer'); // Renderer for executing hooks //(provide test renderer for hook execution)
@@ -54,10 +45,11 @@ function renderHook(hookFn) { // Utility to render hooks within React environmen
   return { result: { current: value } }; // Mimic Testing Library return structure
 } //
 
-// Enhanced axios mock for API testing
-const mockAxios = {
-  create: (config) => ({ // mimic axios.create so library code stays unchanged
-    request: async (requestConfig) => { // simulate axios.request behaviour
+// Enhanced axios mock extending qtests stub
+const mockAxios = require('axios'); // base stub from qtests setup
+mockAxios.create = (config) => { // provide axios.create capability
+    const instance = async (requestConfig) => instance.request(requestConfig); // callable like real axios
+    instance.request = async (requestConfig) => { // simulate axios.request behaviour
       const { url, method, data } = requestConfig;
       
       // Convert relative URLs to absolute for testing
@@ -92,12 +84,24 @@ const mockAxios = {
         statusText: 'OK'
       };
     },
-    get: async (url) => { // simple wrapper used by getQueryFn tests
-      return mockAxios.create().request({ url, method: 'GET' });
-    }
-  }),
-  isAxiosError: (error) => error && error.isAxiosError === true // mirror axios.isAxiosError for compatibility
+    instance.get = async (url) => { // simple wrapper used by getQueryFn tests
+      return instance.request({ url, method: 'GET' });
+    };
+    return instance;
 };
+mockAxios.isAxiosError = (error) => error && error.isAxiosError === true; // match axios API
+
+const {
+  useAsyncAction, useDropdownData, createDropdownListHook, useDropdownToggle,
+  useEditForm, useIsMobile, useToast, toast, useToastAction, useAuthRedirect,
+  showToast, stopEvent, apiRequest, getQueryFn, queryClient, formatAxiosError, axiosClient
+} = require('./index.js'); // import library under test after axios stub in place
+const { buildRequestConfig, createMockResponse, handle401Error, codexRequest, executeAxiosRequest } = require('./lib/api.js'); // internal API helpers
+
+// Direct imports for internal utilities under test
+const { executeAsyncWithLogging, logFunction, withToastLogging } = require('./lib/utils.js'); // test logging helpers
+const { executeWithErrorHandling, executeSyncWithErrorHandling } = require('./lib/errorHandling.js'); // test error wrappers
+const { executeWithErrorToast, executeWithToastFeedback } = require('./lib/toastIntegration.js'); // test toast integration
 
 const mockedAxiosClient = mockAxios.create(); // Create axios stub instance for API calls
 axiosClient.request = mockedAxiosClient.request; // Override request with stub
@@ -139,6 +143,9 @@ const mockWindow = {
   }
 };
 
+// Provide minimal PopStateEvent implementation for auth redirect tests
+global.PopStateEvent = class PopStateEvent { constructor(type, options = {}) { this.type = type; this.state = options.state || null; } };
+
 // Patch require and global objects for testing
 const originalRequire = require; // Preserve original require for restoration //(save original require)
 const originalWindow = global.window; // Keep original window for cleanup //(preserve original window)
@@ -149,10 +156,7 @@ const originalAxios = require('axios'); // Save axios instance before mocking //
  * network calls while still letting all other modules load via the saved originalRequire
  * function. The original require is restored after tests so normal behavior resumes.
  */
-require = function(id) { // Intercept require calls to stub axios only
-  if (id === 'axios') return mockAxios; // Provide axios mock for network isolation
-  return originalRequire.apply(this, arguments); // Fallback to original require
-}; //
+// axios stub path is replaced directly via require.cache so no custom require needed
 
 global.window = mockWindow;
 
@@ -960,6 +964,14 @@ runTest('useIsMobile integration with window API', () => {
   mockWindow.innerWidth = 1200; // Switch to desktop width
   const { result: desktop } = renderHook(() => useIsMobile()); // Execute hook for desktop state
   assert(desktop.current === false, 'Should detect desktop width correctly');
+});
+
+runTest('useIsMobile returns false when window missing', () => {
+  const prevWindow = global.window; // save current window for restoration
+  global.window = undefined; // remove window to simulate server environment
+  const { result } = renderHook(() => useIsMobile()); // invoke hook without window
+  assert(result.current === false, 'Should return false with no window');
+  global.window = prevWindow; // restore window after test
 });
 
 runTest('useDropdownData and useToastAction integration sequence', async () => {
