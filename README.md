@@ -179,7 +179,7 @@ Combined preventDefault and stopPropagation utility for React events.
 Returns the current number of registered toast listeners. Useful for tests verifying cleanup.
 
 ### resetToastSystem()
-Clears all toast listeners and resets toast state. Useful for isolated testing environments.
+Clears all toast listeners, cancels pending removal timers, and resets toast state. Useful for isolated testing environments.
 
 ## Example Usage
 
