@@ -111,6 +111,7 @@ React hook for handling authentication-based redirects.
 **Parameters:**
 - `target` (string): The target URL to redirect to
 - `condition` (boolean): The condition that triggers the redirect
+- Gracefully skips navigation when `window.history.pushState` is unavailable
 
 ## Utility Functions
 
