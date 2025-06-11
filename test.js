@@ -155,6 +155,7 @@ require = function(id) { // Intercept require calls to stub axios only
 }; //
 
 global.window = mockWindow;
+global.PopStateEvent = class PopStateEvent { constructor(type, opts={}){ this.type=type; this.state=opts.state||null; } }; // stub for auth redirect tests
 
 // Test utilities
 let testCount = 0;
@@ -396,9 +397,13 @@ runTest('showToast error handling and propagation', () => {
   }, 'Should propagate toast system errors');
   
   // Test with null toast function
-  assertThrows(() => {
+  let errorMsg;
+  try {
     showToast(null, 'Test message');
-  }, 'Should handle null toast function');
+  } catch (err) {
+    errorMsg = err.message;
+  }
+  assertEqual(errorMsg, 'showToast requires a function for `toast` parameter', 'Should handle null toast function');
 });
 
 runTest('stopEvent comprehensive behavior', () => {
@@ -1394,6 +1399,7 @@ testQueue.then(() => { // wait for queued tests before reporting
   // Restore original environment after tests complete
   require = originalRequire;
   global.window = originalWindow;
+  delete global.PopStateEvent; // cleanup custom event constructor
 console.log('\n📊 DETAILED TEST SUMMARY');
 console.log('='.repeat(60));
 
