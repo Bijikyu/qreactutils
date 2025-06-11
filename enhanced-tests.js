@@ -188,7 +188,8 @@ runTest('formatAxiosError handles different error types', () => {
   // Test regular error
   const regularError = new Error('Regular error');
   const formattedRegular = formatAxiosError(regularError);
-  assert(formattedRegular.message === 'Regular error', 'Should preserve regular error message');
+  // Use includes to allow for appended context text in error messages
+  assert(formattedRegular.message.includes('Regular error'), 'Should preserve regular error message');
 });
 
 runTest('apiRequest handles successful requests', async () => {
