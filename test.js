@@ -17,11 +17,17 @@
  * 8. Memory Management Tests - Test for memory leaks and cleanup
  */
 
-const { 
+const {
   useAsyncAction, useDropdownData, createDropdownListHook, useDropdownToggle,
   useEditForm, useIsMobile, useToast, toast, useToastAction, useAuthRedirect,
   showToast, stopEvent, apiRequest, getQueryFn, queryClient, formatAxiosError, axiosClient
 } = require('./index.js'); // import library under test
+const {
+  executeWithLoadingState,
+  useStableCallbackWithHandlers,
+  useAsyncStateWithCallbacks,
+  useCallbackWithErrorHandling
+} = require('./lib/hooks'); // import internal helpers for direct testing
 
 const React = require('react'); // Load real React for hook rendering //(replace mock React with real module)
 const TestRenderer = require('react-test-renderer'); // Renderer for executing hooks //(provide test renderer for hook execution)
@@ -353,6 +359,143 @@ runTest('Factory function exports and behavior', () => {
   
   assert(typeof customHook === 'function', 'Factory should return a function');
   assert(customHook.length === 2, 'Created hook should accept 2 parameters');
+});
+
+// =============================================================================
+// UNIT TESTS - HOOK HELPERS
+// =============================================================================
+
+console.log('\n🧩 UNIT TESTS - HOOK HELPERS');
+
+runTest('executeWithLoadingState manages loading state', async () => {
+  function useTestHook(asyncFn) {
+    const [isLoading, setIsLoading] = React.useState(false); // track loading
+    const historyRef = React.useRef([]); // record state changes
+    const wrappedSet = React.useCallback(v => { historyRef.current.push(v); setIsLoading(v); }, []);
+    const run = React.useCallback(() => executeWithLoadingState(wrappedSet, asyncFn), [asyncFn, wrappedSet]);
+    return [run, isLoading, historyRef];
+  }
+
+  let resolve;
+  const asyncOperation = () => new Promise(res => { resolve = res; });
+  const { result } = renderHook(() => useTestHook(asyncOperation));
+  const [run] = result.current;
+
+  assert(result.current[1] === false, 'Initial loading should be false');
+  let runPromise;
+  TestRenderer.act(() => { runPromise = run(); });
+  resolve('done');
+  await runPromise;
+  TestRenderer.act(() => {}); // flush state
+  const [, isLoading, historyRef] = result.current;
+  assert(historyRef.current[0] === true && historyRef.current[1] === false, 'Loading should toggle true then false');
+  assertEqual(isLoading, false, 'Final loading state should be false');
+});
+
+runTest('useStableCallbackWithHandlers triggers callbacks', async () => {
+  let successCalled = false;
+  let errorCalled = false;
+
+  const { result: success } = renderHook(() =>
+    useStableCallbackWithHandlers(
+      async (val) => val,
+      { onSuccess: () => { successCalled = true; }, onError: () => { errorCalled = true; } },
+      []
+    )
+  );
+
+  let okResult;
+  TestRenderer.act(() => { okResult = success.current('ok'); });
+  const resolvedOk = await okResult;
+  assert(successCalled, 'onSuccess should be called');
+  assert(!errorCalled, 'onError should not be called on success');
+  assertEqual(resolvedOk, 'ok', 'Should return value');
+
+  successCalled = false;
+  errorCalled = false;
+
+  const { result: fail } = renderHook(() =>
+    useStableCallbackWithHandlers(
+      async () => { throw new Error('fail'); },
+      { onSuccess: () => { successCalled = true; }, onError: () => { errorCalled = true; } },
+      []
+    )
+  );
+
+  try {
+    let failPromise;
+    TestRenderer.act(() => { failPromise = fail.current(); });
+    await failPromise;
+    throw new Error('Should have thrown');
+  } catch (err) {
+    assert(!successCalled, 'onSuccess should not run on error');
+    assert(errorCalled, 'onError should run on error');
+  }
+});
+
+runTest('useAsyncStateWithCallbacks toggles loading and propagates errors', async () => {
+  let successCalled = false;
+  let errorCalled = false;
+
+  const { result } = renderHook(() =>
+    useAsyncStateWithCallbacks(
+      async (val) => { if (val === 'bad') { throw new Error('bad'); } return val; },
+      { onSuccess: () => { successCalled = true; }, onError: () => { errorCalled = true; } }
+    )
+  );
+
+  const [run] = result.current;
+  assert(result.current[1] === false, 'Initial loading should be false');
+  let successVal;
+  TestRenderer.act(() => { successVal = run('good'); });
+  const resolvedGood = await successVal;
+  assert(successCalled, 'Success callback should run');
+  assert(!errorCalled, 'Error callback should not run on success');
+  assertEqual(resolvedGood, 'good', 'Should return value');
+
+  successCalled = false;
+  errorCalled = false;
+  try {
+    let badPromise;
+    TestRenderer.act(() => { badPromise = run('bad'); });
+    await badPromise;
+    throw new Error('Should have thrown');
+  } catch (err) {
+    assert(errorCalled, 'Error callback should run');
+    assert(!successCalled, 'Success callback should not run on error');
+  }
+  assert(result.current[1] === false, 'Loading should end after error');
+});
+
+runTest('useCallbackWithErrorHandling invokes correct handlers', async () => {
+  let successCount = 0;
+  let errorCount = 0;
+
+  const { result } = renderHook(() =>
+    useCallbackWithErrorHandling(
+      async (val) => { if (val === 'err') { throw new Error('err'); } return val; },
+      { onSuccess: () => { successCount++; }, onError: () => { errorCount++; } },
+      []
+    )
+  );
+
+  const cb = result.current;
+  let val;
+  TestRenderer.act(() => { val = cb('ok'); });
+  const resolved = await val;
+  assertEqual(resolved, 'ok', 'Should return value');
+  assert(successCount === 1, 'Success handler should run once');
+  assert(errorCount === 0, 'Error handler should not run');
+
+  try {
+    let errPromise;
+    TestRenderer.act(() => { errPromise = cb('err'); });
+    await errPromise;
+    throw new Error('Should have thrown');
+  } catch (err) {
+    assert(successCount === 1, 'Success handler should not run again');
+    assert(errorCount === 1, 'Error handler should run on failure');
+  }
 });
 
 // =============================================================================
