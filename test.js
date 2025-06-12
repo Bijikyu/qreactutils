@@ -1052,6 +1052,16 @@ runTest('useIsMobile falls back to addListener', () => {
   mockWindow.matchMedia = originalMatchMedia; // restore implementation
 });
 
+runTest('useIsMobile handles missing matchMedia', () => {
+  const originalMatchMedia = mockWindow.matchMedia; // keep for restore
+  mockWindow.matchMedia = undefined; // simulate old browser environment
+  mockWindow.innerWidth = 500; // set mobile width
+  const { result } = renderHook(() => useIsMobile());
+  assert(result.current === true, 'Should derive state from innerWidth when matchMedia absent');
+  assertEqual(mockWindow._mediaListeners.length, 0, 'Should not register listeners without matchMedia');
+  mockWindow.matchMedia = originalMatchMedia; // cleanup
+});
+
 runTest('useDropdownData and useToastAction integration sequence', async () => {
   resetToastSystem(); // ensure clean state for integration test
   const fetchCalls = [];
