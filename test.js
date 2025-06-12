@@ -1096,6 +1096,26 @@ runTest('useAuthRedirect handles missing pushState gracefully', () => {
   mockWindow.history.pushState = originalPushState; // restore original pushState for subsequent tests
 });
 
+runTest('useEditForm startEdit populates fields and editingId', () => {
+  const initial = { name: '', age: 0 };
+  const { result } = renderHook(() => useEditForm(initial));
+  TestRenderer.act(() => { result.current.startEdit({ _id: '1', name: 'Bob', age: 5 }); });
+  assertEqual(result.current.editingId, '1', 'Should store item id');
+  assertEqual(result.current.fields.name, 'Bob', 'Should copy name field');
+  assertEqual(result.current.fields.age, 5, 'Should copy age field');
+});
+
+runTest('useEditForm startEdit handles invalid item', () => {
+  const init = { title: 't' };
+  const { result } = renderHook(() => useEditForm(init));
+  TestRenderer.act(() => { result.current.startEdit(null); });
+  assert(result.current.editingId === null, 'EditingId should remain null with null item');
+  assertEqual(result.current.fields.title, 't', 'Fields should remain unchanged');
+  TestRenderer.act(() => { result.current.startEdit({ title: 'x' }); });
+  assert(result.current.editingId === null, 'EditingId should remain null when _id missing');
+  assertEqual(result.current.fields.title, 't', 'Fields should remain unchanged when _id missing');
+});
+
 // =============================================================================
 // ERROR HANDLING TESTS
 // =============================================================================
