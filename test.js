@@ -486,6 +486,24 @@ runTest('executeAsyncWithLogging handles success and error', async () => {
   assert(thrown, 'Should rethrow error when no handler');
 });
 
+runTest('executeAsyncWithLogging awaits async handler', async () => {
+  const failOp = async () => { throw new Error('oops'); };
+  let handled = false;
+  const asyncHandler = async () => { await Promise.resolve(); handled = true; return 'async'; };
+  const res = await executeAsyncWithLogging(failOp, 'failAsync', asyncHandler);
+  assertEqual(res, 'async', 'Should await handler result');
+  assert(handled, 'Handler should complete before return');
+
+  const rejectHandler = async () => { throw new Error('reject'); };
+  let caught = false;
+  try {
+    await executeAsyncWithLogging(failOp, 'failReject', rejectHandler);
+  } catch (err) {
+    caught = err && err.message === 'reject';
+  }
+  assert(caught, 'Should propagate rejection from async handler');
+});
+
 runTest('logFunction outputs expected messages', () => {
   const messages = [];
   const orig = console.log;
