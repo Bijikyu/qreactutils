@@ -76,7 +76,7 @@ Factory function that creates typed dropdown hooks.
 ### useDropdownToggle()
 React hook for managing dropdown open/close state.
 
-This hook uses a functional state update when toggling to ensure rapid consecutive calls remain consistent.
+`toggleOpen` is a memoized callback using a functional state update so rapid consecutive calls remain consistent. `close` is also memoized to provide a stable reference for event handlers.
 
 **Returns:** Object - `{isOpen, toggleOpen, close}`
 

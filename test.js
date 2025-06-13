@@ -1106,6 +1106,16 @@ runTest('useAuthRedirect handles missing pushState gracefully', () => {
   mockWindow.history.pushState = originalPushState; // restore original pushState for subsequent tests
 });
 
+runTest('useDropdownToggle toggles and closes correctly', () => {
+  const { result } = renderHook(() => useDropdownToggle());
+  TestRenderer.act(() => { result.current.toggleOpen(); });
+  assert(result.current.isOpen === true, 'Toggle should open dropdown');
+  TestRenderer.act(() => { result.current.toggleOpen(); });
+  assert(result.current.isOpen === false, 'Toggle should close dropdown');
+  TestRenderer.act(() => { result.current.close(); });
+  assert(result.current.isOpen === false, 'Close should force closed state');
+});
+
 runTest('useEditForm startEdit populates fields and editingId', () => {
   const initial = { name: '', age: 0 };
   const { result } = renderHook(() => useEditForm(initial));
