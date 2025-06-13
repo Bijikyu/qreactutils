@@ -1034,6 +1034,14 @@ runTest('useDropdownData refetches when toast changes', async () => {
   assertEqual(calls, 2, 'Fetch should run again when toast instance changes');
 });
 
+runTest('useDropdownData skips toast error when not a function', async () => {
+  const fetcher = async () => { throw new Error('fail'); };
+  const { result } = renderHook(() => useDropdownData(fetcher, { error: 'text' }, { id: 'u3' }));
+  await TestRenderer.act(async () => { await result.current.fetchData(); });
+  assert(Array.isArray(result.current.items), 'Hook should not crash on invalid toast');
+  assert(result.current.isLoading === false, 'Loading state resets after failure');
+});
+
 runTest('useIsMobile integration with window API', () => {
   assert(typeof useIsMobile === 'function', 'useIsMobile should be a function'); // Export validation
 
