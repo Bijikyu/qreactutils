@@ -18,7 +18,7 @@
 const {
   useAsyncAction, useDropdownData, createDropdownListHook, useDropdownToggle, //(grab hook utilities)
   useEditForm, useIsMobile, useToast, toast, useToastAction, useAuthRedirect, //(grab UI helpers)
-  showToast, stopEvent, apiRequest, getQueryFn, queryClient, formatAxiosError, axiosClient, getToastListenerCount, resetToastSystem //(grab API utilities)
+  showToast, toastSuccess, toastError, stopEvent, apiRequest, getQueryFn, queryClient, formatAxiosError, axiosClient, getToastListenerCount, resetToastSystem //(grab API utilities)
 } = require('./lib/hooks'); // aggregated exports from internal modules
 
 /**
@@ -52,6 +52,8 @@ module.exports = { // expose library functions
   
   // Utility functions
   showToast,             // Helper for displaying toast messages
+  toastSuccess,          // Success toast utility
+  toastError,            // Error toast utility
   stopEvent,             // Event handling utility for preventing default behavior
   getToastListenerCount, // Allows tests to inspect active toast listeners
   resetToastSystem,      // Clears toast listeners between tests
