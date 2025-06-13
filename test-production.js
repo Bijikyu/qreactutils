@@ -117,14 +117,10 @@ test('createDropdownListHook creates hook function', () => {
 });
 
 test('Error handling with null inputs', () => {
-  let errorThrown = false;
-  try {
-    formatAxiosError(null);
-  } catch (error) {
-    errorThrown = true;
-    assert(error instanceof Error, 'Should throw proper error');
-  }
-  assert(errorThrown, 'Should handle null input gracefully');
+  // formatAxiosError should handle null gracefully by returning a generic error
+  const result = formatAxiosError(null);
+  assert(result instanceof Error, 'Should return Error instance for null input');
+  assert(typeof result.message === 'string', 'Should have error message');
 });
 
 console.log(`\n\nProduction Test Results: ${passed}/${total} passed`);
