@@ -252,7 +252,10 @@ suite('Factory Functions', [
 suite('Integration Scenarios', [
   test('useToast hook integration', () => {
     const { result } = renderHook(() => useToast());
-    assert(typeof result.current === 'function', 'useToast returns toast function');
+    assert(typeof result.current === 'object', 'useToast returns object');
+    assert(typeof result.current.toast === 'function', 'useToast object has toast function');
+    assert(typeof result.current.dismiss === 'function', 'useToast object has dismiss function');
+    assert(Array.isArray(result.current.toasts), 'useToast object has toasts array');
   }),
 
   test('useAuthRedirect hook integration', () => {
@@ -266,16 +269,17 @@ suite('Integration Scenarios', [
       const [run, isLoading] = useAsyncAction(async () => 'test');
       const form = useEditForm({ name: '' });
       const isMobile = useIsMobile();
-      const toastFn = useToast();
+      const toastState = useToast();
       
-      return { run, isLoading, form, isMobile, toastFn };
+      return { run, isLoading, form, isMobile, toastState };
     });
     
     assert(typeof result.current.run === 'function', 'Async action available');
     assert(typeof result.current.isLoading === 'boolean', 'Loading state available');
     assert(typeof result.current.form === 'object', 'Form state available');
     assert(typeof result.current.isMobile === 'boolean', 'Mobile detection available');
-    assert(typeof result.current.toastFn === 'function', 'Toast function available');
+    assert(typeof result.current.toastState === 'object', 'Toast state available');
+    assert(typeof result.current.toastState.toast === 'function', 'Toast function available');
   })
 ]);
 
