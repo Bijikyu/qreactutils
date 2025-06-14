@@ -1055,7 +1055,7 @@ runTest('createDropdownListHook integration with useDropdownData', () => {
   assert(typeof useCustomDropdown === 'function', 'Should create hook function');
   
   // Mock toast and user for testing
-  const mockToast = { error: () => {} };
+  const mockToast = () => {}; // single function to fit new hook signature
   const mockUser = { id: 'test-user' };
   
   const { result } = renderHook(() => useCustomDropdown(mockToast, mockUser)); // Render hook with React renderer
@@ -1086,19 +1086,19 @@ runTest('useDropdownData refetches when toast changes', async () => {
 
   const { rerender } = renderHook(
     (p) => useDropdownData(fetcher, p.toast, { id: 'u2' }),
-    { toast: { error: () => {} } }
+    { toast: () => {} }
   );
   await TestRenderer.act(async () => { await Promise.resolve(); });
   assertEqual(calls, 1, 'Initial fetch should run once');
 
-  rerender({ toast: { error: () => {} } });
+  rerender({ toast: () => {} });
   await TestRenderer.act(async () => { await Promise.resolve(); });
   assertEqual(calls, 2, 'Fetch should run again when toast instance changes');
 });
 
 runTest('useDropdownData skips toast error when not a function', async () => {
   const fetcher = async () => { throw new Error('fail'); };
-  const { result } = renderHook(() => useDropdownData(fetcher, { error: 'text' }, { id: 'u3' }));
+  const { result } = renderHook(() => useDropdownData(fetcher, 'text', { id: 'u3' }));
   await TestRenderer.act(async () => { await result.current.fetchData(); });
   assert(Array.isArray(result.current.items), 'Hook should not crash on invalid toast');
   assert(result.current.isLoading === false, 'Loading state resets after failure');
@@ -1157,7 +1157,7 @@ runTest('useDropdownData and useToastAction integration sequence', async () => {
 
   function useCombo() {
     const toastStore = useToast();
-    const dropdown = useDropdownData(mockFetcher, { error: (msg) => showToast(toastStore.toast, msg, 'Error', 'destructive') }, null);
+    const dropdown = useDropdownData(mockFetcher, (msg) => showToast(toastStore.toast, msg, 'Error', 'destructive'), null); // pass toast function
     const [trigger] = useToastAction(dropdown.fetchData, 'Loaded');
     return { dropdown, trigger };
   }
