@@ -504,6 +504,21 @@ runTest('executeAsyncWithLogging awaits async handler', async () => {
   assert(caught, 'Should propagate rejection from async handler');
 });
 
+runTest('executeAsyncWithLogging logs phases', async () => {
+  const messages = [];
+  const orig = console.log;
+  console.log = (msg) => { messages.push(msg); };
+
+  await executeAsyncWithLogging(async () => 'good', 'logOp');
+  assert(messages.some(m => m.includes('logOp is running')), 'Entry log expected');
+  assert(messages.some(m => m.includes('logOp is returning')), 'Exit log expected');
+
+  messages.length = 0; // clear messages for error case
+  await executeAsyncWithLogging(async () => { throw new Error('oops'); }, 'logOpErr', () => {});
+  assert(messages.some(m => m.includes('logOpErr has run resulting in a final value of failure')), 'Error log expected');
+  console.log = orig;
+});
+
 runTest('logFunction outputs expected messages', () => {
   const messages = [];
   const orig = console.log;
