@@ -602,17 +602,17 @@ runTest('safeStringify handles circular references gracefully', () => {
   obj.self = obj; // create circular reference
 
   const result = safeStringify(obj);
-  assertEqual(result, '[Circular Reference]', 'Should return fallback for circular object');
+  assertEqual(result, '{"name":"test","self":"[Circular]"}', 'Should mark circular reference in output');
 
   const normal = { a: 1 };
   assertEqual(safeStringify(normal), JSON.stringify(normal), 'Should stringify non-circular objects');
 });
 
-runTest('safeStringify(undefined) returns fallback string', () => {
+runTest('safeStringify(undefined) returns literal undefined string', () => {
   assertEqual(
     safeStringify(undefined),
-    '[Circular Reference]',
-    'Should return fallback when JSON.stringify returns undefined'
+    'undefined',
+    'Should return "undefined" for undefined input'
   );
 });
 
