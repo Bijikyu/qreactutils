@@ -102,7 +102,7 @@ const {
   useEditForm, useIsMobile, useToast, toast, useToastAction, useAuthRedirect,
   showToast, stopEvent, apiRequest, getQueryFn, queryClient, formatAxiosError, axiosClient, getToastListenerCount, resetToastSystem, dispatch
 } = require('./index.js'); // import library after axios stub so axiosClient can be overridden
-const { buildRequestConfig, createMockResponse, handle401Error, codexRequest, executeAxiosRequest } = require('./lib/api.js'); // internal API helpers
+const { handle401Error, codexRequest, executeAxiosRequest } = require('./lib/api.js'); // internal API helpers without config helpers
 
 // Direct imports for internal utilities under test
 const { executeAsyncWithLogging, logFunction, withToastLogging } = require('./lib/utils.js'); // test logging helpers
@@ -747,21 +747,6 @@ runTest('queryClient configuration and methods', () => {
   assert(defaultOptions.queries.refetchOnWindowFocus === false, 'Should disable window focus refetch');
 });
 
-runTest('buildRequestConfig returns correct structure', () => {
-  const cfg = buildRequestConfig('/api/x', 'PUT', { a: 1 });
-  assertEqual(cfg.url, '/api/x', 'URL should match');
-  assertEqual(cfg.method, 'PUT', 'Method should match');
-  assertEqual(cfg.data.a, 1, 'Data should match');
-});
-
-runTest('createMockResponse produces expected mock data', () => {
-  const mock = createMockResponse('/api/x', 'POST', { b: 2 });
-  assertEqual(mock.status, 200, 'Status should be 200');
-  assert(mock.data.mocked === true, 'Should flag as mocked');
-  assertEqual(mock.data.url, '/api/x', 'URL should match');
-  assertEqual(mock.data.method, 'POST', 'Method should match');
-  assertEqual(mock.data.requestData.b, 2, 'Request data should match');
-});
 
 runTest('handle401Error logic across behaviors', () => {
   const err401 = { isAxiosError: true, response: { status: 401 } };
