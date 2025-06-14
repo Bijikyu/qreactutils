@@ -578,6 +578,14 @@ runTest('safeStringify handles circular references gracefully', () => {
   assertEqual(safeStringify(normal), JSON.stringify(normal), 'Should stringify non-circular objects');
 });
 
+runTest('safeStringify(undefined) returns fallback string', () => {
+  assertEqual(
+    safeStringify(undefined),
+    '[Circular Reference]',
+    'Should return fallback when JSON.stringify returns undefined'
+  );
+});
+
 // =============================================================================
 // UNIT TESTS - API FUNCTIONS
 // =============================================================================
