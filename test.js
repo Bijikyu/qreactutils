@@ -1295,6 +1295,14 @@ runTest('executeWithErrorHandling manages async operations', async () => {
   } catch (e) {
     assert(e.message === 'wrapped', 'Should throw transformed error');
   }
+
+  const asyncTransform = async () => { await Promise.resolve(); return new Error('async'); }; //(simulate async transform)
+  try {
+    await executeWithErrorHandling(errFn, 'errAsyncTrans', asyncTransform); //(call with async transform)
+    throw new Error('should have thrown');
+  } catch (e) {
+    assert(e.message === 'async', 'Should await transformed error');
+  }
 });
 
 runTest('executeSyncWithErrorHandling manages sync operations', () => {
