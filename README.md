@@ -173,7 +173,7 @@ Pre-configured Axios instance with authentication and JSON handling.
 ## Utility Functions
 
 ### showToast(toast, message, title, variant)
-Framework-agnostic toast creation utility.
+Async framework-agnostic toast creation utility that resolves to the toast object.
 
 ### stopEvent(event)
 Combined preventDefault and stopPropagation utility for React events.

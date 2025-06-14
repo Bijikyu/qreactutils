@@ -381,7 +381,7 @@ runTest('Factory function exports and behavior', () => {
 
 console.log('\n🔧 UNIT TESTS - UTILITY FUNCTIONS');
 
-runTest('showToast with all parameter combinations', () => {
+runTest('showToast with all parameter combinations', async () => {
   const callHistory = [];
   const mockToast = (params) => {
     callHistory.push(params);
@@ -389,30 +389,31 @@ runTest('showToast with all parameter combinations', () => {
   };
   
   // Test with all parameters
-  showToast(mockToast, 'Message', 'Title', 'success');
+  await showToast(mockToast, 'Message', 'Title', 'success'); // wrapper is async now
   assertEqual(callHistory[0].title, 'Title', 'Title should be set');
   assertEqual(callHistory[0].description, 'Message', 'Description should be set');
   assertEqual(callHistory[0].variant, 'success', 'Variant should be set');
   
   // Test with minimal parameters
-  showToast(mockToast, 'Message only');
+  await showToast(mockToast, 'Message only'); // await to ensure execution completes
   assertEqual(callHistory[1].description, 'Message only', 'Should handle minimal params');
   assertEqual(callHistory[1].title, undefined, 'Title should be undefined when not provided');
 });
 
-runTest('showToast error handling and propagation', () => {
+runTest('showToast error handling and propagation', async () => {
   const failingToast = () => {
     throw new Error('Toast system failure');
   };
   
-  assertThrows(() => {
-    showToast(failingToast, 'Test message');
-  }, 'Should propagate toast system errors');
+  let caught = false;
+  try { await showToast(failingToast, 'Test message'); }
+  catch (err) { caught = err.message === 'Toast system failure'; }
+  assert(caught, 'Should propagate toast system errors');
   
   // Test with null toast function
   let errorMsg;
   try {
-    showToast(null, 'Test message');
+    await showToast(null, 'Test message');
   } catch (err) {
     errorMsg = err.message;
   }
@@ -521,17 +522,28 @@ runTest('logFunction outputs expected messages', () => {
   assert(messages.some(m => m.includes('final value of failure')), 'Error log expected');
 });
 
-runTest('withToastLogging wraps function and preserves errors', () => {
+runTest('withToastLogging wraps function and preserves errors', async () => {
   const calls = [];
   const wrapped = withToastLogging('demo', (t, msg) => { calls.push(msg); return 'done'; });
-  const result = wrapped(() => {}, 'hi');
+  const result = await wrapped(() => {}, 'hi'); // await async wrapper result
   assertEqual(result, 'done', 'Wrapped function should return result');
   assertEqual(calls[0], 'hi', 'Wrapped function should receive args');
 
   const errorWrap = withToastLogging('demoErr', () => { throw new Error('boom'); });
   let threw = false;
-  try { errorWrap(); } catch (e) { threw = e instanceof Error; }
+  try { await errorWrap(); } catch (e) { threw = e instanceof Error; } // async error propagation
   assert(threw, 'Wrapped errors should propagate');
+});
+
+runTest('withToastLogging awaits async operations', async () => {
+  const asyncWrap = withToastLogging('demoAsync', async (msg) => { return `ok-${msg}`; });
+  const res = await asyncWrap('test');
+  assertEqual(res, 'ok-test', 'Should resolve async result');
+
+  const errWrap = withToastLogging('demoAsyncErr', async () => { throw new Error('fail'); });
+  let caught = false;
+  try { await errWrap(); } catch (e) { caught = e && e.message === 'fail'; }
+  assert(caught, 'Should rethrow async errors after logging');
 });
 
 // =============================================================================
