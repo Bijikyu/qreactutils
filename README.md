@@ -60,7 +60,7 @@ Generic React hook for managing dropdown state with loading and error handling.
 
 **Parameters:**
 - `fetcher` (Function): Async function that returns array data
-- `toast` (Object): Toast instance for error notifications
+- `toast` (Function): Toast function for error notifications
 - `user` (Object): User object that triggers data fetch when available
 
 **Returns:** Object - `{items, isLoading, fetchData}`
@@ -71,7 +71,7 @@ Factory function that creates typed dropdown hooks.
 **Parameters:**
 - `fetcher` (Function): Async function that returns array data
 
-**Returns:** Function - Custom hook that accepts `(toast, user)` parameters
+**Returns:** Function - Custom hook that accepts `(toast, user)` parameters, where `toast` is a toast function
 
 ### useDropdownToggle()
 React hook for managing dropdown open/close state.

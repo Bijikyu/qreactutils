@@ -324,7 +324,7 @@ runTest('useEditForm setField updates correctly', () => {
 
 runTest('useDropdownData handles fetcher errors gracefully', () => {
   const errorFetcher = async () => { throw new Error('Fetch failed'); };
-  const mockToast = { error: () => {} };
+  const mockToast = () => {}; // simplified toast function
   const { result } = renderHook(() => useDropdownData(errorFetcher, mockToast, { id: 'user' }));
   
   assert(Array.isArray(result.current.items), 'Should return empty items array on error');
