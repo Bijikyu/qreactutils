@@ -60,7 +60,7 @@ Generic React hook for managing dropdown state with loading and error handling.
 
 **Parameters:**
 - `fetcher` (Function): Async function that returns array data
-- `toast` (Object): Toast instance for error notifications
+ - `toast` (Object|Function): Toast instance for error notifications. If `toast.error` is missing but `toast` is a function, the hook falls back to that function.
 - `user` (Object): User object that triggers data fetch when available
 
 **Returns:** Object - `{items, isLoading, fetchData}`
