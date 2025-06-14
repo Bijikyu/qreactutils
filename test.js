@@ -512,13 +512,14 @@ runTest('logFunction outputs expected messages', () => {
   logFunction('testFn', 'entry', 'param');
   logFunction('testFn', 'exit', 'result');
   logFunction('testFn', 'completion', 'value');
-  logFunction('testFn', 'error');
+  const err = new Error('bad');
+  logFunction('testFn', 'error', err); // provide error to test logging of error details
 
   console.log = orig;
   assert(messages.some(m => m.includes('testFn is running with param')), 'Entry log expected');
   assert(messages.some(m => m.includes('testFn is returning')), 'Exit log expected');
   assert(messages.some(m => m.includes('final value of value')), 'Completion log expected');
-  assert(messages.some(m => m.includes('final value of failure')), 'Error log expected');
+  assert(messages.some(m => m.includes('encountered error') && m.includes('bad')), 'Error log expected');
 });
 
 runTest('withToastLogging wraps function and preserves errors', () => {
