@@ -100,7 +100,7 @@ mockAxios.isAxiosError = (error) => error && error.isAxiosError === true; // mat
 const {
   useAsyncAction, useDropdownData, createDropdownListHook, useDropdownToggle,
   useEditForm, useIsMobile, useToast, toast, useToastAction, useAuthRedirect,
-  showToast, stopEvent, apiRequest, getQueryFn, queryClient, formatAxiosError, axiosClient, getToastListenerCount, resetToastSystem
+  showToast, stopEvent, apiRequest, getQueryFn, queryClient, formatAxiosError, axiosClient, getToastListenerCount, resetToastSystem, dispatch
 } = require('./index.js'); // import library after axios stub so axiosClient can be overridden
 const { buildRequestConfig, createMockResponse, handle401Error, codexRequest, executeAxiosRequest } = require('./lib/api.js'); // internal API helpers
 
@@ -854,6 +854,16 @@ runTest('toast IDs restart after resetToastSystem', () => {
   resetToastSystem(); // ensure counter resets
   const first = toast({ title: 'a' });
   assertEqual(first.id, '1', 'First toast ID after reset should be 1');
+});
+
+runTest('dispatching unknown action leaves toast state unchanged', () => {
+  resetToastSystem(); // clean slate before dispatch test
+  toast({ title: 'persist' }); // initialize state with one toast
+  const { result, unmount } = renderHook(() => useToast());
+  assertEqual(result.current.toasts.length, 1, 'Initial toast should exist');
+  TestRenderer.act(() => { dispatch({ type: 'UNKNOWN' }); });
+  assertEqual(result.current.toasts.length, 1, 'State should remain after unknown action');
+  unmount(); // remove listener
 });
 
 runTest('executeWithErrorToast displays error toast', async () => {
