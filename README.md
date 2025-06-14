@@ -226,6 +226,7 @@ The library includes comprehensive test coverage:
 # Run test suite
 npm test
 ```
+Before running the tests ensure `qtests` is installed by executing `npm install`. The `test-setup` script falls back to local stubs when `qtests` is not available.
 
 All tests pass with 100% functional coverage including:
 - Unit tests for all hooks and utilities
