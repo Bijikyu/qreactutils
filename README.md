@@ -227,6 +227,14 @@ The library includes comprehensive test coverage:
 npm test
 ```
 
+Before running the tests, install the lightweight stubbing library used by the suite:
+
+```bash
+npm install qtests --save-dev
+```
+
+The test runner requires the `qtests/setup` module so automatic stubbing is enabled. Ensure the setup file is present or `npm test` will fail.
+
 All tests pass with 100% functional coverage including:
 - Unit tests for all hooks and utilities
 - Integration tests for hook composition
