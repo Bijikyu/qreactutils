@@ -1,4 +1,4 @@
-require('qtests/setup'); // initialize qtests stubs before other imports
+require('./test-setup'); // ensure qtests or fallback stubs
 
 /**
  * Comprehensive Test Suite for React Hooks Utility Library

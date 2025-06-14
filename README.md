@@ -226,6 +226,7 @@ The library includes comprehensive test coverage:
 # Run test suite
 npm test
 ```
+Before running the tests ensure `qtests` is installed by executing `npm install`. The `test-setup` script falls back to local stubs when `qtests` is not available.
 
 Before running the tests, install the lightweight stubbing library used by the suite:
 
