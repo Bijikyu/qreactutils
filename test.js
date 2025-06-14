@@ -773,6 +773,14 @@ runTest('codexRequest offline and online behavior', async () => {
   assert(called === true, 'Request function should run online');
 });
 
+runTest('codexRequest returns default when offline without mock', async () => {
+  process.env.OFFLINE_MODE = 'true';
+  const result = await codexRequest(() => ({ data: 7 }));
+  assertEqual(result.status, 200, 'Default status should be 200');
+  assert(result.data === null, 'Default data should be null');
+  process.env.OFFLINE_MODE = 'false';
+});
+
 runTest('executeAxiosRequest integrates codexRequest and errors', async () => {
   process.env.OFFLINE_MODE = 'true';
   const resOffline = await executeAxiosRequest(() => ({ data: 5 }), 'throw', { data: { value: 5 } });
@@ -789,6 +797,14 @@ runTest('executeAxiosRequest integrates codexRequest and errors', async () => {
   }
   const nullRes = await executeAxiosRequest(() => Promise.reject(err401), 'returnNull');
   assertEqual(nullRes.data, null, 'Should return null on 401 with returnNull');
+});
+
+runTest('executeAxiosRequest returns default when offline without mock', async () => {
+  process.env.OFFLINE_MODE = 'true';
+  const res = await executeAxiosRequest(() => ({ data: 9 }), 'throw');
+  assertEqual(res.status, 200, 'Default status should be 200');
+  assert(res.data === null, 'Default data should be null');
+  process.env.OFFLINE_MODE = 'false';
 });
 
 // =============================================================================
