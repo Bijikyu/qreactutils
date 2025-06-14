@@ -578,6 +578,20 @@ runTest('safeStringify handles circular references gracefully', () => {
   assertEqual(safeStringify(normal), JSON.stringify(normal), 'Should stringify non-circular objects');
 });
 
+runTest('logFunction handles circular references on exit', () => {
+  const cyc = {};
+  cyc.self = cyc; // create cycle
+  const orig = console.log;
+  console.log = () => {};
+  let threw = false;
+  try {
+    logFunction('fn','exit',cyc);
+  } catch (e) {
+    threw = true;
+  }
+  console.log = orig;
+  assert(!threw, 'Should not throw with circular object');
+});
 // =============================================================================
 // UNIT TESTS - API FUNCTIONS
 // =============================================================================
