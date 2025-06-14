@@ -521,6 +521,18 @@ runTest('logFunction outputs expected messages', () => {
   assert(messages.some(m => m.includes('final value of failure')), 'Error log expected');
 });
 
+runTest('logFunction handles circular data without throwing', () => {
+  const obj = {}; obj.self = obj; // create circular reference for test
+  const messages = [];
+  const orig = console.log;
+  console.log = (msg) => { messages.push(msg); }; // capture logs to verify output
+
+  logFunction('circFn', 'exit', obj); // should not throw despite circular structure
+
+  console.log = orig;
+  assert(messages[0].includes('[Circular Reference]'), 'Should log fallback for circular object');
+});
+
 runTest('withToastLogging wraps function and preserves errors', () => {
   const calls = [];
   const wrapped = withToastLogging('demo', (t, msg) => { calls.push(msg); return 'done'; });
