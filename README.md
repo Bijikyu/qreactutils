@@ -121,6 +121,9 @@ React hook for handling authentication-based redirects.
 ### toast(props)
 Standalone toast function for creating notifications.
 
+Each toast is assigned a unique id generated with `nanoid()` so it can be
+updated or dismissed programmatically.
+
 **Parameters:**
 - `props` (Object): Toast configuration object
 

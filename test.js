@@ -896,10 +896,12 @@ runTest('toast system memory management', () => {
   assert(typeof useToast === 'function', 'useToast function should exist for memory management');
 });
 
-runTest('toast IDs remain valid after resetToastSystem', () => {
-  resetToastSystem(); // ensure clean state between tests
+
+runTest('toast IDs restart after resetToastSystem', () => {
+  resetToastSystem(); // ensure system is cleared before generating new ids
   const first = toast({ title: 'a' });
-  assert(typeof first.id === 'string' && first.id.length > 0, 'Generated ID should be non-empty string');
+  assert(typeof first.id === 'string' && first.id.length > 0, 'First toast ID should be string after reset');
+
 });
 
 runTest('dispatching unknown action leaves toast state unchanged', () => {
