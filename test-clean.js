@@ -96,7 +96,7 @@ console.log('React Hooks Library Test Suite');
 console.log('================================\n');
 
 // Test 1: useAsyncAction
-test('useAsyncAction returns correct structure', () => {
+test('useAsyncAction returns correct structure', () => { // validates tuple output
   const { result } = renderHook(() => useAsyncAction(async () => 'test'));
   assert(Array.isArray(result.current), 'Should return array'); // ensures hook signature remains [fn, bool]
   assert(result.current.length === 2, 'Should have run function and loading state');
@@ -105,7 +105,7 @@ test('useAsyncAction returns correct structure', () => {
 });
 
 // Test 2: useEditForm
-test('useEditForm manages form state', () => {
+test('useEditForm manages form state', () => { // confirms fields and mutators
   const { result } = renderHook(() => useEditForm({ name: 'John', age: 25 }));
   assert(typeof result.current.fields === 'object', 'Should have fields object');
   assert(result.current.fields.name === 'John', 'Should preserve initial values');
@@ -114,13 +114,13 @@ test('useEditForm manages form state', () => {
 });
 
 // Test 3: useIsMobile
-test('useIsMobile detects screen size', () => {
+test('useIsMobile detects screen size', () => { // verifies breakpoint logic
   const { result } = renderHook(() => useIsMobile());
   assert(typeof result.current === 'boolean', 'Should return boolean');
 });
 
 // Test 4: toast system
-test('toast creates notification objects', () => {
+test('toast creates notification objects', () => { // toast should have id and dismiss
   const result = toast({ title: 'Test', description: 'Message' });
   assert(typeof result === 'object', 'Should return object');
   assert(typeof result.id === 'string', 'Should have string id');
@@ -129,7 +129,7 @@ test('toast creates notification objects', () => {
 });
 
 // Test 5: stopEvent utility
-test('stopEvent handles DOM events', () => {
+test('stopEvent handles DOM events', () => { // ensures default/prevent occur
   let preventCalled = false;
   let stopCalled = false;
   
@@ -144,7 +144,7 @@ test('stopEvent handles DOM events', () => {
 });
 
 // Test 6: formatAxiosError
-test('formatAxiosError transforms errors', () => {
+test('formatAxiosError transforms errors', () => { // converts axios errors
   const axiosError = {
     isAxiosError: true,
     response: { status: 404, data: { message: 'Not found' } }
@@ -156,14 +156,14 @@ test('formatAxiosError transforms errors', () => {
 });
 
 // Test 7: createDropdownListHook
-test('createDropdownListHook creates hook function', () => {
+test('createDropdownListHook creates hook function', () => { // factory output check
   const mockFetcher = async () => ['item1', 'item2'];
   const hook = createDropdownListHook(mockFetcher);
   assert(typeof hook === 'function', 'Should return hook function');
 });
 
 // Test 8: Error handling
-test('formatAxiosError handles null inputs', () => {
+test('formatAxiosError handles null inputs', () => { // handles bad argument
   const result = formatAxiosError(null);
   assert(result instanceof Error, 'Should return Error instance for null input');
   assert(typeof result.message === 'string', 'Should have error message');

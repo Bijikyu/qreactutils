@@ -117,7 +117,7 @@ function runTest(name, testFn) {
 console.log('🚀 Starting Enhanced Test Suite...\n');
 
 // Module Export Tests
-runTest('All core functions are exported', () => {
+runTest('All core functions are exported', () => { // validates module exports
   assert(typeof useAsyncAction === 'function', 'useAsyncAction should be function');
   assert(typeof useDropdownData === 'function', 'useDropdownData should be function');
   assert(typeof useEditForm === 'function', 'useEditForm should be function');
@@ -131,7 +131,7 @@ runTest('All core functions are exported', () => {
 });
 
 // Core Hook Tests
-runTest('useAsyncAction returns correct structure', () => {
+runTest('useAsyncAction returns correct structure', () => { // tuple of [run,isLoading]
   const mockFn = async () => 'result';
   const { result } = renderHook(() => useAsyncAction(mockFn));
   
@@ -141,7 +141,7 @@ runTest('useAsyncAction returns correct structure', () => {
   assert(typeof result.current[1] === 'boolean', 'Second element should be boolean');
 });
 
-runTest('useEditForm manages state correctly', () => {
+runTest('useEditForm manages state correctly', () => { // exposes field helpers
   const initialState = { name: '', email: '' };
   const { result } = renderHook(() => useEditForm(initialState));
   
@@ -152,7 +152,7 @@ runTest('useEditForm manages state correctly', () => {
   assert(typeof result.current.cancelEdit === 'function', 'Should have cancelEdit function');
 });
 
-runTest('useDropdownToggle manages open/close state', () => {
+runTest('useDropdownToggle manages open/close state', () => { // verifies toggle helpers
   const { result } = renderHook(() => useDropdownToggle());
   
   assert(typeof result.current.isOpen === 'boolean', 'Should have isOpen boolean');
@@ -161,13 +161,13 @@ runTest('useDropdownToggle manages open/close state', () => {
   assert(result.current.isOpen === false, 'Should start closed');
 });
 
-runTest('useIsMobile handles responsive detection', () => {
+runTest('useIsMobile handles responsive detection', () => { // returns boolean
   const { result } = renderHook(() => useIsMobile());
   
   assert(typeof result.current === 'boolean', 'Should return boolean');
 });
 
-runTest('createDropdownListHook returns function', () => {
+runTest('createDropdownListHook returns function', () => { // factory output
   const mockFetcher = async () => [];
   const customHook = createDropdownListHook(mockFetcher);
   
@@ -175,7 +175,7 @@ runTest('createDropdownListHook returns function', () => {
 });
 
 // API Function Tests
-runTest('formatAxiosError handles different error types', () => {
+runTest('formatAxiosError handles different error types', () => { // tests axios and regular errors
   // Test axios error
   const axiosError = new Error('Network error');
   axiosError.isAxiosError = true;
@@ -192,19 +192,19 @@ runTest('formatAxiosError handles different error types', () => {
   assert(formattedRegular.message.includes('Regular error'), 'Should preserve regular error message');
 });
 
-runTest('apiRequest handles successful requests', async () => {
+runTest('apiRequest handles successful requests', async () => { // uses mocked axios
   const result = await apiRequest('/api/test', 'GET');
   assert(typeof result === 'object', 'Should return object');
   assert(result.success === true, 'Should indicate success');
 });
 
-runTest('getQueryFn creates valid query function', () => {
+runTest('getQueryFn creates valid query function', () => { // ensures callable
   const queryFn = getQueryFn({ on401: 'throw' });
   assert(typeof queryFn === 'function', 'Should return function');
 });
 
 // Utility Function Tests
-runTest('stopEvent prevents default and propagation', () => {
+runTest('stopEvent prevents default and propagation', () => { // both DOM methods should fire
   let preventDefaultCalled = false;
   let stopPropagationCalled = false;
   
@@ -219,7 +219,7 @@ runTest('stopEvent prevents default and propagation', () => {
   assert(stopPropagationCalled, 'Should call stopPropagation');
 });
 
-runTest('showToast creates toast with proper structure', () => {
+runTest('showToast creates toast with proper structure', () => { // wrapper uses provided toast fn
   const mockToast = (props) => ({ id: 'test-id', ...props });
   const result = showToast(mockToast, 'Test message', 'Test title', 'default');
   
@@ -229,7 +229,7 @@ runTest('showToast creates toast with proper structure', () => {
 });
 
 // Toast System Tests
-runTest('toast function creates toast with unique ID', () => {
+runTest('toast function creates toast with unique ID', () => { // ensures ID generation
   const toastResult = toast({ title: 'Test', description: 'Message' });
   
   assert(typeof toastResult === 'object', 'Should return object');
@@ -238,7 +238,7 @@ runTest('toast function creates toast with unique ID', () => {
   assert(typeof toastResult.update === 'function', 'Should have update function');
 });
 
-runTest('useToast provides toast management', () => {
+runTest('useToast provides toast management', () => { // exposes toast controls
   const { result } = renderHook(() => useToast());
   
   assert(Array.isArray(result.current.toasts), 'Should have toasts array');
@@ -247,7 +247,7 @@ runTest('useToast provides toast management', () => {
 });
 
 // Integration Tests
-runTest('useToastAction combines async action with toast', () => {
+runTest('useToastAction combines async action with toast', () => { // integrates toast with async
   const mockAsyncFn = async () => 'success';
   const { result } = renderHook(() => useToastAction(mockAsyncFn, 'Success message'));
   
@@ -256,14 +256,14 @@ runTest('useToastAction combines async action with toast', () => {
   assert(typeof result.current[1] === 'boolean', 'Should have loading state');
 });
 
-runTest('useAuthRedirect handles navigation', () => {
+runTest('useAuthRedirect handles navigation', () => { // verifies redirect side effects
   // Should not throw when called with valid parameters
   const { result } = renderHook(() => useAuthRedirect('/login', true));
   assert(result.current === undefined, 'Should not return value');
 });
 
 // Error Handling Tests
-runTest('Error handling preserves error chains', async () => {
+runTest('Error handling preserves error chains', async () => { // ensures errors bubble
   try {
     await apiRequest('/api/error', 'POST');
     assert(false, 'Should throw error');
@@ -274,7 +274,7 @@ runTest('Error handling preserves error chains', async () => {
 });
 
 // Memory Management Tests
-runTest('Hooks clean up properly', () => {
+runTest('Hooks clean up properly', () => { // hooks unmount without crash
   // Test that hooks can be unmounted without errors
   let component;
   TestRenderer.act(() => {
@@ -294,7 +294,7 @@ runTest('Hooks clean up properly', () => {
 });
 
 // Configuration Tests
-runTest('queryClient is properly configured', () => {
+runTest('queryClient is properly configured', () => { // verifies query client methods
   assert(typeof queryClient === 'object', 'queryClient should be object');
   assert(typeof queryClient.getQueryData === 'function', 'Should have getQueryData method');
   assert(typeof queryClient.setQueryData === 'function', 'Should have setQueryData method');
@@ -302,7 +302,7 @@ runTest('queryClient is properly configured', () => {
 });
 
 // Edge Case Tests
-runTest('useAsyncAction handles rejected promises', async () => {
+runTest('useAsyncAction handles rejected promises', async () => { // ensures onError callback
   const rejectingFn = async () => { throw new Error('Async error'); };
   const { result } = renderHook(() => useAsyncAction(rejectingFn, {
     onError: (error) => assert(error.message === 'Async error', 'Should receive error')
@@ -311,7 +311,7 @@ runTest('useAsyncAction handles rejected promises', async () => {
   assert(typeof result.current[0] === 'function', 'Should return function even for rejecting async');
 });
 
-runTest('useEditForm setField updates correctly', () => {
+runTest('useEditForm setField updates correctly', () => { // setField modifies fields
   const { result } = renderHook(() => useEditForm({ name: 'initial' }));
   
   TestRenderer.act(() => {
@@ -322,7 +322,7 @@ runTest('useEditForm setField updates correctly', () => {
   assert(typeof result.current.setField === 'function', 'setField should remain functional');
 });
 
-runTest('useDropdownData handles fetcher errors gracefully', () => {
+runTest('useDropdownData handles fetcher errors gracefully', () => { // error fetcher results empty list
   const errorFetcher = async () => { throw new Error('Fetch failed'); };
   const mockToast = () => {}; // simplified toast function
   const { result } = renderHook(() => useDropdownData(errorFetcher, mockToast, { id: 'user' }));
@@ -331,7 +331,7 @@ runTest('useDropdownData handles fetcher errors gracefully', () => {
   assert(typeof result.current.fetchData === 'function', 'Should provide fetchData function');
 });
 
-runTest('apiRequest handles network timeouts', async () => {
+runTest('apiRequest handles network timeouts', async () => { // timeout should throw
   try {
     await apiRequest('/api/timeout', 'POST');
     assert(false, 'Should throw on timeout');
@@ -340,14 +340,14 @@ runTest('apiRequest handles network timeouts', async () => {
   }
 });
 
-runTest('getQueryFn handles 401 errors with returnNull option', async () => {
+runTest('getQueryFn handles 401 errors with returnNull option', async () => { // verifies 401 behavior
   const queryFn = getQueryFn({ on401: 'returnNull' });
   const result = await queryFn({ queryKey: ['/api/401'] });
   assert(result === null, 'Should return null for 401 errors when configured');
 });
 
 // Performance Tests
-runTest('Multiple toast creation does not exceed limit', () => {
+runTest('Multiple toast creation does not exceed limit', () => { // ensures each toast is unique
   // Create multiple toasts rapidly
   const toast1 = toast({ title: 'First' });
   const toast2 = toast({ title: 'Second' });
@@ -358,7 +358,7 @@ runTest('Multiple toast creation does not exceed limit', () => {
   assert(typeof toast3.id === 'string', 'Third toast should have ID');
 });
 
-runTest('Hook composition does not cause memory leaks', () => {
+runTest('Hook composition does not cause memory leaks', () => { // composed hooks cleanup
   // Test composing multiple hooks without leaks
   const { result } = renderHook(() => {
     const asyncAction = useAsyncAction(async () => 'test');
