@@ -246,11 +246,20 @@ function MyComponent() {
 
 The library includes a custom Node-based test runner defined in `test.js`.
 
+1. Install dependencies so required modules like `qtests` are available:
+
 ```bash
-# Run test suite (executes `node test.js`)
+npm install
+```
+
+2. Run the test suite (executes `node test.js`):
+
+```bash
 npm test
 ```
-Run `npm install` first so dependencies like `qtests` are present. The `test-setup` script falls back to local stubs when `qtests` is not available.
+
+The `test-setup` script falls back to local stubs when `qtests` is not available.
+React may display "act()" warnings during `npm test`; these warnings are expected and can be safely ignored.
 
 If `qtests` is missing, install it explicitly:
 
