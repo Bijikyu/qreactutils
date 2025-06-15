@@ -66,8 +66,8 @@ console.log = originalLog;
 console.log('Testing React Hooks Library Core Functions...\n');
 console.log = () => {};
 
-// Test 1: useAsyncAction returns proper structure
-test('useAsyncAction structure', () => {
+// Test 1: verify the async hook returns [runFn, isLoading] tuple
+test('useAsyncAction structure', () => { // ensures consumer gets function and loading flag
   const { result } = renderHook(() => useAsyncAction(async () => 'test'));
   assert(Array.isArray(result.current), 'Should return array'); // ensures hook returns [fn, bool]
   assert(result.current.length === 2, 'Should have 2 elements');
@@ -75,8 +75,8 @@ test('useAsyncAction structure', () => {
   assert(typeof result.current[1] === 'boolean', 'Second element should be boolean');
 });
 
-// Test 2: useEditForm manages state correctly
-test('useEditForm state management', () => {
+// Test 2: check form hook exposes fields and mutators
+test('useEditForm state management', () => { // confirms initial state preserved
   const { result } = renderHook(() => useEditForm({ name: 'John', age: 25 }));
   assert(typeof result.current.fields === 'object', 'Should have fields object');
   assert(result.current.fields.name === 'John', 'Should preserve initial name');
@@ -85,14 +85,14 @@ test('useEditForm state management', () => {
   assert(typeof result.current.startEdit === 'function', 'Should have startEdit function');
 });
 
-// Test 3: useIsMobile returns boolean
-test('useIsMobile responsive detection', () => {
+// Test 3: detect responsive breakpoint logic
+test('useIsMobile responsive detection', () => { // boolean indicates mobile status
   const { result } = renderHook(() => useIsMobile());
   assert(typeof result.current === 'boolean', 'Should return boolean value');
 });
 
-// Test 4: toast creates notification objects
-test('toast notification creation', () => {
+// Test 4: toast should create dismissible notification objects
+test('toast notification creation', () => { // verifies basic toast fields
   const result = toast({ title: 'Test', description: 'Message' });
   assert(typeof result === 'object', 'Should return object');
   assert(typeof result.id === 'string', 'Should have string id');
@@ -100,15 +100,15 @@ test('toast notification creation', () => {
   assert(typeof result.dismiss === 'function', 'Should have dismiss function');
 });
 
-// Test 5: showToast wrapper function
-test('showToast wrapper', () => {
+// Test 5: wrapper uses default toast implementation
+test('showToast wrapper', () => { // ensures a toast object is returned
   const result = showToast('Test message');
   assert(typeof result === 'object', 'Should return toast object');
   assert(typeof result.id === 'string', 'Should have id');
 });
 
-// Test 6: stopEvent prevents defaults
-test('stopEvent utility', () => {
+// Test 6: stopEvent should cancel native browser actions
+test('stopEvent utility', () => { // ensures both preventDefault and stopPropagation fire
   let preventDefaultCalled = false;
   let stopPropagationCalled = false;
   
@@ -122,8 +122,8 @@ test('stopEvent utility', () => {
   assert(stopPropagationCalled, 'Should call stopPropagation');
 });
 
-// Test 7: formatAxiosError transforms errors
-test('formatAxiosError transformation', () => {
+// Test 7: formatAxiosError converts axios errors to user-friendly Error
+test('formatAxiosError transformation', () => { // confirms message contains status code
   const axiosError = {
     isAxiosError: true,
     response: { status: 404, data: { message: 'Not found' } }
@@ -134,15 +134,15 @@ test('formatAxiosError transformation', () => {
   assert(result.message.includes('404'), 'Should include status code');
 });
 
-// Test 8: createDropdownListHook factory
-test('createDropdownListHook factory', () => {
+// Test 8: factory returns custom hook given a fetcher
+test('createDropdownListHook factory', () => { // ensures returned value is callable
   const mockFetcher = async () => ['item1', 'item2'];
   const hook = createDropdownListHook(mockFetcher);
   assert(typeof hook === 'function', 'Should return function');
 });
 
-// Test 9: Error handling for invalid inputs
-test('Error handling with invalid inputs', () => {
+// Test 9: error utilities handle bad parameters gracefully
+test('Error handling with invalid inputs', () => { // passing null should throw
   try {
     formatAxiosError(null);
     assert(false, 'Should handle null input');
@@ -151,8 +151,8 @@ test('Error handling with invalid inputs', () => {
   }
 });
 
-// Test 10: Hook stability (functions don't change on re-render)
-test('Hook function stability', () => {
+// Test 10: hook should maintain stable function references across renders
+test('Hook function stability', () => { // ensures memoization works
   let renderCount = 0;
   const { result } = renderHook(() => {
     renderCount++;
