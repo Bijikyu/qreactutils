@@ -8,14 +8,14 @@
 const React = require('react'); // real React so hooks execute as in apps
 const TestRenderer = require('react-test-renderer'); // lets us run hooks without a DOM
 
-// Suppress all console output during hook execution
+// Suppress all console output during hook execution // keeps test logs compact
 const originalConsole = {
   log: console.log,
   error: console.error,
   warn: console.warn
 };
 
-// Silence everything during testing
+// Silence everything during testing // prevents noisy output when running hooks
 console.log = () => {};
 console.error = () => {};
 console.warn = () => {};
@@ -30,7 +30,7 @@ console.log = originalConsole.log;
 console.error = originalConsole.error;
 console.warn = originalConsole.warn;
 
-// Mock browser environment
+// Mock browser environment // allows hooks using window to run under Node
 global.window = {
   innerWidth: 1024,
   matchMedia: (query) => ({
@@ -68,7 +68,7 @@ function test(name, fn) { // queue keeps execution ordered for reliable results
   }
 }
 
-function assert(condition, message) {
+function assert(condition, message) { // basic assertion helper
   if (!condition) throw new Error(message || 'Assertion failed');
 }
 
@@ -188,7 +188,7 @@ testResults.forEach((test, index) => {
   }
 });
 
-console.log('\nSummary:');
+console.log('\nSummary:'); // show final pass/fail counts
 console.log(`--------`);
 console.log(`Total Tests: ${testResults.length}`);
 console.log(`Passed: ${passed}`);

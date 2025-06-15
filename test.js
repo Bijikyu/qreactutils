@@ -53,7 +53,7 @@ function renderHook(hookFn, props = {}) { // Utility to render hooks with basic 
 } //
 
 // Enhanced axios mock extending qtests stub to emulate axios.create and common error conditions
-const mockAxios = require('axios'); // base stub from qtests setup
+const mockAxios = require('axios'); // base stub from qtests setup to intercept HTTP
 mockAxios.create = (config) => { // provide axios.create capability for tests to support instances
     const instance = async (requestConfig) => instance.request(requestConfig); // callable like real axios
     instance.request = async (requestConfig) => { // simulate axios.request behaviour so network calls are deterministic
@@ -114,7 +114,7 @@ const mockedAxiosClient = mockAxios.create(); // Create axios stub instance for 
 axiosClient.request = mockedAxiosClient.request; // override request so api layer uses mock
 axiosClient.get = mockedAxiosClient.get; // override get so queries use stub
 
-// Mock window object for browser API testing
+// Mock window object for browser API testing // allows hooks using window to run under Node
 const mockWindow = {
   innerWidth: 1024,
   matchMedia: (query) => ({ // minimal MediaQueryList mock used by useIsMobile
@@ -170,8 +170,8 @@ const originalAxios = require('axios'); // Save axios instance before mocking //
  */
 // axios stub path is replaced directly via require.cache so no custom require needed
 
-global.window = mockWindow;
-global.PopStateEvent = class PopStateEvent { constructor(type, opts={}){ this.type=type; this.state=opts.state||null; } }; // stub for auth redirect tests
+global.window = mockWindow; // assign stubbed window so hooks use controlled environment
+global.PopStateEvent = class PopStateEvent { constructor(type, opts={}){ this.type=type; this.state=opts.state||null; } }; // stub for auth redirect tests so SPA navigation is emulated
 
 // Test utilities
 let testCount = 0; // number of tests executed in this run
@@ -326,6 +326,7 @@ console.log('🚀 Starting Enhanced Comprehensive Test Suite...\n');
 // =============================================================================
 // MODULE EXPORT TESTS
 // =============================================================================
+// Ensures the public API remains stable and all expected functions are exposed
 
 console.log('📦 MODULE EXPORT TESTS');
 
@@ -381,6 +382,7 @@ runTest('Factory function exports and behavior', () => {
 // =============================================================================
 // UNIT TESTS - UTILITY FUNCTIONS
 // =============================================================================
+// Exercise individual helper utilities with mocked dependencies
 
 console.log('\n🔧 UNIT TESTS - UTILITY FUNCTIONS');
 
@@ -568,6 +570,7 @@ runTest('withToastLogging wraps function and preserves errors', () => {
 // =============================================================================
 // UNIT TESTS - VALIDATION UTILITIES
 // =============================================================================
+// Validate helper guards that check argument types and structures
 
 console.log('\n🛡️  UNIT TESTS - VALIDATION UTILITIES');
 
@@ -620,6 +623,7 @@ runTest('safeStringify(undefined) returns literal undefined string', () => {
 // =============================================================================
 // UNIT TESTS - API FUNCTIONS
 // =============================================================================
+// Exercises the axios wrappers using the mocked client to avoid real HTTP
 
 console.log('\n🌐 UNIT TESTS - API FUNCTIONS');
 
@@ -810,6 +814,7 @@ runTest('executeAxiosRequest returns default when offline without mock', async (
 // =============================================================================
 // UNIT TESTS - TOAST SYSTEM
 // =============================================================================
+// Verifies toast helpers work with the window and axios stubs
 
 console.log('\n🍞 UNIT TESTS - TOAST SYSTEM');
 
@@ -941,6 +946,7 @@ runTest('executeWithToastFeedback shows success and error toasts', async () => {
 // =============================================================================
 // INTEGRATION TESTS
 // =============================================================================
+// Combine hooks and utilities together using the mocks to ensure interoperability
 
 console.log('\n🔗 INTEGRATION TESTS');
 
@@ -1373,6 +1379,7 @@ runTest('Concurrent operations and race conditions', async () => {
 // =============================================================================
 // PERFORMANCE TESTS
 // =============================================================================
+// Measure internal operations using mocks to keep timing deterministic
 
 console.log('\n⚡ PERFORMANCE TESTS');
 
@@ -1447,6 +1454,7 @@ runTest('Error formatting performance with complex objects', () => {
 // =============================================================================
 // MEMORY MANAGEMENT TESTS
 // =============================================================================
+// Ensure hooks unregister listeners and timers to prevent leaks
 
 console.log('\n🧠 MEMORY MANAGEMENT TESTS');
 
@@ -1525,6 +1533,7 @@ runTest('multiple useToast instances clean up correctly', () => {
 // =============================================================================
 // WORKFLOW AND INTEGRATION SCENARIOS
 // =============================================================================
+// Simulate real usage flows to verify modules work together end-to-end
 
 console.log('\n🔄 WORKFLOW INTEGRATION TESTS');
 

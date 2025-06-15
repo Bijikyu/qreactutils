@@ -13,7 +13,7 @@ const {
   stopEvent, formatAxiosError, createDropdownListHook
 } = require('./index.js');
 
-// Mock browser environment
+// Mock browser environment // simulates DOM APIs for hook usage
 global.window = {
   innerWidth: 1024,
   matchMedia: (query) => ({
@@ -39,7 +39,7 @@ function test(name, fn) { // executed sequentially for deterministic results so 
   }
 }
 
-function assert(condition, message) {
+function assert(condition, message) { // basic truthy assertion helper
   if (!condition) throw new Error(message || 'Assertion failed');
 }
 
@@ -125,7 +125,7 @@ test('Error handling with null inputs', () => { // handles unexpected argument
   assert(typeof result.message === 'string', 'Should have error message');
 });
 
-console.log(`\n\nProduction Test Results: ${passed}/${total} passed`);
+console.log(`\n\nProduction Test Results: ${passed}/${total} passed`); // final tally of test outcomes
 
 if (passed === total) {
   console.log('\n✅ All production tests passed');
