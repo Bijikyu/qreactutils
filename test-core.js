@@ -6,7 +6,7 @@
 // Runs sequentially in Node so full frameworks are unnecessary
 
 const React = require('react'); // real React provides hook semantics
-const TestRenderer = require('react-test-renderer'); // executes hooks without DOM libraries
+const TestRenderer = require('react-test-renderer'); // use react-test-renderer so hooks execute without a browser DOM
 
 // Import only the hooks and utilities we can test independently
 const {
@@ -25,14 +25,14 @@ global.window = {
   history: { pushState: () => {} }
 }; // minimal window mock so hooks relying on browser APIs run
 
-// Suppress console output during testing
+// Suppress console output during testing to keep Node's stdout buffer small
 const originalLog = console.log;
 console.log = () => {};
 
 let passed = 0;
 let total = 0;
 
-function test(name, fn) { // queue-based runner ensures sequential execution
+function test(name, fn) { // simple queue-based runner ensures sequential execution so shared mocks remain consistent
   total++;
   try {
     fn();
@@ -46,11 +46,11 @@ function test(name, fn) { // queue-based runner ensures sequential execution
   }
 }
 
-function assert(condition, message) {
+function assert(condition, message) { // truthy assertion helper for readability
   if (!condition) throw new Error(message || 'Assertion failed');
 }
 
-function renderHook(hookFn) { // mimic Testing Library's renderHook for Node
+function renderHook(hookFn) { // mimic Testing Library's renderHook for Node to execute hooks without mounting components
   let value;
   function TestComponent() {
     value = hookFn();

@@ -35,7 +35,7 @@ globalThis.IS_REACT_ACT_ENVIRONMENT = true; // flag React act environment for wa
  * @param {Function} hookFn - Hook function being tested
  * @returns {{result: {current: any}}} - Structure mimicking Testing Library
  */
-function renderHook(hookFn, props = {}) { // Utility to render hooks with basic rerendering
+function renderHook(hookFn, props = {}) { // Utility to render hooks with basic rerendering using react-test-renderer so no DOM is needed
   const result = { current: null }; // store latest hook value
   let root; // store renderer instance for cleanup
   function TestComponent(innerProps) { // Minimal component to invoke hook with props
@@ -189,7 +189,7 @@ const testResults = []; // stores per-test details for the summary output
  * @param {Function} testFn - The test logic to run
  */
 let testQueue = Promise.resolve(); // queue keeps async tests in order so mocks reset correctly between runs
-function runTest(name, testFn) { // each test awaits the previous via the queue to maintain order and avoid race conditions
+function runTest(name, testFn) { // each test awaits the previous via the queue so Node can run without Jest and logs stay sequential
   testQueue = testQueue.then(async () => { // chain test onto queue
     testCount++;
     const testStart = Date.now();
@@ -221,7 +221,7 @@ function runTest(name, testFn) { // each test awaits the previous via the queue 
  * @param {boolean} condition - Value to evaluate
  * @param {string} message - Message when assertion fails
  */
-function assert(condition, message) {
+function assert(condition, message) { // basic truthy assertion helper
   if (!condition) {
     throw new Error(message);
   }
@@ -237,7 +237,7 @@ function assert(condition, message) {
  * @param {*} expected - Expected value
  * @param {string} message - Message prefix for errors
  */
-function assertEqual(actual, expected, message) {
+function assertEqual(actual, expected, message) { // strict equality helper
   if (actual !== expected) {
     throw new Error(`${message}: expected ${expected}, got ${actual}`);
   }
@@ -252,7 +252,7 @@ function assertEqual(actual, expected, message) {
  * @param {Function} fn - Function expected to throw
  * @param {string} message - Message used when no error is thrown
  */
-function assertThrows(fn, message) {
+function assertThrows(fn, message) { // verify that a function throws
   try {
     fn();
     throw new Error(`${message}: expected function to throw but it didn't`);
@@ -274,7 +274,7 @@ function assertThrows(fn, message) {
  * @param {string} message - Message prefix for rejected promise
  * @returns {Promise<void>} promise that rejects with formatted error
  */
-function assertAsync(asyncFn, message) {
+function assertAsync(asyncFn, message) { // helper for awaiting async errors in tests
   return asyncFn().catch(error => {
     throw new Error(`${message}: ${error.message}`);
   });

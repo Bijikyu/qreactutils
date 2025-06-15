@@ -6,9 +6,9 @@
 // These tests run in plain Node without Jest using simple helper functions
 
 const React = require('react'); // use real React so hooks behave normally
-const TestRenderer = require('react-test-renderer'); // allows hook execution without a browser
+const TestRenderer = require('react-test-renderer'); // allows hook execution without a browser for lightweight Node testing
 
-// Silence all console output during execution
+// Silence all console output during execution to keep logs readable and avoid EPIPE
 const originalConsole = { log: console.log, error: console.error, warn: console.warn };
 console.log = console.error = console.warn = () => {};
 
@@ -45,11 +45,11 @@ global.PopStateEvent = class PopStateEvent { // stub constructor so history API 
 let testResults = []; // store results so summary prints in order
 let testSuites = []; // queue suites to run sequentially to keep state isolation
 
-function suite(name, tests) {
+function suite(name, tests) { // group tests so they can run sequentially without interfering
   testSuites.push({ name, tests });
 }
 
-function test(name, fn) { // sequential execution avoids shared state issues between hooks
+function test(name, fn) { // sequential execution avoids shared state issues between hooks and keeps output ordered
   try {
     console.log = console.error = console.warn = () => {};
     fn();
@@ -65,17 +65,17 @@ function test(name, fn) { // sequential execution avoids shared state issues bet
   }
 }
 
-function assert(condition, message) {
+function assert(condition, message) { // basic truthy assertion helper
   if (!condition) throw new Error(message || 'Assertion failed');
 }
 
-function assertEqual(actual, expected, message) {
+function assertEqual(actual, expected, message) { // strict equality helper for consistent messages
   if (actual !== expected) {
     throw new Error(`${message}: expected ${expected}, got ${actual}`);
   }
 }
 
-function renderHook(hookFn) { // minimal renderer so hooks work without DOM
+function renderHook(hookFn) { // minimal renderer so hooks work without DOM by leveraging react-test-renderer
   let value;
   function TestComponent() {
     value = hookFn();

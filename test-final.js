@@ -6,7 +6,7 @@
 // Executes sequentially using a simple queue so Node can run the suite without Jest
 
 const React = require('react'); // standard React allows real hook behavior
-const TestRenderer = require('react-test-renderer'); // renders hooks with no browser
+const TestRenderer = require('react-test-renderer'); // renders hooks without a browser so Node can run them directly
 
 // Mock axios completely before requiring the library
 const mockAxios = {
@@ -63,24 +63,24 @@ global.PopStateEvent = class PopStateEvent {
   }
 };
 
-// Suppress verbose output during tests
+// Suppress verbose output during tests to keep CI logs manageable
 const originalLog = console.log;
 console.log = () => {};
 
 let testCount = 0; // running tally of executed tests
 let passedTests = 0; // count of successful tests
 
-function assert(condition, message) {
+function assert(condition, message) { // generic truthy assertion used by all tests
   if (!condition) throw new Error(message || 'Assertion failed');
 }
 
-function assertEqual(actual, expected, message) {
+function assertEqual(actual, expected, message) { // strict equality helper to reduce repetitive checks
   if (actual !== expected) {
     throw new Error(`${message}: expected ${expected}, got ${actual}`);
   }
 }
 
-function runTest(name, testFn) { // queue keeps tests sequential so mocks reset predictably
+function runTest(name, testFn) { // queue keeps tests sequential so mocks reset predictably and logging remains readable
   testCount++;
   try {
     const result = testFn();
@@ -102,7 +102,7 @@ function runTest(name, testFn) { // queue keeps tests sequential so mocks reset 
   }
 }
 
-function renderHook(hookFn) { // mimic Testing Library to render hooks in Node
+function renderHook(hookFn) { // mimic Testing Library to render hooks in Node using react-test-renderer
   let value;
   function TestComponent() {
     value = hookFn();

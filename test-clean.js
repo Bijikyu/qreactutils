@@ -6,9 +6,9 @@
 // This file illustrates how to run hook tests in Node without Jest
 
 const React = require('react'); // real React so hooks execute as in apps
-const TestRenderer = require('react-test-renderer'); // lets us run hooks without a DOM
+const TestRenderer = require('react-test-renderer'); // lets us run hooks without a DOM so Node can execute them directly
 
-// Suppress all console output during hook execution
+// Suppress all console output during hook execution to avoid noisy logs and buffer overflow
 const originalConsole = {
   log: console.log,
   error: console.error,
@@ -43,7 +43,7 @@ global.window = {
 
 let testResults = []; // collected sequentially to keep output order stable
 
-function test(name, fn) { // queue keeps execution ordered for reliable results
+function test(name, fn) { // queue keeps execution ordered for reliable results and predictable mock state
   try {
     // Silence console during test execution
     console.log = () => {};
@@ -68,11 +68,11 @@ function test(name, fn) { // queue keeps execution ordered for reliable results
   }
 }
 
-function assert(condition, message) {
+function assert(condition, message) { // simple truthy assertion helper
   if (!condition) throw new Error(message || 'Assertion failed');
 }
 
-function renderHook(hookFn) { // lightweight hook renderer used instead of react-testing-library
+function renderHook(hookFn) { // lightweight hook renderer using react-test-renderer instead of full testing library
   let value;
   function TestComponent() {
     value = hookFn();

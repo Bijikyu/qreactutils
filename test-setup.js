@@ -1,6 +1,6 @@
 // Attempt to load qtests setup so axios and winston stubs exist for tests
 // Hooks are executed with react-test-renderer and queued sequentially in the runners
-// to keep this plain Node environment simple without Jest and still simulate a test framework
+// to keep this plain Node environment simple without Jest while ensuring predictable mocks
 let qtestsAvailable = true; // track presence of qtests module for reporting and summary output
 try { require('qtests/setup'); } catch (error) { // qtests provides axios/winston mocks when available
   qtestsAvailable = false; // qtests missing so we fall back to simple mocks

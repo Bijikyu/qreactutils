@@ -6,7 +6,7 @@
 // Minimal helpers keep this suite runnable directly with Node
 
 const React = require('react'); // standard React for hook execution
-const TestRenderer = require('react-test-renderer'); // run hooks without browser DOM
+const TestRenderer = require('react-test-renderer'); // use react-test-renderer so hooks execute without a DOM
 
 const {
   useAsyncAction, useEditForm, useIsMobile, toast, 
@@ -27,7 +27,7 @@ global.window = {
 let passed = 0;
 let total = 0;
 
-function test(name, fn) { // executed sequentially for deterministic results so state is isolated
+function test(name, fn) { // executed sequentially for deterministic results so shared state between hooks doesn't leak
   total++;
   try {
     fn();
@@ -39,11 +39,11 @@ function test(name, fn) { // executed sequentially for deterministic results so 
   }
 }
 
-function assert(condition, message) {
+function assert(condition, message) { // simple truthy assertion keeps output readable
   if (!condition) throw new Error(message || 'Assertion failed');
 }
 
-function renderHook(hookFn) { // basic hook renderer for Node environment
+function renderHook(hookFn) { // basic hook renderer for Node environment using react-test-renderer
   let value;
   function TestComponent() {
     value = hookFn();

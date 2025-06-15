@@ -14,30 +14,30 @@ const {
 } = require('./index.js');
 
 const React = require('react'); // load React so hooks match production behavior
-const TestRenderer = require('react-test-renderer'); // runs hooks without DOM which keeps Node tests light
+const TestRenderer = require('react-test-renderer'); // use react-test-renderer so hooks execute without a browser, keeping Node tests light
 
-// Suppress console.log during tests to prevent output overflow
+// Suppress console.log during tests to prevent output overflow which can cause EPIPE in CI
 const originalLog = console.log;
-console.log = () => {}; // Disable logging during tests
+console.log = () => {}; // Disable logging during tests so buffers don't fill
 
 let testCount = 0; // tracks how many tests have run so far
 let passedTests = 0; // incremented for every successful test
 let failedTests = 0; // incremented whenever a test throws
 let testResults = []; // collects summary data for post-run report
 
-function assert(condition, message) {
+function assert(condition, message) { // truthy assertion helper keeps failures easy to read
   if (!condition) {
     throw new Error(message || 'Assertion failed');
   }
 }
 
-function assertEqual(actual, expected, message) {
+function assertEqual(actual, expected, message) { // strict equality check to avoid type coercion surprises
   if (actual !== expected) {
     throw new Error(`${message || 'Values not equal'}: expected ${expected}, got ${actual}`);
   }
 }
 
-function runTest(name, testFn) { // queue ensures sequential execution for stability and readable logs
+function runTest(name, testFn) { // queue ensures sequential execution so mocks reset cleanly and output order is stable
   testCount++;
   const startTime = Date.now();
   
@@ -69,7 +69,7 @@ function runTest(name, testFn) { // queue ensures sequential execution for stabi
   }
 }
 
-function renderHook(hookFn) { // minimal implementation of renderHook for Node
+function renderHook(hookFn) { // minimal implementation of renderHook for Node so we don't depend on full React testing libs
   let value;
   function TestComponent() {
     value = hookFn();
