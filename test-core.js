@@ -32,7 +32,7 @@ console.log = () => {};
 let passed = 0;
 let total = 0;
 
-function test(name, fn) { // queue-based runner ensures sequential execution
+function test(name, fn) { // lightweight runner executing tests sequentially
   total++;
   try {
     fn();
@@ -46,11 +46,11 @@ function test(name, fn) { // queue-based runner ensures sequential execution
   }
 }
 
-function assert(condition, message) { // basic assertion helper
+function assert(condition, message) { // throw if condition is false
   if (!condition) throw new Error(message || 'Assertion failed');
 }
 
-function renderHook(hookFn) { // mimic Testing Library's renderHook for Node; avoids full testing frameworks
+function renderHook(hookFn) { // execute a hook and expose its return value for assertions
   let value;
   function TestComponent() {
     value = hookFn();
@@ -152,6 +152,7 @@ test('Error handling with invalid inputs', () => { // passing null should throw
 });
 
 // Test 10: hook should maintain stable function references across renders
+// verifies that useEditForm returns memoized handlers so components don't re-render unnecessarily
 test('Hook function stability', () => { // ensures memoization works
   let renderCount = 0;
   const { result } = renderHook(() => {
