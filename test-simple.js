@@ -5,14 +5,16 @@
  * maintaining comprehensive test coverage.
  */
 
+// Tests run in plain Node using a queue so we don't need Jest
+
 const { 
   useAsyncAction, useDropdownData, createDropdownListHook, useDropdownToggle,
   useEditForm, useIsMobile, useToast, toast, useToastAction, useAuthRedirect,
   showToast, stopEvent, apiRequest, getQueryFn, queryClient, formatAxiosError, axiosClient
 } = require('./index.js');
 
-const React = require('react');
-const TestRenderer = require('react-test-renderer');
+const React = require('react'); // load React so hooks match production behavior
+const TestRenderer = require('react-test-renderer'); // runs hooks without DOM which keeps Node tests light
 
 // Suppress console.log during tests to prevent output overflow
 const originalLog = console.log;
@@ -35,7 +37,7 @@ function assertEqual(actual, expected, message) {
   }
 }
 
-function runTest(name, testFn) {
+function runTest(name, testFn) { // queue ensures sequential execution for stability
   testCount++;
   const startTime = Date.now();
   
@@ -73,8 +75,8 @@ function renderHook(hookFn) {
     value = hookFn();
     return null;
   }
-  TestRenderer.act(() => {
-    TestRenderer.create(React.createElement(TestComponent));
+  TestRenderer.act(() => { // run hook without a real DOM
+    TestRenderer.create(React.createElement(TestComponent)); // keeps dependencies small
   });
   return { result: { current: value } };
 }

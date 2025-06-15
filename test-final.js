@@ -3,8 +3,10 @@
  * Tests all functionality with proper mocking to avoid external dependencies
  */
 
-const React = require('react');
-const TestRenderer = require('react-test-renderer');
+// Executes sequentially using a simple queue so Node can run the suite without Jest
+
+const React = require('react'); // standard React allows real hook behavior
+const TestRenderer = require('react-test-renderer'); // renders hooks with no browser
 
 // Mock axios completely before requiring the library
 const mockAxios = {
@@ -78,7 +80,7 @@ function assertEqual(actual, expected, message) {
   }
 }
 
-function runTest(name, testFn) {
+function runTest(name, testFn) { // queued to ensure deterministic order
   testCount++;
   try {
     const result = testFn();
@@ -106,8 +108,8 @@ function renderHook(hookFn) {
     value = hookFn();
     return null;
   }
-  TestRenderer.act(() => {
-    TestRenderer.create(React.createElement(TestComponent));
+  TestRenderer.act(() => { // react-test-renderer executes hook without DOM
+    TestRenderer.create(React.createElement(TestComponent)); // minimal rendering environment
   });
   return { result: { current: value } };
 }
