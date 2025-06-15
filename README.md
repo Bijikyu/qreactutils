@@ -187,6 +187,22 @@ Returns the current number of registered toast listeners. Useful for tests verif
 ### resetToastSystem()
 Clears all toast listeners, cancels pending removal timers, and resets toast state. Useful for isolated testing environments.
 
+## Validation Utilities
+
+Lightweight runtime guards used throughout the library.
+
+### isFunction(value)
+Returns `true` when the value is callable, avoiding `TypeError: value is not a function` when hooks invoke optional callbacks.
+
+### isObject(value)
+Ensures a value is a plain object so property reads don't trigger `Cannot read property` errors on `null` or arrays.
+
+### safeStringify(value)
+Serializes objects with `safe-json-stringify` so logging data containing circular references never crashes.
+
+### isAxiosErrorWithStatus(error, status)
+Validates an error originated from Axios and matches a specific HTTP status, preventing generic errors from being mistaken for network responses.
+
 ## Example Usage
 
 ```javascript
