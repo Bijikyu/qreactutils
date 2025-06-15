@@ -116,7 +116,7 @@ console.log = originalLog; // Restore logging for test output
 console.log('🚀 Running Simplified Test Suite...\n');
 
 // Core functionality tests
-runTest('All exports exist', () => {
+runTest('All exports exist', () => { // validates module surface
   assert(typeof useAsyncAction === 'function', 'useAsyncAction should be exported');
   assert(typeof useDropdownData === 'function', 'useDropdownData should be exported');
   assert(typeof useEditForm === 'function', 'useEditForm should be exported');
@@ -130,7 +130,7 @@ runTest('All exports exist', () => {
   assert(typeof formatAxiosError === 'function', 'formatAxiosError should be exported');
 });
 
-runTest('useAsyncAction basic functionality', () => {
+runTest('useAsyncAction basic functionality', () => { // ensures tuple output
   const { result } = renderHook(() => useAsyncAction(async () => 'test'));
   assert(Array.isArray(result.current), 'Should return array'); // hook returns [run,isLoading]
   assertEqual(result.current.length, 2, 'Should return [run, isLoading]');
@@ -138,7 +138,7 @@ runTest('useAsyncAction basic functionality', () => {
   assert(typeof result.current[1] === 'boolean', 'Second element should be boolean');
 });
 
-runTest('useEditForm basic functionality', () => {
+runTest('useEditForm basic functionality', () => { // verifies form helpers
   const { result } = renderHook(() => useEditForm({ name: '', age: 0 }));
   assert(typeof result.current.fields === 'object', 'Should have fields');
   assert(typeof result.current.setField === 'function', 'Should have setField');
@@ -146,18 +146,18 @@ runTest('useEditForm basic functionality', () => {
   assertEqual(result.current.fields.name, '', 'Should initialize with default values');
 });
 
-runTest('useIsMobile basic functionality', () => {
+runTest('useIsMobile basic functionality', () => { // checks responsive value
   const { result } = renderHook(() => useIsMobile());
   assert(typeof result.current === 'boolean', 'Should return boolean');
 });
 
-runTest('toast system basic functionality', () => {
+runTest('toast system basic functionality', () => { // toast returns dismissible obj
   const result = toast({ title: 'Test', description: 'Test message' });
   assert(typeof result.id === 'string', 'Should return object with id');
   assert(typeof result.dismiss === 'function', 'Should have dismiss function');
 });
 
-runTest('stopEvent utility', () => {
+runTest('stopEvent utility', () => { // ensures event cancelling logic
   const mockEvent = {
     preventDefault: () => {},
     stopPropagation: () => {}
@@ -165,7 +165,7 @@ runTest('stopEvent utility', () => {
   assert(() => stopEvent(mockEvent), 'Should handle valid event');
 });
 
-runTest('formatAxiosError handles errors', () => {
+runTest('formatAxiosError handles errors', () => { // converts axios error
   const axiosError = {
     isAxiosError: true,
     response: { status: 404, data: { message: 'Not found' } }
@@ -174,17 +174,17 @@ runTest('formatAxiosError handles errors', () => {
   assert(result instanceof Error, 'Should return Error object');
 });
 
-runTest('apiRequest basic functionality', async () => {
+runTest('apiRequest basic functionality', async () => { // makes mocked request
   const result = await apiRequest('/api/test', 'GET');
   assert(result.success === true, 'Should return success response');
 });
 
-runTest('getQueryFn creates query function', () => {
+runTest('getQueryFn creates query function', () => { // factory returns function
   const queryFn = getQueryFn({ on401: 'returnNull' });
   assert(typeof queryFn === 'function', 'Should return function');
 });
 
-runTest('createDropdownListHook factory', () => {
+runTest('createDropdownListHook factory', () => { // ensures hook is generated
   const fetcher = async () => ['item1', 'item2'];
   const hook = createDropdownListHook(fetcher);
   assert(typeof hook === 'function', 'Should return hook function');
