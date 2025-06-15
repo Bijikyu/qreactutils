@@ -8,7 +8,7 @@
 const React = require('react'); // standard React allows real hook behavior
 const TestRenderer = require('react-test-renderer'); // renders hooks with no browser
 
-// Mock axios completely before requiring the library
+// Mock axios completely before requiring the library // keeps tests offline and deterministic
 const mockAxios = {
   create: () => ({
     request: async (config) => {
@@ -36,7 +36,7 @@ const mockAxios = {
 };
 
 // Replace axios globally before library import
-global.axios = mockAxios; // ensures apiRequest uses mocked responses
+global.axios = mockAxios; // ensures apiRequest uses mocked responses without network calls
 
 // Import library after mocking
 const {
@@ -46,7 +46,7 @@ const {
 } = require('./index.js');
 
 // Mock browser environment
-global.window = {
+global.window = { // minimal window stub so hooks referencing browser APIs run
   innerWidth: 1024,
   matchMedia: (query) => ({
     matches: query.includes('max-width') && 1024 <= 767,
@@ -63,18 +63,18 @@ global.PopStateEvent = class PopStateEvent {
   }
 };
 
-// Suppress verbose output during tests
+// Suppress verbose output during tests // only final summary should display
 const originalLog = console.log;
 console.log = () => {};
 
 let testCount = 0; // running tally of executed tests
 let passedTests = 0; // count of successful tests
 
-function assert(condition, message) {
+function assert(condition, message) { // simple assertion helper
   if (!condition) throw new Error(message || 'Assertion failed');
 }
 
-function assertEqual(actual, expected, message) {
+function assertEqual(actual, expected, message) { // strict equality helper for clarity
   if (actual !== expected) {
     throw new Error(`${message}: expected ${expected}, got ${actual}`);
   }
@@ -102,7 +102,7 @@ function runTest(name, testFn) { // queue keeps tests sequential so mocks reset 
   }
 }
 
-function renderHook(hookFn) { // mimic Testing Library to render hooks in Node
+function renderHook(hookFn) { // mimic Testing Library to render hooks in Node without DOM
   let value;
   function TestComponent() {
     value = hookFn();
@@ -198,7 +198,7 @@ Promise.all([
   })
 
 ]).then(() => {
-  console.log('\n\n📊 Final Test Results');
+  console.log('\n\n📊 Final Test Results'); // display aggregated success metrics
   console.log('='.repeat(50));
   console.log(`Total Tests: ${testCount}`);
   console.log(`Passed: ${passedTests}`);
