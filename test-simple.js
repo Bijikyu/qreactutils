@@ -25,19 +25,19 @@ let passedTests = 0; // incremented for every successful test
 let failedTests = 0; // incremented whenever a test throws
 let testResults = []; // collects summary data for post-run report
 
-function assert(condition, message) { // basic truthy check used across tests
+function assert(condition, message) { // throw if condition is false
   if (!condition) {
     throw new Error(message || 'Assertion failed');
   }
 }
 
-function assertEqual(actual, expected, message) { // strict equality helper for concise errors
+function assertEqual(actual, expected, message) { // compare actual and expected
   if (actual !== expected) {
     throw new Error(`${message || 'Values not equal'}: expected ${expected}, got ${actual}`);
   }
 }
 
-function runTest(name, testFn) { // queue ensures sequential execution for stability and readable logs
+function runTest(name, testFn) { // run a single test and record result sequentially
   testCount++;
   const startTime = Date.now();
   
@@ -69,7 +69,7 @@ function runTest(name, testFn) { // queue ensures sequential execution for stabi
   }
 }
 
-function renderHook(hookFn) { // minimal implementation of renderHook for Node to keep deps small
+function renderHook(hookFn) { // run hook with react-test-renderer and return its value
   let value;
   function TestComponent() {
     value = hookFn();
@@ -174,6 +174,7 @@ runTest('formatAxiosError handles errors', () => { // converts axios error
   assert(result instanceof Error, 'Should return Error object');
 });
 
+// verifies that apiRequest handles a simple GET using the mocked axios client
 runTest('apiRequest basic functionality', async () => { // makes mocked request
   const result = await apiRequest('/api/test', 'GET');
   assert(result.success === true, 'Should return success response');

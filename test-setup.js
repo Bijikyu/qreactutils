@@ -14,4 +14,4 @@ try { require('qtests/setup'); } catch (error) { // qtests provides axios/winsto
     return originalLoad(request, parent, isMain); // defer to original for everything else
   }; // loader patched so tests run without qtests
 }
-module.exports = { qtestsAvailable }; // export so tests can log whether real qtests mocks loaded for diagnostics
+module.exports = { qtestsAvailable }; // expose flag so test files know if fallback mocks were used

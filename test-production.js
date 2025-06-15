@@ -27,7 +27,7 @@ global.window = {
 let passed = 0;
 let total = 0;
 
-function test(name, fn) { // executed sequentially for deterministic results so state is isolated
+function test(name, fn) { // run a single test sequentially so shared state stays consistent
   total++;
   try {
     fn();
@@ -39,11 +39,11 @@ function test(name, fn) { // executed sequentially for deterministic results so 
   }
 }
 
-function assert(condition, message) { // basic truthy assertion helper
+function assert(condition, message) { // throw when condition is false
   if (!condition) throw new Error(message || 'Assertion failed');
 }
 
-function renderHook(hookFn) { // basic hook renderer for Node environment
+function renderHook(hookFn) { // run hook with react-test-renderer and return current value
   let value;
   function TestComponent() {
     value = hookFn();
@@ -118,6 +118,7 @@ test('createDropdownListHook creates hook function', () => { // confirms factory
   assert(typeof hook === 'function', 'Should return hook function');
 });
 
+// Ensure unexpected inputs do not break formatAxiosError and still return an Error
 test('Error handling with null inputs', () => { // handles unexpected argument
   // formatAxiosError should handle null gracefully by returning a generic error
   const result = formatAxiosError(null);

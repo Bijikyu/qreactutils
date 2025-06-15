@@ -43,7 +43,7 @@ global.window = {
 
 let testResults = []; // collected sequentially to keep output order stable
 
-function test(name, fn) { // queue keeps execution ordered for reliable results
+function test(name, fn) { // run test sequentially to keep state isolated
   try {
     // Silence console during test execution
     console.log = () => {};
@@ -68,11 +68,11 @@ function test(name, fn) { // queue keeps execution ordered for reliable results
   }
 }
 
-function assert(condition, message) { // basic assertion helper
+function assert(condition, message) { // throw if condition evaluates to false
   if (!condition) throw new Error(message || 'Assertion failed');
 }
 
-function renderHook(hookFn) { // lightweight hook renderer used instead of react-testing-library
+function renderHook(hookFn) { // run hook with react-test-renderer for assertions
   let value;
   function TestComponent() {
     value = hookFn();
@@ -163,6 +163,7 @@ test('createDropdownListHook creates hook function', () => { // factory output c
 });
 
 // Test 8: Error handling
+// ensures formatAxiosError is robust to invalid arguments
 test('formatAxiosError handles null inputs', () => { // handles bad argument
   const result = formatAxiosError(null);
   assert(result instanceof Error, 'Should return Error instance for null input');

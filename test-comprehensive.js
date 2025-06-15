@@ -45,11 +45,11 @@ global.PopStateEvent = class PopStateEvent { // stub constructor so history API 
 let testResults = []; // store results so summary prints in order
 let testSuites = []; // queue suites to run sequentially to keep state isolation
 
-function suite(name, tests) { // define a suite to group related tests for readability
+function suite(name, tests) { // collect tests under a named suite for organized output
   testSuites.push({ name, tests });
 }
 
-function test(name, fn) { // sequential execution avoids shared state issues between hooks
+function test(name, fn) { // run test sequentially to avoid shared state issues
   try {
     console.log = console.error = console.warn = () => {};
     fn();
@@ -65,17 +65,17 @@ function test(name, fn) { // sequential execution avoids shared state issues bet
   }
 }
 
-function assert(condition, message) { // simple truthy assertion helper
+function assert(condition, message) { // throw if condition evaluates to false
   if (!condition) throw new Error(message || 'Assertion failed');
 }
 
-function assertEqual(actual, expected, message) { // strict equality helper
+function assertEqual(actual, expected, message) { // throw when values do not match
   if (actual !== expected) {
     throw new Error(`${message}: expected ${expected}, got ${actual}`);
   }
 }
 
-function renderHook(hookFn) { // minimal renderer so hooks work without DOM; keeps dependencies minimal
+function renderHook(hookFn) { // execute hook with react-test-renderer and return value
   let value;
   function TestComponent() {
     value = hookFn();
@@ -266,6 +266,7 @@ suite('Integration Scenarios', [
     assert(result.current === undefined, 'useAuthRedirect returns undefined (side-effect hook)');
   }),
 
+  // This scenario checks that multiple hooks can be composed without interfering with each other's state
   test('Multiple hook composition', () => {
     const { result } = renderHook(() => {
       const [run, isLoading] = useAsyncAction(async () => 'test');

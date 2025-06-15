@@ -22,7 +22,7 @@ const TestRenderer = require('react-test-renderer');
  * @param {Function} hookFn - Hook function to execute
  * @returns {{result: {current: any}}} Current hook state for assertions
  */
-function renderHook(hookFn) {
+function renderHook(hookFn) { // execute hook with react-test-renderer for inspection
   let value;
   function TestComponent() {
     value = hookFn();
@@ -43,7 +43,7 @@ function renderHook(hookFn) {
  * @param {boolean} condition - Expression expected to be true
  * @param {string} message - Error message when assertion fails
  */
-function assert(condition, message) {
+function assert(condition, message) { // throw if expectation fails
   if (!condition) {
     throw new Error(`Assertion failed: ${message}`);
   }
@@ -103,7 +103,7 @@ let passedTests = 0;
  * @param {string} name - Test description for output
  * @param {Function} testFn - Test implementation
  */
-function runTest(name, testFn) {
+function runTest(name, testFn) { // execute and log a single test
   testCount++;
   try {
     testFn();
@@ -331,7 +331,8 @@ runTest('useDropdownData handles fetcher errors gracefully', () => { // error fe
   assert(typeof result.current.fetchData === 'function', 'Should provide fetchData function');
 });
 
-runTest('apiRequest handles network timeouts', async () => { // timeout should throw
+  // ensure apiRequest propagates timeout errors from the axios stub
+  runTest('apiRequest handles network timeouts', async () => { // timeout should throw
   try {
     await apiRequest('/api/timeout', 'POST');
     assert(false, 'Should throw on timeout');

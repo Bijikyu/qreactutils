@@ -70,17 +70,17 @@ console.log = () => {};
 let testCount = 0; // running tally of executed tests
 let passedTests = 0; // count of successful tests
 
-function assert(condition, message) { // simple assertion helper
+function assert(condition, message) { // throw when condition fails
   if (!condition) throw new Error(message || 'Assertion failed');
 }
 
-function assertEqual(actual, expected, message) { // strict equality helper for clarity
+function assertEqual(actual, expected, message) { // compare expected and actual values
   if (actual !== expected) {
     throw new Error(`${message}: expected ${expected}, got ${actual}`);
   }
 }
 
-function runTest(name, testFn) { // queue keeps tests sequential so mocks reset predictably
+function runTest(name, testFn) { // run queued test and track pass/fail status
   testCount++;
   try {
     const result = testFn();
@@ -102,7 +102,7 @@ function runTest(name, testFn) { // queue keeps tests sequential so mocks reset 
   }
 }
 
-function renderHook(hookFn) { // mimic Testing Library to render hooks in Node without DOM
+function renderHook(hookFn) { // execute hook with react-test-renderer and expose value
   let value;
   function TestComponent() {
     value = hookFn();
@@ -180,6 +180,7 @@ Promise.all([
     assert(result.message.includes('404'), 'Should include status code');
   }),
 
+  // Verifies that the API layer returns data from the axios stub without real network traffic
   runTest('API request with mocked response', async () => { // apiRequest uses mocked axios
     const result = await apiRequest('/api/success', 'GET');
     assert(result.success === true, 'Should return success response');
