@@ -16,22 +16,22 @@ const {
 const React = require('react'); // load React so hooks match production behavior
 const TestRenderer = require('react-test-renderer'); // runs hooks without DOM which keeps Node tests light
 
-// Suppress console.log during tests to prevent output overflow
+// Suppress console.log during tests to prevent output overflow // avoids EPIPE errors on CI
 const originalLog = console.log;
-console.log = () => {}; // Disable logging during tests
+console.log = () => {}; // Disable logging during tests to keep output manageable
 
 let testCount = 0; // tracks how many tests have run so far
 let passedTests = 0; // incremented for every successful test
 let failedTests = 0; // incremented whenever a test throws
 let testResults = []; // collects summary data for post-run report
 
-function assert(condition, message) {
+function assert(condition, message) { // basic truthy check used across tests
   if (!condition) {
     throw new Error(message || 'Assertion failed');
   }
 }
 
-function assertEqual(actual, expected, message) {
+function assertEqual(actual, expected, message) { // strict equality helper for concise errors
   if (actual !== expected) {
     throw new Error(`${message || 'Values not equal'}: expected ${expected}, got ${actual}`);
   }
@@ -69,7 +69,7 @@ function runTest(name, testFn) { // queue ensures sequential execution for stabi
   }
 }
 
-function renderHook(hookFn) { // minimal implementation of renderHook for Node
+function renderHook(hookFn) { // minimal implementation of renderHook for Node to keep deps small
   let value;
   function TestComponent() {
     value = hookFn();
@@ -81,7 +81,7 @@ function renderHook(hookFn) { // minimal implementation of renderHook for Node
   return { result: { current: value } };
 }
 
-// Mock axios for testing
+// Mock axios for testing // prevents real HTTP requests during unit tests
 const mockAxios = {
   create: () => ({
     request: async ({ url, method }) => {
@@ -99,7 +99,7 @@ const mockAxios = {
 // Replace axios in the global scope for testing
 global.axios = mockAxios; // avoids real HTTP calls in this suite
 
-// Mock window object
+// Mock window object // simulates browser APIs so hooks operate in Node environment
 global.window = {
   innerWidth: 1024,
   matchMedia: (query) => ({
@@ -190,7 +190,7 @@ runTest('createDropdownListHook factory', () => { // ensures hook is generated
   assert(typeof hook === 'function', 'Should return hook function');
 });
 
-// Wait 1s so any pending async assertions resolve before summarizing
+// Wait 1s so any pending async assertions resolve before summarizing // ensures promises finish and results are stable
 setTimeout(() => {
   console.log('\n\n📊 Test Results Summary');
   console.log('='.repeat(40));

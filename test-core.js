@@ -15,7 +15,7 @@ const {
 } = require('./index.js');
 
 // Setup test environment
-global.window = {
+global.window = { // simple window mock so hooks relying on browser APIs run
   innerWidth: 1024,
   matchMedia: (query) => ({
     matches: query.includes('max-width') && 1024 <= 767,
@@ -25,7 +25,7 @@ global.window = {
   history: { pushState: () => {} }
 }; // minimal window mock so hooks relying on browser APIs run
 
-// Suppress console output during testing
+// Suppress console output during testing // keeps noise low for CI
 const originalLog = console.log;
 console.log = () => {};
 
@@ -46,11 +46,11 @@ function test(name, fn) { // queue-based runner ensures sequential execution
   }
 }
 
-function assert(condition, message) {
+function assert(condition, message) { // basic assertion helper
   if (!condition) throw new Error(message || 'Assertion failed');
 }
 
-function renderHook(hookFn) { // mimic Testing Library's renderHook for Node
+function renderHook(hookFn) { // mimic Testing Library's renderHook for Node; avoids full testing frameworks
   let value;
   function TestComponent() {
     value = hookFn();
@@ -172,7 +172,7 @@ test('Hook function stability', () => { // ensures memoization works
 });
 
 console.log = originalLog;
-console.log(`\n\nTest Results: ${passed}/${total} passed`);
+console.log(`\n\nTest Results: ${passed}/${total} passed`); // summary for quick review
 
 if (passed === total) {
   console.log('\n✅ All core functionality tests passed');

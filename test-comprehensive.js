@@ -8,7 +8,7 @@
 const React = require('react'); // use real React so hooks behave normally
 const TestRenderer = require('react-test-renderer'); // allows hook execution without a browser
 
-// Silence all console output during execution
+// Silence all console output during execution // keeps test output concise for CI pipelines
 const originalConsole = { log: console.log, error: console.error, warn: console.warn };
 console.log = console.error = console.warn = () => {};
 
@@ -18,13 +18,13 @@ const {
   showToast, toastSuccess, toastError, apiRequest, getQueryFn
 } = require('./index.js');
 
-// Restore console for output
+// Restore console for output // ensures test progress is visible again
 console.log = originalConsole.log;
 console.error = originalConsole.error;
 console.warn = originalConsole.warn;
 
 // Enhanced browser environment mock
-global.window = {
+global.window = { // window stub so hooks relying on browser APIs don't crash in Node
   innerWidth: 1024,
   matchMedia: (query) => ({
     matches: query.includes('max-width') && 1024 <= 767,
@@ -35,7 +35,7 @@ global.window = {
   location: { href: 'http://localhost:3000' }
 }; // browser stub so routing and media queries work in Node
 
-global.PopStateEvent = class PopStateEvent { // stub constructor so history API tests run
+global.PopStateEvent = class PopStateEvent { // stub constructor so history API tests run without browser
   constructor(type, options = {}) {
     this.type = type;
     this.state = options.state || null;
@@ -45,7 +45,7 @@ global.PopStateEvent = class PopStateEvent { // stub constructor so history API 
 let testResults = []; // store results so summary prints in order
 let testSuites = []; // queue suites to run sequentially to keep state isolation
 
-function suite(name, tests) {
+function suite(name, tests) { // define a suite to group related tests for readability
   testSuites.push({ name, tests });
 }
 
@@ -65,17 +65,17 @@ function test(name, fn) { // sequential execution avoids shared state issues bet
   }
 }
 
-function assert(condition, message) {
+function assert(condition, message) { // simple truthy assertion helper
   if (!condition) throw new Error(message || 'Assertion failed');
 }
 
-function assertEqual(actual, expected, message) {
+function assertEqual(actual, expected, message) { // strict equality helper
   if (actual !== expected) {
     throw new Error(`${message}: expected ${expected}, got ${actual}`);
   }
 }
 
-function renderHook(hookFn) { // minimal renderer so hooks work without DOM
+function renderHook(hookFn) { // minimal renderer so hooks work without DOM; keeps dependencies minimal
   let value;
   function TestComponent() {
     value = hookFn();
@@ -293,7 +293,7 @@ testSuites.forEach(suite => { // suites execute sequentially for predictability
 });
 
 // Display results
-console.log('Test Results Summary:');
+console.log('Test Results Summary:'); // display aggregate results so failures are obvious
 console.log('--------------------');
 
 let passed = 0;

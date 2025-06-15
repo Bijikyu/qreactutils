@@ -49,7 +49,7 @@ function assert(condition, message) {
   }
 }
 
-// Mock implementations
+// Mock implementations // replace real modules so tests run offline
 const mockAxios = {
   create: () => ({
     request: async ({ url, method, data }) => {
@@ -66,10 +66,10 @@ const mockAxios = {
   isAxiosError: (error) => error && error.isAxiosError === true
 };
 
-// Override axios client
+// Override axios client // ensures API helpers use deterministic responses
 Object.assign(axiosClient, mockAxios.create());
 
-// Mock window for browser APIs
+// Mock window for browser APIs // minimal DOM replacement for Node environment
 global.window = {
   innerWidth: 1024,
   matchMedia: (query) => ({
@@ -83,7 +83,7 @@ global.window = {
   dispatchEvent: () => {}
 };
 
-// Mock PopStateEvent for auth redirect tests
+// Mock PopStateEvent for auth redirect tests // lets hooks handle browser navigation events
 global.PopStateEvent = class PopStateEvent {
   constructor(type, options = {}) {
     this.type = type;
@@ -374,7 +374,7 @@ runTest('Hook composition does not cause memory leaks', () => { // composed hook
 });
 
 // Final Results
-console.log(`\n📊 Test Results: ${passedTests}/${testCount} tests passed`);
+console.log(`\n📊 Test Results: ${passedTests}/${testCount} tests passed`); // summarized outcome for CI logs
 
 if (passedTests === testCount) {
   console.log('🎉 All tests passed!');
