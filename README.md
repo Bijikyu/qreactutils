@@ -244,21 +244,21 @@ function MyComponent() {
 
 ## Testing
 
-The library includes comprehensive test coverage:
+The library includes a custom Node-based test runner defined in `test.js`.
 
 ```bash
-# Run test suite
+# Run test suite (executes `node test.js`)
 npm test
 ```
-Before running the tests ensure `qtests` is installed by executing `npm install`. The `test-setup` script falls back to local stubs when `qtests` is not available.
+Run `npm install` first so dependencies like `qtests` are present. The `test-setup` script falls back to local stubs when `qtests` is not available.
 
-Before running the tests, install the lightweight stubbing library used by the suite:
+If `qtests` is missing, install it explicitly:
 
 ```bash
 npm install qtests --save-dev
 ```
 
-The test runner requires the `qtests/setup` module so automatic stubbing is enabled. Ensure the setup file is present or `npm test` will fail.
+The test runner loads `qtests/setup` to provide automatic stubbing. Ensure this module exists or `npm test` will fail.
 
 All tests pass with 100% functional coverage including:
 - Unit tests for all hooks and utilities
