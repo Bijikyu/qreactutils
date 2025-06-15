@@ -67,8 +67,8 @@ global.PopStateEvent = class PopStateEvent {
 const originalLog = console.log;
 console.log = () => {};
 
-let testCount = 0;
-let passedTests = 0;
+let testCount = 0; // running tally of executed tests
+let passedTests = 0; // count of successful tests
 
 function assert(condition, message) {
   if (!condition) throw new Error(message || 'Assertion failed');

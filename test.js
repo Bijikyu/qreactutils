@@ -174,10 +174,10 @@ global.window = mockWindow;
 global.PopStateEvent = class PopStateEvent { constructor(type, opts={}){ this.type=type; this.state=opts.state||null; } }; // stub for auth redirect tests
 
 // Test utilities
-let testCount = 0;
-let passedTests = 0;
-let failedTests = 0;
-const testResults = [];
+let testCount = 0; // number of tests executed in this run
+let passedTests = 0; // incremented when assertions succeed
+let failedTests = 0; // incremented when a test throws or rejects
+const testResults = []; // stores per-test details for the summary output
 
 /**
  * Execute a test with detailed logging.
