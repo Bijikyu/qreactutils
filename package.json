@@ -1,43 +1,51 @@
 {
-  "name": "qreactutils",
+  "name": "workspace",
   "version": "1.0.0",
-  "description": "A comprehensive React hooks utility library for managing async actions, dropdowns, forms, mobile detection, toast notifications, and authentication redirects.",
+  "description": "A comprehensive React hooks library providing common functionality for async actions, dropdown management, form editing, mobile detection, toast notifications, and authentication redirects.",
   "main": "index.js",
-  "scripts": {
-    "test": "node test.js"
+  "directories": {
+    "lib": "lib"
   },
-  "keywords": [
-    "react",
-    "hooks",
-    "utility",
-    "async",
-    "dropdown",
-    "form",
-    "mobile",
-    "toast",
-    "notification",
-    "authentication",
-    "query",
-    "axios"
-  ],
-  "author": "Q",
-  "license": "ISC",
   "dependencies": {
-    "@tanstack/react-query": "^5.80.6",
-    "@types/node": "^22.15.31",
-    "axios": "^1.9.0",
-
-    "nanoid": "^5.1.5",
-
-    "qtests": "^1.0.4",
+    "@tanstack/react-query": "^5.80.7",
+    "@types/node": "^24.0.1",
+    "asynckit": "^0.4.0",
+    "axios": "^1.10.0",
+    "call-bind-apply-helpers": "^1.0.2",
+    "combined-stream": "^1.0.8",
+    "delayed-stream": "^1.0.0",
+    "dunder-proto": "^1.0.1",
+    "es-define-property": "^1.0.1",
+    "es-errors": "^1.3.0",
+    "es-object-atoms": "^1.1.1",
+    "es-set-tostringtag": "^2.1.0",
+    "follow-redirects": "^1.15.9",
+    "form-data": "^4.0.3",
+    "function-bind": "^1.1.2",
+    "get-intrinsic": "^1.3.0",
+    "get-proto": "^1.0.1",
+    "gopd": "^1.2.0",
+    "has-symbols": "^1.1.0",
+    "has-tostringtag": "^1.0.2",
+    "hasown": "^2.0.2",
+    "math-intrinsics": "^1.1.0",
+    "mime-db": "^1.52.0",
+    "mime-types": "^2.1.35",
+    "nanoid": "^3.3.11",
+    "proxy-from-env": "^1.1.0",
+    "qtests": "^1.0.5",
     "react": "^19.1.0",
-
-    "react-responsive": "^10.0.1"
-
-    "safe-json-stringify": "^1.2.0"
-
+    "react-is": "^19.1.0",
+    "react-responsive": "^10.0.1",
+    "react-test-renderer": "^19.1.0",
+    "safe-json-stringify": "^1.2.0",
+    "scheduler": "^0.26.0",
+    "undici-types": "^6.21.0"
   },
-  "devDependencies": {
-    "react-test-renderer": "^19.1.0"
-  }
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
 }
