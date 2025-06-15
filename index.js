@@ -16,10 +16,10 @@
 // Import all hooks, utilities, and API functions from the consolidated hooks module
 // The hooks module acts as an aggregator, pulling together functionality from multiple internal modules
 const {
-  useAsyncAction, useDropdownData, createDropdownListHook, useDropdownToggle, // aggregate hook utilities
-  useEditForm, useIsMobile, useToast, toast, useToastAction, useAuthRedirect, // UI-related helpers
-  showToast, toastSuccess, toastError, stopEvent, apiRequest, getQueryFn, queryClient, formatAxiosError, axiosClient, getToastListenerCount, resetToastSystem, dispatch // core API & toast utilities
-} = require('./lib/hooks'); // CommonJS import keeps broad Node compatibility
+  useAsyncAction, useDropdownData, createDropdownListHook, useDropdownToggle, // aggregate hook utilities // gathered here to ensure stable references across modules
+  useEditForm, useIsMobile, useToast, toast, useToastAction, useAuthRedirect, // UI-related helpers // centralizing UI hooks prevents scattered imports
+  showToast, toastSuccess, toastError, stopEvent, apiRequest, getQueryFn, queryClient, formatAxiosError, axiosClient, getToastListenerCount, resetToastSystem, dispatch // core API & toast utilities // exposes internal tools in one shot for clarity
+} = require('./lib/hooks'); // CommonJS import keeps broad Node compatibility // require chosen so Node apps of any version can consume this module
 
 /**
  * Export all functions for use as a module
@@ -37,36 +37,36 @@ const {
  */
 module.exports = { // CommonJS export consolidating public API
   // Core async functionality hooks
-  useAsyncAction,        // Primary hook for async operations with loading states
-  useToastAction,        // Combination of async action with automatic toast notifications
+  useAsyncAction,        // Primary hook for async operations with loading states // exported separately so consumers can tree-shake unused hooks
+  useToastAction,        // Combination of async action with automatic toast notifications // keeps toast logic consistent across apps
   
   // Dropdown and form management hooks
-  useDropdownData,       // Generic dropdown state management with async data fetching
-  createDropdownListHook,// Factory for creating typed dropdown hooks
-  useDropdownToggle,     // Simple open/close state management for dropdowns
-  useEditForm,           // Form editing state with field management
+  useDropdownData,       // Generic dropdown state management with async data fetching // provides standardised dropdown pattern
+  createDropdownListHook,// Factory for creating typed dropdown hooks // export factory to customize dropdowns while reusing internals
+  useDropdownToggle,     // Simple open/close state management for dropdowns // keeps local state isolated
+  useEditForm,           // Form editing state with field management // unifies form logic across projects
   
   // UI and responsive hooks
-  useIsMobile,           // Responsive design hook for mobile detection
-  useToast,              // Toast notification system with centralized state
-  toast,                 // Standalone toast function for imperative usage
+  useIsMobile,           // Responsive design hook for mobile detection // avoids repeated media query logic in apps
+  useToast,              // Toast notification system with centralized state // hook variant for React usage
+  toast,                 // Standalone toast function for imperative usage // allows non-hook code to trigger notifications
   
   // Authentication and navigation
-  useAuthRedirect,       // Authentication-based client-side routing
+  useAuthRedirect,       // Authentication-based client-side routing // exported to standardize auth flows
   
   // Utility functions
-  showToast,             // Helper for displaying toast messages
-  toastSuccess,          // Success toast utility
-  toastError,            // Error toast utility
-  stopEvent,             // Event handling utility for preventing default behavior
-  getToastListenerCount, // Allows tests to inspect active toast listeners
-  resetToastSystem,      // Clears toast listeners between tests
-  dispatch,              // Expose dispatch for advanced control and tests
+  showToast,             // Helper for displaying toast messages // consistent entry point for notifications
+  toastSuccess,          // Success toast utility // separate exports keep success/error semantics explicit
+  toastError,            // Error toast utility // enables uniform error toasts across modules
+  stopEvent,             // Event handling utility for preventing default behavior // small helper kept public for testing
+  getToastListenerCount, // Allows tests to inspect active toast listeners // exported for monitoring toast system usage
+  resetToastSystem,      // Clears toast listeners between tests // ensures clean slate in test environments
+  dispatch,              // Expose dispatch for advanced control and tests // advanced consumers may replace dispatch implementation
   
   // API and HTTP functionality
-  apiRequest,            // Standardized HTTP request wrapper with error handling
-  getQueryFn,            // React Query integration for server state management
-  queryClient,           // Pre-configured React Query client instance
-  formatAxiosError,      // Error normalization for consistent error handling
-  axiosClient            // Pre-configured axios instance with sensible defaults
+  apiRequest,            // Standardized HTTP request wrapper with error handling // centralizing HTTP logic simplifies future swaps
+  getQueryFn,            // React Query integration for server state management // exported so apps can use shared query function
+  queryClient,           // Pre-configured React Query client instance // shared client ensures consistent caching behaviour
+  formatAxiosError,      // Error normalization for consistent error handling // keeps error objects uniform across the library
+  axiosClient            // Pre-configured axios instance with sensible defaults // leaving axios setup inside library reduces boilerplate
 }; // end consolidated export object
