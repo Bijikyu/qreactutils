@@ -20,10 +20,10 @@ const TestRenderer = require('react-test-renderer'); // runs hooks without DOM w
 const originalLog = console.log;
 console.log = () => {}; // Disable logging during tests
 
-let testCount = 0;
-let passedTests = 0;
-let failedTests = 0;
-let testResults = [];
+let testCount = 0; // tracks how many tests have run so far
+let passedTests = 0; // incremented for every successful test
+let failedTests = 0; // incremented whenever a test throws
+let testResults = []; // collects summary data for post-run report
 
 function assert(condition, message) {
   if (!condition) {
@@ -190,7 +190,7 @@ runTest('createDropdownListHook factory', () => { // ensures hook is generated
   assert(typeof hook === 'function', 'Should return hook function');
 });
 
-// Wait for async tests to complete
+// Wait 1s so any pending async assertions resolve before summarizing
 setTimeout(() => {
   console.log('\n\n📊 Test Results Summary');
   console.log('='.repeat(40));
