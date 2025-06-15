@@ -38,7 +38,7 @@ const {
 module.exports = { // CommonJS export consolidating public API
   // Core async functionality hooks
   useAsyncAction,        // Primary hook for async operations with loading states // public so apps share one async pattern
-  useToastAction,        // Combination of async action with automatic toast notifications // exposed to simplify toast wiring
+  useToastAction,        // Combines async actions with toast updates // public so apps wire loading and toasts consistently
   
   // Dropdown and form management hooks
   useDropdownData,       // Generic dropdown state management with async data fetching // exported to avoid reimplementing dropdown logic
