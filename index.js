@@ -37,24 +37,31 @@ const {
  */
 module.exports = { // CommonJS export consolidating public API
   // Core async functionality hooks
+  // Exported individually to keep reference stability for apps depending on these hooks
   useAsyncAction,        // Primary hook for async operations with loading states // exported separately so consumers can tree-shake unused hooks
   useToastAction,        // Combination of async action with automatic toast notifications // keeps toast logic consistent across apps
   
   // Dropdown and form management hooks
+  // Grouped together because forms and dropdowns share state-management patterns; exporting
+  // them as a block keeps compatibility for apps built before internal refactors
   useDropdownData,       // Generic dropdown state management with async data fetching // provides standardised dropdown pattern
   createDropdownListHook,// Factory for creating typed dropdown hooks // export factory to customize dropdowns while reusing internals
   useDropdownToggle,     // Simple open/close state management for dropdowns // keeps local state isolated
   useEditForm,           // Form editing state with field management // unifies form logic across projects
   
   // UI and responsive hooks
+  // Exported as a cluster so consuming apps keep a stable import path for visual
+  // utilities when upgrading the library
   useIsMobile,           // Responsive design hook for mobile detection // avoids repeated media query logic in apps
   useToast,              // Toast notification system with centralized state // hook variant for React usage
   toast,                 // Standalone toast function for imperative usage // allows non-hook code to trigger notifications
   
   // Authentication and navigation
+  // Separated so authentication helpers remain stable and easy to locate for legacy consumers
   useAuthRedirect,       // Authentication-based client-side routing // exported to standardize auth flows
   
   // Utility functions
+  // These helpers are exported for testability and to maintain cross-version behaviour parity
   showToast,             // Helper for displaying toast messages // consistent entry point for notifications
   toastSuccess,          // Success toast utility // separate exports keep success/error semantics explicit
   toastError,            // Error toast utility // enables uniform error toasts across modules
@@ -62,8 +69,9 @@ module.exports = { // CommonJS export consolidating public API
   getToastListenerCount, // Allows tests to inspect active toast listeners // exported for monitoring toast system usage
   resetToastSystem,      // Clears toast listeners between tests // ensures clean slate in test environments
   dispatch,              // Expose dispatch for advanced control and tests // advanced consumers may replace dispatch implementation
-  
+
   // API and HTTP functionality
+  // Exported to provide a stable HTTP abstraction layer that can evolve without changing consumers
   apiRequest,            // Standardized HTTP request wrapper with error handling // centralizing HTTP logic simplifies future swaps
   getQueryFn,            // React Query integration for server state management // exported so apps can use shared query function
   queryClient,           // Pre-configured React Query client instance // shared client ensures consistent caching behaviour
