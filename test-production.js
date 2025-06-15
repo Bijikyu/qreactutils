@@ -3,8 +3,10 @@
  * Clean validation without console noise
  */
 
-const React = require('react');
-const TestRenderer = require('react-test-renderer');
+// Minimal helpers keep this suite runnable directly with Node
+
+const React = require('react'); // standard React for hook execution
+const TestRenderer = require('react-test-renderer'); // run hooks without browser DOM
 
 const {
   useAsyncAction, useEditForm, useIsMobile, toast, 
@@ -25,7 +27,7 @@ global.window = {
 let passed = 0;
 let total = 0;
 
-function test(name, fn) {
+function test(name, fn) { // executed sequentially for deterministic results
   total++;
   try {
     fn();
@@ -47,8 +49,8 @@ function renderHook(hookFn) {
     value = hookFn();
     return null;
   }
-  TestRenderer.act(() => {
-    TestRenderer.create(React.createElement(TestComponent));
+  TestRenderer.act(() => { // react-test-renderer lets Node run hooks
+    TestRenderer.create(React.createElement(TestComponent)); // no DOM required
   });
   return { result: { current: value } };
 }

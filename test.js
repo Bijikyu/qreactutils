@@ -1,4 +1,5 @@
 require('./test-setup'); // ensure qtests or fallback stubs
+// Hooks run via react-test-renderer and tests queue sequentially so Node can run this without Jest
 
 /**
  * Comprehensive Test Suite for React Hooks Utility Library
@@ -41,8 +42,8 @@ function renderHook(hookFn, props = {}) { // Utility to render hooks with basic 
     result.current = hookFn(innerProps); // capture value on each render
     return null;
   }
-  TestRenderer.act(() => {
-    root = TestRenderer.create(React.createElement(TestComponent, props));
+  TestRenderer.act(() => { // react-test-renderer lets us execute hooks here
+    root = TestRenderer.create(React.createElement(TestComponent, props)); // avoids need for a browser DOM
   });
   return {
     result,
@@ -187,8 +188,8 @@ const testResults = [];
  * @param {string} name - Description of the test
  * @param {Function} testFn - The test logic to run
  */
-let testQueue = Promise.resolve(); // ensures tests run sequentially
-function runTest(name, testFn) {
+let testQueue = Promise.resolve(); // queue keeps async tests in order
+function runTest(name, testFn) { // each test awaits the previous via the queue
   testQueue = testQueue.then(async () => { // chain test onto queue
     testCount++;
     const testStart = Date.now();

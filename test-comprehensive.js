@@ -3,8 +3,10 @@
  * Advanced testing with edge cases and integration scenarios
  */
 
-const React = require('react');
-const TestRenderer = require('react-test-renderer');
+// These tests run in plain Node without Jest using simple helper functions
+
+const React = require('react'); // use real React so hooks behave normally
+const TestRenderer = require('react-test-renderer'); // allows hook execution without a browser
 
 // Silence all console output during execution
 const originalConsole = { log: console.log, error: console.error, warn: console.warn };
@@ -40,14 +42,14 @@ global.PopStateEvent = class PopStateEvent {
   }
 };
 
-let testResults = [];
-let testSuites = [];
+let testResults = []; // store results so summary prints in order
+let testSuites = []; // queue suites to run sequentially
 
 function suite(name, tests) {
   testSuites.push({ name, tests });
 }
 
-function test(name, fn) {
+function test(name, fn) { // sequential execution avoids shared state issues
   try {
     console.log = console.error = console.warn = () => {};
     fn();
@@ -79,10 +81,10 @@ function renderHook(hookFn) {
     value = hookFn();
     return null;
   }
-  const originalError = console.error;
+const originalError = console.error; // save logger for restoration
   console.error = () => {};
-  TestRenderer.act(() => {
-    TestRenderer.create(React.createElement(TestComponent));
+  TestRenderer.act(() => { // react-test-renderer executes hook logic
+    TestRenderer.create(React.createElement(TestComponent)); // no DOM needed here
   });
   console.error = originalError;
   return { result: { current: value } };
@@ -284,7 +286,7 @@ suite('Integration Scenarios', [
 ]);
 
 // Execute all test suites
-testSuites.forEach(suite => {
+testSuites.forEach(suite => { // suites execute sequentially for predictability
   console.log(`${suite.name}:`);
   suite.tests.forEach(() => {}); // Tests already executed during definition
   console.log('');

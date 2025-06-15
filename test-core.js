@@ -3,8 +3,10 @@
  * Tests individual components without external dependencies
  */
 
-const React = require('react');
-const TestRenderer = require('react-test-renderer');
+// Runs sequentially in Node so full frameworks are unnecessary
+
+const React = require('react'); // real React provides hook semantics
+const TestRenderer = require('react-test-renderer'); // executes hooks without DOM libraries
 
 // Import only the hooks and utilities we can test independently
 const {
@@ -30,7 +32,7 @@ console.log = () => {};
 let passed = 0;
 let total = 0;
 
-function test(name, fn) {
+function test(name, fn) { // each test runs in order for reliable state
   total++;
   try {
     fn();
@@ -54,8 +56,8 @@ function renderHook(hookFn) {
     value = hookFn();
     return null;
   }
-  TestRenderer.act(() => {
-    TestRenderer.create(React.createElement(TestComponent));
+  TestRenderer.act(() => { // run hook without DOM via react-test-renderer
+    TestRenderer.create(React.createElement(TestComponent)); // minimal renderer
   });
   return { result: { current: value } };
 }
