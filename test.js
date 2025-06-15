@@ -1,5 +1,5 @@
-require('./test-setup'); // ensure qtests or fallback stubs before other imports
-// Hooks run via react-test-renderer and tests queue sequentially so Node can run this without Jest
+require('./test-setup'); // ensure qtests or fallback stubs before other imports so axios/winston mocks load first
+// Hooks run via react-test-renderer and tests queue sequentially so Node can run this without Jest; this keeps orchestration simple
 
 /**
  * Comprehensive Test Suite for React Hooks Utility Library
@@ -24,7 +24,7 @@ require('./test-setup'); // ensure qtests or fallback stubs before other imports
 
 const React = require('react'); // Load real React for hook rendering //(replace mock React with real module)
 const TestRenderer = require('react-test-renderer'); // Renderer for executing hooks //(provide test renderer for hook execution)
-globalThis.IS_REACT_ACT_ENVIRONMENT = true; // flag React act environment for warnings
+globalThis.IS_REACT_ACT_ENVIRONMENT = true; // flag React act environment for warnings so TestRenderer.act works correctly
 
 /**
  * Render a hook via react-test-renderer to keep tests lightweight.
@@ -46,17 +46,17 @@ function renderHook(hookFn, props = {}) { // Utility to render hooks with basic 
     root = TestRenderer.create(React.createElement(TestComponent, props)); // avoids need for a browser DOM
   });
   return {
-    result,
+    result, // exposes current hook state to assertions
     rerender: (newProps = props) => TestRenderer.act(() => root.update(React.createElement(TestComponent, newProps))), // allow prop updates for effects
-    unmount: () => TestRenderer.act(() => root.unmount()) // expose unmount for cleanup tests
+    unmount: () => TestRenderer.act(() => root.unmount()) // expose unmount for cleanup tests to verify teardown logic
   }; // return mimic of Testing Library plus unmount
 } //
 
-// Enhanced axios mock extending qtests stub
+// Enhanced axios mock extending qtests stub to emulate axios.create and common error conditions
 const mockAxios = require('axios'); // base stub from qtests setup
-mockAxios.create = (config) => { // provide axios.create capability for tests
+mockAxios.create = (config) => { // provide axios.create capability for tests to support instances
     const instance = async (requestConfig) => instance.request(requestConfig); // callable like real axios
-    instance.request = async (requestConfig) => { // simulate axios.request behaviour
+    instance.request = async (requestConfig) => { // simulate axios.request behaviour so network calls are deterministic
       const { url, method, data } = requestConfig;
       
       // Convert relative URLs to absolute for testing
@@ -84,7 +84,7 @@ mockAxios.create = (config) => { // provide axios.create capability for tests
         throw error;
       }
       
-      // Default successful response - return the response structure that axios actually returns
+      // Default successful response - return structure mirroring real axios for realistic assertions
       return {
         data: { success: true, url: absoluteUrl, method, requestData: data },
         status: 200,
@@ -96,7 +96,7 @@ mockAxios.create = (config) => { // provide axios.create capability for tests
     };
     return instance;
 };
-mockAxios.isAxiosError = (error) => error && error.isAxiosError === true; // match axios API
+mockAxios.isAxiosError = (error) => error && error.isAxiosError === true; // match axios API so formatAxiosError recognizes mocked errors
 
 const {
   useAsyncAction, useDropdownData, createDropdownListHook, useDropdownToggle,
@@ -188,15 +188,15 @@ const testResults = [];
  * @param {string} name - Description of the test
  * @param {Function} testFn - The test logic to run
  */
-let testQueue = Promise.resolve(); // queue keeps async tests in order so mocks reset correctly
-function runTest(name, testFn) { // each test awaits the previous via the queue to maintain order
+let testQueue = Promise.resolve(); // queue keeps async tests in order so mocks reset correctly between runs
+function runTest(name, testFn) { // each test awaits the previous via the queue to maintain order and avoid race conditions
   testQueue = testQueue.then(async () => { // chain test onto queue
     testCount++;
     const testStart = Date.now();
     try {
       console.log(`\n🧪 Test ${testCount}: ${name}`);
       mockWindow._resetMocks(); // reset window state for isolation
-      await testFn(); // await async test bodies
+      await testFn(); // await async test bodies so promises resolve within this chain
       const duration = Date.now() - testStart;
       passedTests++;
       testResults.push({ name, status: 'PASSED', duration });
@@ -1614,10 +1614,10 @@ runTest('Multi-component integration scenario', () => {
 // TEST SUMMARY AND REPORTING
 // =============================================================================
 
-testQueue.then(() => { // wait for queued tests before reporting
+testQueue.then(() => { // wait for queued tests before reporting to keep summary accurate
   // Restore original environment after tests complete
-  require = originalRequire;
-  global.window = originalWindow;
+  require = originalRequire; // restore module loading behavior
+  global.window = originalWindow; // restore any mocked browser APIs
   delete global.PopStateEvent; // cleanup custom event constructor
 
 console.log('\n📊 DETAILED TEST SUMMARY');
@@ -1681,5 +1681,5 @@ if (failedTests === 0) {
 }
 
 console.log('\n🔚 Enhanced test suite completed successfully.');
-console.log('📋 For debugging failed tests, set DEBUG_TESTS=true environment variable.');
+console.log('📋 For debugging failed tests, set DEBUG_TESTS=true environment variable.'); // note optional verbose output
 });
