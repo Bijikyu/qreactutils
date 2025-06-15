@@ -31,12 +31,7 @@ const actionTypes = {
   REMOVE_TOAST: "REMOVE_TOAST",
 } as const
 
-let count = 0
-
-function genId() {
-  count = (count + 1) % Number.MAX_SAFE_INTEGER
-  return count.toString()
-}
+const { nanoid } = require('nanoid')
 
 type ActionType = typeof actionTypes
 
@@ -149,7 +144,7 @@ function dispatch(action: Action) { //(notify listeners with updated state)
 type Toast = Omit<ToasterToast, "id">
 
 function toast({ ...props }: Toast) { //(create new toast and return controls)
-  const id = genId()
+  const id = nanoid()
 
   const update = (props: ToasterToast) =>
     dispatch({

@@ -126,19 +126,16 @@ const showToast = withToastLogging('showToast', function(toast, message, title, 
 **Fix**: Add type checking for critical parameters
 
 #### Issue: Potential integer overflow in toast ID generation
-**Location**: `lib/hooks.js:509-512`
+**Location**: `lib/hooks.js`
 **Severity**: VERY LOW
-**Description**: While modulo operation prevents true overflow, ID collision is theoretically possible.
+**Description**: Previous versions used a simple counter for toast IDs which could theoretically overflow.
 
 ```javascript
-function genId() {
-  count = (count + 1) % Number.MAX_SAFE_INTEGER;
-  return count.toString();
-}
+const id = nanoid();
 ```
 
-**Impact**: Extremely unlikely ID collision after 9+ quadrillion toasts
-**Status**: Not a practical concern
+**Impact**: Collision risk eliminated with nanoid's randomness
+**Status**: Resolved by using nanoid()
 
 ### 5. Performance and Optimization Issues
 
