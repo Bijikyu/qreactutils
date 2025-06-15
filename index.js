@@ -16,10 +16,10 @@
 // Import all hooks, utilities, and API functions from the consolidated hooks module
 // The hooks module acts as an aggregator, pulling together functionality from multiple internal modules
 const {
-  useAsyncAction, useDropdownData, createDropdownListHook, useDropdownToggle, //(grab hook utilities)
-  useEditForm, useIsMobile, useToast, toast, useToastAction, useAuthRedirect, //(grab UI helpers)
-  showToast, toastSuccess, toastError, stopEvent, apiRequest, getQueryFn, queryClient, formatAxiosError, axiosClient, getToastListenerCount, resetToastSystem, dispatch //(grab API utilities)
-} = require('./lib/hooks'); // aggregated exports from internal modules
+  useAsyncAction, useDropdownData, createDropdownListHook, useDropdownToggle, // aggregate hook utilities
+  useEditForm, useIsMobile, useToast, toast, useToastAction, useAuthRedirect, // UI-related helpers
+  showToast, toastSuccess, toastError, stopEvent, apiRequest, getQueryFn, queryClient, formatAxiosError, axiosClient, getToastListenerCount, resetToastSystem, dispatch // core API & toast utilities
+} = require('./lib/hooks'); // CommonJS import keeps broad Node compatibility
 
 /**
  * Export all functions for use as a module
@@ -35,7 +35,7 @@ const {
  * Keeping a single export block makes the API easy to scan by new consumers; ensures discoverability.
  * Internal modules can move or reorganize without changing these exports, so existing imports keep working; ensures backward compatibility.
  */
-module.exports = { // expose library functions
+module.exports = { // CommonJS export consolidating public API
   // Core async functionality hooks
   useAsyncAction,        // Primary hook for async operations with loading states
   useToastAction,        // Combination of async action with automatic toast notifications
@@ -69,4 +69,4 @@ module.exports = { // expose library functions
   queryClient,           // Pre-configured React Query client instance
   formatAxiosError,      // Error normalization for consistent error handling
   axiosClient            // Pre-configured axios instance with sensible defaults
-}; // export object
+}; // end consolidated export object
