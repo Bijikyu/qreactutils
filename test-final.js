@@ -36,7 +36,7 @@ const mockAxios = {
 };
 
 // Replace axios globally before library import
-global.axios = mockAxios;
+global.axios = mockAxios; // ensures apiRequest uses mocked responses
 
 // Import library after mocking
 const {
@@ -80,7 +80,7 @@ function assertEqual(actual, expected, message) {
   }
 }
 
-function runTest(name, testFn) { // queued to ensure deterministic order
+function runTest(name, testFn) { // queue keeps tests sequential so mocks reset predictably
   testCount++;
   try {
     const result = testFn();
@@ -102,7 +102,7 @@ function runTest(name, testFn) { // queued to ensure deterministic order
   }
 }
 
-function renderHook(hookFn) {
+function renderHook(hookFn) { // mimic Testing Library to render hooks in Node
   let value;
   function TestComponent() {
     value = hookFn();
@@ -121,7 +121,7 @@ console.log('🔍 Running Final Production Test Suite...\n');
 // Execute all tests
 Promise.all([
   runTest('Core exports validation', () => {
-    assert(typeof useAsyncAction === 'function', 'useAsyncAction missing');
+    assert(typeof useAsyncAction === 'function', 'useAsyncAction missing'); // confirm core hook export
     assert(typeof useEditForm === 'function', 'useEditForm missing');
     assert(typeof useIsMobile === 'function', 'useIsMobile missing');
     assert(typeof toast === 'function', 'toast missing');

@@ -1,4 +1,4 @@
-require('./test-setup'); // ensure qtests or fallback stubs
+require('./test-setup'); // ensure qtests or fallback stubs before other imports
 // Hooks run via react-test-renderer and tests queue sequentially so Node can run this without Jest
 
 /**
@@ -54,7 +54,7 @@ function renderHook(hookFn, props = {}) { // Utility to render hooks with basic 
 
 // Enhanced axios mock extending qtests stub
 const mockAxios = require('axios'); // base stub from qtests setup
-mockAxios.create = (config) => { // provide axios.create capability
+mockAxios.create = (config) => { // provide axios.create capability for tests
     const instance = async (requestConfig) => instance.request(requestConfig); // callable like real axios
     instance.request = async (requestConfig) => { // simulate axios.request behaviour
       const { url, method, data } = requestConfig;
@@ -111,8 +111,8 @@ const { executeWithErrorHandling, executeSyncWithErrorHandling } = require('./li
 const { executeWithErrorToast, executeWithToastFeedback } = require('./lib/toastIntegration.js'); // test toast integration
 
 const mockedAxiosClient = mockAxios.create(); // Create axios stub instance for API calls
-axiosClient.request = mockedAxiosClient.request; // Override request with stub
-axiosClient.get = mockedAxiosClient.get; // Override get with stub
+axiosClient.request = mockedAxiosClient.request; // override request so api layer uses mock
+axiosClient.get = mockedAxiosClient.get; // override get so queries use stub
 
 // Mock window object for browser API testing
 const mockWindow = {
@@ -188,8 +188,8 @@ const testResults = [];
  * @param {string} name - Description of the test
  * @param {Function} testFn - The test logic to run
  */
-let testQueue = Promise.resolve(); // queue keeps async tests in order
-function runTest(name, testFn) { // each test awaits the previous via the queue
+let testQueue = Promise.resolve(); // queue keeps async tests in order so mocks reset correctly
+function runTest(name, testFn) { // each test awaits the previous via the queue to maintain order
   testQueue = testQueue.then(async () => { // chain test onto queue
     testCount++;
     const testStart = Date.now();
@@ -292,7 +292,7 @@ function assertAsync(asyncFn, message) {
 function assertFunctionsExported(functionNames, category) {
   functionNames.forEach(functionName => {
     const fn = eval(functionName);
-    assert(typeof fn === 'function', `${functionName} should be a function`);
+    assert(typeof fn === 'function', `${functionName} should be a function`); // verify export type
     assert(fn.length >= 0, `${functionName} should be callable`);
   });
 }

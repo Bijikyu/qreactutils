@@ -22,12 +22,12 @@ global.window = {
     removeEventListener: () => {}
   }),
   history: { pushState: () => {} }
-};
+}; // simple window mock so hooks can access browser APIs
 
 let passed = 0;
 let total = 0;
 
-function test(name, fn) { // executed sequentially for deterministic results
+function test(name, fn) { // executed sequentially for deterministic results so state is isolated
   total++;
   try {
     fn();
@@ -43,7 +43,7 @@ function assert(condition, message) {
   if (!condition) throw new Error(message || 'Assertion failed');
 }
 
-function renderHook(hookFn) {
+function renderHook(hookFn) { // basic hook renderer for Node environment
   let value;
   function TestComponent() {
     value = hookFn();
@@ -60,7 +60,7 @@ console.log('Testing React Hooks Library Production Build...\n');
 // Core hook functionality tests
 test('useAsyncAction returns correct structure', () => {
   const { result } = renderHook(() => useAsyncAction(async () => 'test'));
-  assert(Array.isArray(result.current), 'Should return array');
+  assert(Array.isArray(result.current), 'Should return array'); // confirm [fn, bool] shape
   assert(result.current.length === 2, 'Should have run function and loading state');
   assert(typeof result.current[0] === 'function', 'First element should be function');
   assert(typeof result.current[1] === 'boolean', 'Second element should be boolean');

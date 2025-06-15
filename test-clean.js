@@ -39,11 +39,11 @@ global.window = {
     removeEventListener: () => {}
   }),
   history: { pushState: () => {} }
-};
+}; // basic DOM stub so hooks referencing window don't fail
 
 let testResults = []; // collected sequentially to keep output order stable
 
-function test(name, fn) { // simple queue ensures hooks run one after another
+function test(name, fn) { // queue keeps execution ordered for reliable results
   try {
     // Silence console during test execution
     console.log = () => {};
@@ -72,7 +72,7 @@ function assert(condition, message) {
   if (!condition) throw new Error(message || 'Assertion failed');
 }
 
-function renderHook(hookFn) {
+function renderHook(hookFn) { // lightweight hook renderer used instead of react-testing-library
   let value;
   function TestComponent() {
     value = hookFn();
@@ -98,7 +98,7 @@ console.log('================================\n');
 // Test 1: useAsyncAction
 test('useAsyncAction returns correct structure', () => {
   const { result } = renderHook(() => useAsyncAction(async () => 'test'));
-  assert(Array.isArray(result.current), 'Should return array');
+  assert(Array.isArray(result.current), 'Should return array'); // ensures hook signature remains [fn, bool]
   assert(result.current.length === 2, 'Should have run function and loading state');
   assert(typeof result.current[0] === 'function', 'First element should be function');
   assert(typeof result.current[1] === 'boolean', 'Second element should be boolean');

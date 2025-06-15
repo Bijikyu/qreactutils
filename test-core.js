@@ -23,7 +23,7 @@ global.window = {
     removeEventListener: () => {}
   }),
   history: { pushState: () => {} }
-};
+}; // minimal window mock so hooks relying on browser APIs run
 
 // Suppress console output during testing
 const originalLog = console.log;
@@ -32,7 +32,7 @@ console.log = () => {};
 let passed = 0;
 let total = 0;
 
-function test(name, fn) { // each test runs in order for reliable state
+function test(name, fn) { // queue-based runner ensures sequential execution
   total++;
   try {
     fn();
@@ -50,7 +50,7 @@ function assert(condition, message) {
   if (!condition) throw new Error(message || 'Assertion failed');
 }
 
-function renderHook(hookFn) {
+function renderHook(hookFn) { // mimic Testing Library's renderHook for Node
   let value;
   function TestComponent() {
     value = hookFn();
@@ -69,7 +69,7 @@ console.log = () => {};
 // Test 1: useAsyncAction returns proper structure
 test('useAsyncAction structure', () => {
   const { result } = renderHook(() => useAsyncAction(async () => 'test'));
-  assert(Array.isArray(result.current), 'Should return array');
+  assert(Array.isArray(result.current), 'Should return array'); // ensures hook returns [fn, bool]
   assert(result.current.length === 2, 'Should have 2 elements');
   assert(typeof result.current[0] === 'function', 'First element should be function');
   assert(typeof result.current[1] === 'boolean', 'Second element should be boolean');
