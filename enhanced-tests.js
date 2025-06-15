@@ -1,6 +1,8 @@
+require('./test-setup'); // load qtests stubs before importing the library
+
 /**
  * Enhanced Test Suite for React Hooks Utility Library
- * 
+ *
  * Focused on critical functionality with efficient execution
  */
 
@@ -43,7 +45,7 @@ function renderHook(hookFn) {
  * @param {boolean} condition - Expression expected to be true
  * @param {string} message - Error message when assertion fails
  */
-function assert(condition, message) {
+function assert(condition, message) { // simple boolean assertion helper
   if (!condition) {
     throw new Error(`Assertion failed: ${message}`);
   }
@@ -103,7 +105,7 @@ let passedTests = 0;
  * @param {string} name - Test description for output
  * @param {Function} testFn - Test implementation
  */
-function runTest(name, testFn) {
+function runTest(name, testFn) { // executes test and records result
   testCount++;
   try {
     testFn();

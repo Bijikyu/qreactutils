@@ -221,7 +221,7 @@ function runTest(name, testFn) { // each test awaits the previous via the queue 
  * @param {boolean} condition - Value to evaluate
  * @param {string} message - Message when assertion fails
  */
-function assert(condition, message) {
+function assert(condition, message) { // fail if condition false
   if (!condition) {
     throw new Error(message);
   }
@@ -237,7 +237,7 @@ function assert(condition, message) {
  * @param {*} expected - Expected value
  * @param {string} message - Message prefix for errors
  */
-function assertEqual(actual, expected, message) {
+function assertEqual(actual, expected, message) { // strict equality assertion
   if (actual !== expected) {
     throw new Error(`${message}: expected ${expected}, got ${actual}`);
   }
@@ -252,7 +252,7 @@ function assertEqual(actual, expected, message) {
  * @param {Function} fn - Function expected to throw
  * @param {string} message - Message used when no error is thrown
  */
-function assertThrows(fn, message) {
+function assertThrows(fn, message) { // confirm a function throws
   try {
     fn();
     throw new Error(`${message}: expected function to throw but it didn't`);
@@ -274,7 +274,7 @@ function assertThrows(fn, message) {
  * @param {string} message - Message prefix for rejected promise
  * @returns {Promise<void>} promise that rejects with formatted error
  */
-function assertAsync(asyncFn, message) {
+function assertAsync(asyncFn, message) { // awaits promise and wraps errors
   return asyncFn().catch(error => {
     throw new Error(`${message}: ${error.message}`);
   });
@@ -289,7 +289,7 @@ function assertAsync(asyncFn, message) {
  * @param {Array} functionNames - Names of functions to validate
  * @param {string} category - Category name for error messages
  */
-function assertFunctionsExported(functionNames, category) {
+function assertFunctionsExported(functionNames, category) { // verify export is callable
   functionNames.forEach(functionName => {
     const fn = eval(functionName);
     assert(typeof fn === 'function', `${functionName} should be a function`); // verify export type
@@ -307,7 +307,7 @@ function assertFunctionsExported(functionNames, category) {
  * @param {string} expectedErrorPattern - Pattern expected in error message
  * @param {string} testDescription - Description for error messages
  */
-async function assertApiError(endpoint, expectedErrorPattern, testDescription) {
+async function assertApiError(endpoint, expectedErrorPattern, testDescription) { // assert API throws with pattern
   try {
     await apiRequest(endpoint);
     throw new Error(`Should have thrown for ${testDescription}`);
@@ -329,7 +329,7 @@ console.log('🚀 Starting Enhanced Comprehensive Test Suite...\n');
 
 console.log('📦 MODULE EXPORT TESTS');
 
-runTest('All core hooks are exported as functions', () => {
+runTest('All core hooks are exported as functions', () => { // verify hook export surface
   const hooks = [
     'useAsyncAction', 'useDropdownData', 'useDropdownToggle', 'useEditForm',
     'useIsMobile', 'useToast', 'useToastAction', 'useAuthRedirect'
@@ -342,7 +342,7 @@ runTest('All core hooks are exported as functions', () => {
   });
 });
 
-runTest('All utility functions are exported', () => {
+runTest('All utility functions are exported', () => { // verify util export surface
   const utilities = ['toast', 'showToast', 'stopEvent'];
   
   utilities.forEach(utilName => {
@@ -351,7 +351,7 @@ runTest('All utility functions are exported', () => {
   });
 });
 
-runTest('All API functions are exported', () => {
+runTest('All API functions are exported', () => { // verify API export surface
   assert(typeof apiRequest === 'function', 'apiRequest should be a function');
   assert(typeof getQueryFn === 'function', 'getQueryFn should be a function');
   assert(typeof formatAxiosError === 'function', 'formatAxiosError should be a function');
@@ -368,7 +368,7 @@ runTest('All API functions are exported', () => {
   }
 });
 
-runTest('Factory function exports and behavior', () => {
+runTest('Factory function exports and behavior', () => { // ensure factory returns hook
   assert(typeof createDropdownListHook === 'function', 'createDropdownListHook should be a function');
   
   const mockFetcher = async () => ['item1', 'item2'];
@@ -384,7 +384,7 @@ runTest('Factory function exports and behavior', () => {
 
 console.log('\n🔧 UNIT TESTS - UTILITY FUNCTIONS');
 
-runTest('showToast with all parameter combinations', () => {
+runTest('showToast with all parameter combinations', () => { // toast supports optional args
   const callHistory = [];
   const mockToast = (params) => {
     callHistory.push(params);
@@ -403,7 +403,7 @@ runTest('showToast with all parameter combinations', () => {
   assertEqual(callHistory[1].title, undefined, 'Title should be undefined when not provided');
 });
 
-runTest('showToast error handling and propagation', () => {
+runTest('showToast error handling and propagation', () => { // toast errors bubble up
   const failingToast = () => {
     throw new Error('Toast system failure');
   };
@@ -422,7 +422,7 @@ runTest('showToast error handling and propagation', () => {
   assertEqual(errorMsg, 'showToast requires a function for `toast` parameter', 'Should handle null toast function');
 });
 
-runTest('stopEvent comprehensive behavior', () => {
+runTest('stopEvent comprehensive behavior', () => { // verify event cancellation
   let preventDefaultCalled = false;
   let stopPropagationCalled = false;
   
@@ -448,7 +448,7 @@ runTest('stopEvent comprehensive behavior', () => {
   stopEvent(keyEvent);
 });
 
-runTest('stopEvent edge cases and error conditions', () => {
+runTest('stopEvent edge cases and error conditions', () => { // invalid event scenarios
   // Test with missing methods
   assertThrows(() => {
     stopEvent({});
@@ -471,7 +471,7 @@ runTest('stopEvent edge cases and error conditions', () => {
 // ADDITIONAL UTILITY WRAPPER TESTS
 // -----------------------------------------------------------------------------
 
-runTest('executeAsyncWithLogging handles success and error', async () => {
+runTest('executeAsyncWithLogging handles success and error', async () => { // verifies success and failure paths
   const successOp = async () => 'ok';
   const result = await executeAsyncWithLogging(successOp, 'successOp');
   assertEqual(result, 'ok', 'Should return result on success');
@@ -489,7 +489,7 @@ runTest('executeAsyncWithLogging handles success and error', async () => {
   assert(thrown, 'Should rethrow error when no handler');
 });
 
-runTest('executeAsyncWithLogging awaits async handler', async () => {
+runTest('executeAsyncWithLogging awaits async handler', async () => { // waits for async error handlers
   const failOp = async () => { throw new Error('oops'); };
   let handled = false;
   const asyncHandler = async () => { await Promise.resolve(); handled = true; return 'async'; };
@@ -507,7 +507,7 @@ runTest('executeAsyncWithLogging awaits async handler', async () => {
   assert(caught, 'Should propagate rejection from async handler');
 });
 
-runTest('executeAsyncWithLogging logs phases', async () => {
+runTest('executeAsyncWithLogging logs phases', async () => { // confirms logging output
   const messages = [];
   const orig = console.log;
   console.log = (msg) => { messages.push(msg); };
@@ -522,7 +522,7 @@ runTest('executeAsyncWithLogging logs phases', async () => {
   console.log = orig;
 });
 
-runTest('logFunction outputs expected messages', () => {
+runTest('logFunction outputs expected messages', () => { // verify logging utility
   const messages = [];
   const orig = console.log;
   console.log = (msg) => { messages.push(msg); };
@@ -540,7 +540,7 @@ runTest('logFunction outputs expected messages', () => {
   assert(messages.some(m => m.includes('encountered error') && m.includes('bad')), 'Error log expected');
 });
 
-runTest('logFunction handles circular data without throwing', () => {
+runTest('logFunction handles circular data without throwing', () => { // logs safe for circular objects
   const obj = {}; obj.self = obj; // create circular reference for test
   const messages = [];
   const orig = console.log;
@@ -552,7 +552,7 @@ runTest('logFunction handles circular data without throwing', () => {
   assert(messages[0].includes('[Circular Reference]'), 'Should log fallback for circular object');
 });
 
-runTest('withToastLogging wraps function and preserves errors', () => {
+runTest('withToastLogging wraps function and preserves errors', () => { // ensures wrapper returns and throws correctly
   const calls = [];
   const wrapped = withToastLogging('demo', (t, msg) => { calls.push(msg); return 'done'; });
   const result = wrapped(() => {}, 'hi');
@@ -571,7 +571,7 @@ runTest('withToastLogging wraps function and preserves errors', () => {
 
 console.log('\n🛡️  UNIT TESTS - VALIDATION UTILITIES');
 
-runTest('isFunction boolean return for valid and invalid inputs', () => {
+runTest('isFunction boolean return for valid and invalid inputs', () => { // tests isFunction helper
   assertEqual(isFunction(() => {}), true, 'Should return true for arrow function');
   assertEqual(isFunction(function() {}), true, 'Should return true for function expression');
   assertEqual(isFunction(async function() {}), true, 'Should return true for async function');
@@ -580,7 +580,7 @@ runTest('isFunction boolean return for valid and invalid inputs', () => {
   assertEqual(isFunction(123), false, 'Should return false for number');
 });
 
-runTest('isObject boolean return for valid and invalid inputs', () => {
+runTest('isObject boolean return for valid and invalid inputs', () => { // tests isObject helper
   assertEqual(isObject({ a: 1 }), true, 'Should detect plain object');
   assertEqual(isObject(Object.create(null)), true, 'Should detect object without prototype');
   assertEqual(isObject(null), false, 'Should return false for null');
@@ -588,7 +588,7 @@ runTest('isObject boolean return for valid and invalid inputs', () => {
   assertEqual(isObject('text'), false, 'Should return false for string');
 });
 
-runTest('isAxiosErrorWithStatus boolean return for valid and invalid errors', () => {
+runTest('isAxiosErrorWithStatus boolean return for valid and invalid errors', () => { // tests error type check
   const error401 = { isAxiosError: true, response: { status: 401 } };
   const error500 = { isAxiosError: true, response: { status: 500 } };
   const regularError = new Error('oops');
@@ -598,7 +598,7 @@ runTest('isAxiosErrorWithStatus boolean return for valid and invalid errors', ()
   assertEqual(isAxiosErrorWithStatus(regularError, 401), false, 'Should return false for non-axios error');
 });
 
-runTest('safeStringify handles circular references gracefully', () => {
+runTest('safeStringify handles circular references gracefully', () => { // ensures circular objects stringify
   const obj = { name: 'test' };
   obj.self = obj; // create circular reference
 
@@ -609,7 +609,7 @@ runTest('safeStringify handles circular references gracefully', () => {
   assertEqual(safeStringify(normal), JSON.stringify(normal), 'Should stringify non-circular objects');
 });
 
-runTest('safeStringify(undefined) returns literal undefined string', () => {
+runTest('safeStringify(undefined) returns literal undefined string', () => { // handles undefined input
   assertEqual(
     safeStringify(undefined),
     'undefined',
@@ -623,7 +623,7 @@ runTest('safeStringify(undefined) returns literal undefined string', () => {
 
 console.log('\n🌐 UNIT TESTS - API FUNCTIONS');
 
-runTest('formatAxiosError with various error types', () => {
+runTest('formatAxiosError with various error types', () => { // ensures conversion handles edge cases
   // Test axios error with response
   const axiosErrorWithResponse = {
     isAxiosError: true,
@@ -668,7 +668,7 @@ runTest('formatAxiosError with various error types', () => {
   assertEqual(strErr.message, 'string error', 'Should preserve string message'); // confirm text
 });
 
-runTest('apiRequest with different HTTP methods and data', async () => {
+runTest('apiRequest with different HTTP methods and data', async () => { // tests request wrapper
   // Test GET request
   const getResult = await apiRequest('/api/test', 'GET');
   assert(getResult.success === true, 'GET request should succeed');
@@ -686,7 +686,7 @@ runTest('apiRequest with different HTTP methods and data', async () => {
   assertEqual(defaultResult.method, 'POST', 'Should default to POST method');
 });
 
-runTest('apiRequest error handling scenarios', async () => {
+runTest('apiRequest error handling scenarios', async () => { // verifies error branches
   // Test 500 error
   try {
     await apiRequest('/api/error');
@@ -714,7 +714,7 @@ runTest('apiRequest error handling scenarios', async () => {
   }
 });
 
-runTest('getQueryFn with different options', async () => {
+runTest('getQueryFn with different options', async () => { // check query helper options
   // Test with returnNull on 401
   const queryFnReturnNull = getQueryFn({ on401: 'returnNull' });
   assert(typeof queryFnReturnNull === 'function', 'Should return function');
@@ -737,7 +737,7 @@ runTest('getQueryFn with different options', async () => {
   }
 });
 
-runTest('queryClient configuration and methods', () => {
+runTest('queryClient configuration and methods', () => { // verify query client defaults
   assert(typeof queryClient === 'object', 'queryClient should be object');
   assert(typeof queryClient.getQueryData === 'function', 'Should have getQueryData');
   assert(typeof queryClient.setQueryData === 'function', 'Should have setQueryData');
@@ -751,7 +751,7 @@ runTest('queryClient configuration and methods', () => {
 });
 
 
-runTest('handle401Error logic across behaviors', () => {
+runTest('handle401Error logic across behaviors', () => { // tests auth error helper
   const err401 = { isAxiosError: true, response: { status: 401 } };
   const handled = handle401Error(err401, 'returnNull');
   assert(handled === true, '401 should be handled when configured');
@@ -761,7 +761,7 @@ runTest('handle401Error logic across behaviors', () => {
   assert(handle401Error(err500, 'returnNull') === false, 'Non-401 should not be handled');
 });
 
-runTest('codexRequest offline and online behavior', async () => {
+runTest('codexRequest offline and online behavior', async () => { // mocks offline mode
   process.env.OFFLINE_MODE = 'true';
   let called = false;
   const resultOffline = await codexRequest(() => { called = true; }, { data: 1 });
@@ -773,7 +773,7 @@ runTest('codexRequest offline and online behavior', async () => {
   assert(called === true, 'Request function should run online');
 });
 
-runTest('codexRequest returns default when offline without mock', async () => {
+runTest('codexRequest returns default when offline without mock', async () => { // fallback response when offline
   process.env.OFFLINE_MODE = 'true';
   const result = await codexRequest(() => ({ data: 7 }));
   assertEqual(result.status, 200, 'Default status should be 200');
@@ -781,7 +781,7 @@ runTest('codexRequest returns default when offline without mock', async () => {
   process.env.OFFLINE_MODE = 'false';
 });
 
-runTest('executeAxiosRequest integrates codexRequest and errors', async () => {
+runTest('executeAxiosRequest integrates codexRequest and errors', async () => { // ensures request helper uses codex
   process.env.OFFLINE_MODE = 'true';
   const resOffline = await executeAxiosRequest(() => ({ data: 5 }), 'throw', { data: { value: 5 } });
   assertEqual(resOffline.data.value, 5, 'Should return mock in offline mode');
@@ -799,7 +799,7 @@ runTest('executeAxiosRequest integrates codexRequest and errors', async () => {
   assertEqual(nullRes.data, null, 'Should return null on 401 with returnNull');
 });
 
-runTest('executeAxiosRequest returns default when offline without mock', async () => {
+runTest('executeAxiosRequest returns default when offline without mock', async () => { // offline fallback behavior
   process.env.OFFLINE_MODE = 'true';
   const res = await executeAxiosRequest(() => ({ data: 9 }), 'throw');
   assertEqual(res.status, 200, 'Default status should be 200');
@@ -813,7 +813,7 @@ runTest('executeAxiosRequest returns default when offline without mock', async (
 
 console.log('\n🍞 UNIT TESTS - TOAST SYSTEM');
 
-runTest('toast function comprehensive behavior', () => {
+runTest('toast function comprehensive behavior', () => { // checks toast API
   const toast1 = toast({ title: 'Test 1', description: 'Message 1' });
   const toast2 = toast({ title: 'Test 2', description: 'Message 2' });
   
@@ -840,7 +840,7 @@ runTest('toast function comprehensive behavior', () => {
   assert(typeof complexToast.id === 'string', 'Should handle complex props');
 });
 
-runTest('toast update and dismiss functionality', () => {
+runTest('toast update and dismiss functionality', () => { // check update/dismiss helpers
   const testToast = toast({ title: 'Original', description: 'Original message' });
   
   // Test update function exists and is callable
@@ -852,7 +852,7 @@ runTest('toast update and dismiss functionality', () => {
   testToast.dismiss();
 });
 
-runTest('useToast hook behavior', () => {
+runTest('useToast hook behavior', () => { // verify hook interacts with toast
   // Test that useToast is a function (can't test execution in Node.js)
   assert(typeof useToast === 'function', 'useToast should be a function');
   
@@ -864,7 +864,7 @@ runTest('useToast hook behavior', () => {
   assert(typeof toastResult.update === 'function', 'Should have update function');
 });
 
-runTest('toast system memory management', () => {
+runTest('toast system memory management', () => { // ensures unique IDs and limits
   const initialToastCount = 5;
   const toasts = [];
   
@@ -883,14 +883,14 @@ runTest('toast system memory management', () => {
 });
 
 
-runTest('toast IDs restart after resetToastSystem', () => {
+runTest('toast IDs restart after resetToastSystem', () => { // verify ID reset
   resetToastSystem(); // ensure system is cleared before generating new ids
   const first = toast({ title: 'a' });
   assert(typeof first.id === 'string' && first.id.length > 0, 'First toast ID should be string after reset');
 
 });
 
-runTest('dispatching unknown action leaves toast state unchanged', () => {
+runTest('dispatching unknown action leaves toast state unchanged', () => { // reducer should ignore unknown
   resetToastSystem(); // clean slate before dispatch test
   toast({ title: 'persist' }); // initialize state with one toast
   const { result, unmount } = renderHook(() => useToast());
@@ -900,7 +900,7 @@ runTest('dispatching unknown action leaves toast state unchanged', () => {
   unmount(); // remove listener
 });
 
-runTest('executeWithErrorToast displays error toast', async () => {
+runTest('executeWithErrorToast displays error toast', async () => { // ensures toast on failure
   const calls = [];
   const toastFn = (params) => { calls.push(params); };
   const success = await executeWithErrorToast(async () => 'hi', toastFn);
@@ -919,7 +919,7 @@ runTest('executeWithErrorToast displays error toast', async () => {
   }
 });
 
-runTest('executeWithToastFeedback shows success and error toasts', async () => {
+runTest('executeWithToastFeedback shows success and error toasts', async () => { // success and failure toasts
   const calls = [];
   const toastFn = (params) => { calls.push(params); };
   const result = await executeWithToastFeedback(async () => 1, toastFn, 'Great');
@@ -944,7 +944,7 @@ runTest('executeWithToastFeedback shows success and error toasts', async () => {
 
 console.log('\n🔗 INTEGRATION TESTS');
 
-runTest('useAsyncAction integrates with error handling', async () => {
+runTest('useAsyncAction integrates with error handling', async () => { // hook success and error callbacks
   let successCallbackCalled = false;
   let errorCallbackCalled = false;
   let capturedResult = null;
@@ -993,7 +993,7 @@ runTest('useAsyncAction integrates with error handling', async () => {
   }
 });
 
-runTest('useToastAction integrates async action with toast system', () => {
+runTest('useToastAction integrates async action with toast system', () => { // tie async and toast
   // Test that useToastAction is properly exported and is a function
   assert(typeof useToastAction === 'function', 'useToastAction should be a function');
   
@@ -1013,7 +1013,7 @@ runTest('useToastAction integrates async action with toast system', () => {
   assert(typeof testToast.id === 'string', 'Toast integration should work');
 });
 
-runTest('API functions integrate with utility functions', async () => {
+runTest('API functions integrate with utility functions', async () => { // wrap api with toasts
   // Test that apiRequest can be used with showToast
   const toastCalls = [];
   const mockToast = (params) => {
@@ -1034,7 +1034,7 @@ runTest('API functions integrate with utility functions', async () => {
   }
 });
 
-runTest('createDropdownListHook integration with useDropdownData', () => {
+runTest('createDropdownListHook integration with useDropdownData', () => { // custom hook uses dropdown data
   const fetcherCalls = [];
   const mockFetcher = async () => {
     fetcherCalls.push('fetcher called');
@@ -1052,7 +1052,7 @@ runTest('createDropdownListHook integration with useDropdownData', () => {
   assert(Array.isArray(result.current.items), 'Should expose items array'); // Verify return structure
 });
 
-runTest('useDropdownData refetches when fetcher changes', async () => {
+runTest('useDropdownData refetches when fetcher changes', async () => { // ensures dependency update
   let firstCalls = 0;
   let secondCalls = 0;
   const fetcherOne = async () => { firstCalls++; return ['a']; };
@@ -1070,7 +1070,7 @@ runTest('useDropdownData refetches when fetcher changes', async () => {
   assertEqual(secondCalls, 1, 'Second fetcher should run after rerender');
 });
 
-runTest('useDropdownData refetches when toast changes', async () => {
+runTest('useDropdownData refetches when toast changes', async () => { // toast dependency triggers refetch
   let calls = 0;
   const fetcher = async () => { calls++; return ['item']; };
 
@@ -1086,7 +1086,7 @@ runTest('useDropdownData refetches when toast changes', async () => {
   assertEqual(calls, 2, 'Fetch should run again when toast instance changes');
 });
 
-runTest('useDropdownData skips toast error when not a function', async () => {
+runTest('useDropdownData skips toast error when not a function', async () => { // invalid toast parameter
   const fetcher = async () => { throw new Error('fail'); };
   const { result } = renderHook(() => useDropdownData(fetcher, 'text', { id: 'u3' }));
   await TestRenderer.act(async () => { await result.current.fetchData(); });
@@ -1094,7 +1094,7 @@ runTest('useDropdownData skips toast error when not a function', async () => {
   assert(result.current.isLoading === false, 'Loading state resets after failure');
 });
 
-runTest('useIsMobile integration with window API', () => {
+runTest('useIsMobile integration with window API', () => { // simulate screen width
   assert(typeof useIsMobile === 'function', 'useIsMobile should be a function'); // Export validation
 
   mockWindow.innerWidth = 500; // Simulate mobile width
@@ -1106,7 +1106,7 @@ runTest('useIsMobile integration with window API', () => {
   assert(desktop.current === false, 'Should detect desktop width correctly');
 });
 
-runTest('useIsMobile returns false when window missing', () => {
+runTest('useIsMobile returns false when window missing', () => { // server-side check
   const prevWindow = global.window; // save current window for restoration
   global.window = undefined; // remove window to simulate server environment
   const { result } = renderHook(() => useIsMobile()); // invoke hook without window
@@ -1115,7 +1115,7 @@ runTest('useIsMobile returns false when window missing', () => {
 });
 
 
-runTest('useDropdownData and useToastAction integration sequence', async () => {
+runTest('useDropdownData and useToastAction integration sequence', async () => { // dropdown fetch triggers toast
   resetToastSystem(); // ensure clean state for integration test
   const fetchCalls = [];
   const mockFetcher = async () => { fetchCalls.push('called'); return ['one', 'two']; };
@@ -1137,7 +1137,7 @@ runTest('useDropdownData and useToastAction integration sequence', async () => {
   assertEqual(toastResult.current.toasts[0].description, 'Loaded', 'Toast message should match');
 });
 
-runTest('useAuthRedirect reacts to auth state changes', async () => {
+runTest('useAuthRedirect reacts to auth state changes', async () => { // state change triggers redirect
   function useAuthFlow() {
     const [user, setUser] = React.useState(null);
     useAuthRedirect('/dashboard', !!user);
@@ -1151,7 +1151,7 @@ runTest('useAuthRedirect reacts to auth state changes', async () => {
   assertEqual(mockWindow._lastPushState.url, '/dashboard', 'Redirect should occur after login');
 });
 
-runTest('useAuthRedirect handles missing pushState gracefully', () => {
+runTest('useAuthRedirect handles missing pushState gracefully', () => { // no redirect without history
   const originalPushState = mockWindow.history.pushState; // store original function to restore after test
   delete mockWindow.history.pushState; // simulate environment without pushState
   renderHook(() => useAuthRedirect('/fallback', true));
@@ -1159,7 +1159,7 @@ runTest('useAuthRedirect handles missing pushState gracefully', () => {
   mockWindow.history.pushState = originalPushState; // restore original pushState for subsequent tests
 });
 
-runTest('useDropdownToggle toggles and closes correctly', () => {
+runTest('useDropdownToggle toggles and closes correctly', () => { // verify toggle API
   const { result } = renderHook(() => useDropdownToggle());
   TestRenderer.act(() => { result.current.toggleOpen(); });
   assert(result.current.isOpen === true, 'Toggle should open dropdown');
@@ -1169,7 +1169,7 @@ runTest('useDropdownToggle toggles and closes correctly', () => {
   assert(result.current.isOpen === false, 'Close should force closed state');
 });
 
-runTest('useEditForm startEdit populates fields and editingId', () => {
+runTest('useEditForm startEdit populates fields and editingId', () => { // form edit populates state
   const initial = { name: '', age: 0 };
   const { result } = renderHook(() => useEditForm(initial));
   TestRenderer.act(() => { result.current.startEdit({ _id: '1', name: 'Bob', age: 5 }); });
@@ -1178,7 +1178,7 @@ runTest('useEditForm startEdit populates fields and editingId', () => {
   assertEqual(result.current.fields.age, 5, 'Should copy age field');
 });
 
-runTest('useEditForm startEdit handles invalid item', () => {
+runTest('useEditForm startEdit handles invalid item', () => { // ignore invalid edit targets
   const init = { title: 't' };
   const { result } = renderHook(() => useEditForm(init));
   TestRenderer.act(() => { result.current.startEdit(null); });
@@ -1195,7 +1195,7 @@ runTest('useEditForm startEdit handles invalid item', () => {
 
 console.log('\n⚠️  ERROR HANDLING TESTS');
 
-runTest('Comprehensive formatAxiosError edge cases', () => {
+runTest('Comprehensive formatAxiosError edge cases', () => { // large and circular errors
   // Test with circular reference
   const circularObj = { name: 'test' };
   circularObj.self = circularObj;
@@ -1222,7 +1222,7 @@ runTest('Comprehensive formatAxiosError edge cases', () => {
   assert(largeResult instanceof Error, 'Should handle large responses');
 });
 
-runTest('Error propagation through API chain', async () => {
+runTest('Error propagation through API chain', async () => { // axios -> query function
   // Test error propagation from axios through apiRequest
   try {
     await apiRequest('/api/error');
@@ -1242,7 +1242,7 @@ runTest('Error propagation through API chain', async () => {
   }
 });
 
-runTest('executeWithErrorHandling manages async operations', async () => {
+runTest('executeWithErrorHandling manages async operations', async () => { // promise helper tests
   const res = await executeWithErrorHandling(async () => 'value', 'asyncTest');
   assertEqual(res, 'value', 'Should return result on success');
 
@@ -1270,7 +1270,7 @@ runTest('executeWithErrorHandling manages async operations', async () => {
   }
 });
 
-runTest('executeSyncWithErrorHandling manages sync operations', () => {
+runTest('executeSyncWithErrorHandling manages sync operations', () => { // sync wrapper tests
   const result = executeSyncWithErrorHandling(() => 2, 'syncTest');
   assertEqual(result, 2, 'Should return sync result');
 
@@ -1284,7 +1284,7 @@ runTest('executeSyncWithErrorHandling manages sync operations', () => {
   }, 'Should throw transformed sync error');
 });
 
-runTest('Toast system error recovery', () => {
+runTest('Toast system error recovery', () => { // gracefully handles toast failures
   // Test toast system with failing toast implementation
   const failingToast = () => {
     throw new Error('Toast system unavailable');
@@ -1306,7 +1306,7 @@ runTest('Toast system error recovery', () => {
 
 console.log('\n🏗️  EDGE CASE TESTS');
 
-runTest('Boundary values and extreme inputs', () => {
+runTest('Boundary values and extreme inputs', () => { // stress test unusual data
   // Test with long strings (reduced to prevent output overflow)
   const longString = 'x'.repeat(100);
   const longToast = toast({ title: longString, description: longString });
@@ -1323,7 +1323,7 @@ runTest('Boundary values and extreme inputs', () => {
   assert(typeof unicodeToast.id === 'string', 'Should handle Unicode characters');
 });
 
-runTest('Type coercion and unexpected types', () => {
+runTest('Type coercion and unexpected types', () => { // coercion robustness
   // Test formatAxiosError with unexpected types
   const numErr = formatAxiosError(123);
   assert(numErr instanceof Error, 'Should wrap numbers'); // numbers become Error
@@ -1346,7 +1346,7 @@ runTest('Type coercion and unexpected types', () => {
   assert(typeof typeCoercionToast.id === 'string', 'Should handle type coercion');
 });
 
-runTest('Concurrent operations and race conditions', async () => {
+runTest('Concurrent operations and race conditions', async () => { // simultaneous API calls
   // Test multiple simultaneous API requests
   const promises = [];
   for (let i = 0; i < 5; i++) {
@@ -1376,7 +1376,7 @@ runTest('Concurrent operations and race conditions', async () => {
 
 console.log('\n⚡ PERFORMANCE TESTS');
 
-runTest('Toast ID generation performance at scale', () => {
+runTest('Toast ID generation performance at scale', () => { // performance check
   const startTime = Date.now();
   const largeScale = 1000; // Reduced from 10000 to prevent output overflow
   const ids = [];
@@ -1396,7 +1396,7 @@ runTest('Toast ID generation performance at scale', () => {
   assertEqual(uniqueIds.size, ids.length, 'All generated IDs should be unique at scale');
 });
 
-runTest('API request performance with large payloads', async () => {
+runTest('API request performance with large payloads', async () => { // handle big data
   const largePayload = {
     data: Array(1000).fill(null).map((_, i) => ({
       id: i,
@@ -1414,7 +1414,7 @@ runTest('API request performance with large payloads', async () => {
   assert(result.success === true, 'Large payload request should succeed');
 });
 
-runTest('Error formatting performance with complex objects', () => {
+runTest('Error formatting performance with complex objects', () => { // ensures formatter speed
   const complexErrorData = {
     error: 'Complex error',
     stack: Array(100).fill('stack line').join('\n'),
@@ -1450,7 +1450,7 @@ runTest('Error formatting performance with complex objects', () => {
 
 console.log('\n🧠 MEMORY MANAGEMENT TESTS');
 
-runTest('Toast cleanup and memory leaks', () => {
+runTest('Toast cleanup and memory leaks', () => { // verify dismiss cleanup
   const initialToasts = [];
   const cleanupFunctions = [];
   
@@ -1473,7 +1473,7 @@ runTest('Toast cleanup and memory leaks', () => {
   assert(initialToasts.length === 20, 'Should create all toasts');
 });
 
-runTest('Event listener cleanup simulation', () => {
+runTest('Event listener cleanup simulation', () => { // ensure add/remove pairs
   // Simulate useIsMobile cleanup
   const listeners = [];
   
@@ -1501,7 +1501,7 @@ runTest('Event listener cleanup simulation', () => {
   assertEqual(listeners.length, 0, 'All event listeners should be cleaned up');
 });
 
-runTest('useToast mounts and unmounts without duplicate listeners', () => {
+runTest('useToast mounts and unmounts without duplicate listeners', () => { // verify listener cleanup
   resetToastSystem(); // ensure clean state before test
   for (let i = 0; i < 3; i++) { // mount and unmount repeatedly
     const { unmount } = renderHook(() => useToast());
@@ -1511,7 +1511,7 @@ runTest('useToast mounts and unmounts without duplicate listeners', () => {
   }
 });
 
-runTest('multiple useToast instances clean up correctly', () => {
+runTest('multiple useToast instances clean up correctly', () => { // many hooks cleanup
   resetToastSystem(); // ensure no listeners left from previous tests
   const instances = [];
   for (let i = 0; i < 3; i++) {
@@ -1528,7 +1528,7 @@ runTest('multiple useToast instances clean up correctly', () => {
 
 console.log('\n🔄 WORKFLOW INTEGRATION TESTS');
 
-runTest('Complete user workflow simulation', async () => {
+runTest('Complete user workflow simulation', async () => { // end-to-end flow
   // Simulate: User loads page -> fetches data -> shows toast -> handles error
   const workflow = [];
   
@@ -1565,7 +1565,7 @@ runTest('Complete user workflow simulation', async () => {
   }
 });
 
-runTest('Multi-component integration scenario', () => {
+runTest('Multi-component integration scenario', () => { // multiple features together
   // Simulate multiple components using different parts of the library
   const components = [];
   

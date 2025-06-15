@@ -1,6 +1,8 @@
+require('./test-setup'); // ensure stubs exist before requiring hooks
+
 /**
  * Simplified Test Runner for React Hooks Utility Library
- * 
+ *
  * This version reduces console output to prevent EPIPE errors while
  * maintaining comprehensive test coverage.
  */
@@ -25,13 +27,13 @@ let passedTests = 0; // incremented for every successful test
 let failedTests = 0; // incremented whenever a test throws
 let testResults = []; // collects summary data for post-run report
 
-function assert(condition, message) {
+function assert(condition, message) { // basic truthy assertion
   if (!condition) {
     throw new Error(message || 'Assertion failed');
   }
 }
 
-function assertEqual(actual, expected, message) {
+function assertEqual(actual, expected, message) { // strict equality check helper
   if (actual !== expected) {
     throw new Error(`${message || 'Values not equal'}: expected ${expected}, got ${actual}`);
   }

@@ -1,3 +1,5 @@
+require('./test-setup'); // initialize mocks before loading hooks
+
 /**
  * Production Test Suite - React Hooks Library
  * Clean validation without console noise
@@ -39,7 +41,7 @@ function test(name, fn) { // executed sequentially for deterministic results so 
   }
 }
 
-function assert(condition, message) {
+function assert(condition, message) { // throws on failed expectation
   if (!condition) throw new Error(message || 'Assertion failed');
 }
 

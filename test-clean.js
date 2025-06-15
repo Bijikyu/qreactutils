@@ -1,3 +1,5 @@
+require('./test-setup'); // ensure axios and winston stubs before hooks import
+
 /**
  * Clean Test Runner - React Hooks Library
  * Outputs clear test results without verbose logging
@@ -68,7 +70,7 @@ function test(name, fn) { // queue keeps execution ordered for reliable results
   }
 }
 
-function assert(condition, message) {
+function assert(condition, message) { // throws when expectation fails
   if (!condition) throw new Error(message || 'Assertion failed');
 }
 

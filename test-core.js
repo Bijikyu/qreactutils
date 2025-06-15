@@ -1,3 +1,5 @@
+require('./test-setup'); // load qtests or stubs before other modules for consistent mocks
+
 /**
  * Core Functionality Test - Validates React Hooks Library
  * Tests individual components without external dependencies
@@ -46,7 +48,7 @@ function test(name, fn) { // queue-based runner ensures sequential execution
   }
 }
 
-function assert(condition, message) {
+function assert(condition, message) { // throws when condition is false
   if (!condition) throw new Error(message || 'Assertion failed');
 }
 
