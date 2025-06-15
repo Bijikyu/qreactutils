@@ -31,6 +31,10 @@ const {
  * 3. Provides better tooling support for IDEs and documentation generators
  * 4. Makes it clear to maintainers what the intended public surface is
  */
+/**
+ * Keeping a single export block makes the API easy to scan by new consumers; ensures discoverability.
+ * Internal modules can move or reorganize without changing these exports, so existing imports keep working; ensures backward compatibility.
+ */
 module.exports = { // expose library functions
   // Core async functionality hooks
   useAsyncAction,        // Primary hook for async operations with loading states
