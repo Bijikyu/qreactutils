@@ -33,9 +33,9 @@ global.window = {
   }),
   history: { pushState: () => {} },
   location: { href: 'http://localhost:3000' }
-};
+}; // browser stub so routing and media queries work in Node
 
-global.PopStateEvent = class PopStateEvent {
+global.PopStateEvent = class PopStateEvent { // stub constructor so history API tests run
   constructor(type, options = {}) {
     this.type = type;
     this.state = options.state || null;
@@ -43,13 +43,13 @@ global.PopStateEvent = class PopStateEvent {
 };
 
 let testResults = []; // store results so summary prints in order
-let testSuites = []; // queue suites to run sequentially
+let testSuites = []; // queue suites to run sequentially to keep state isolation
 
 function suite(name, tests) {
   testSuites.push({ name, tests });
 }
 
-function test(name, fn) { // sequential execution avoids shared state issues
+function test(name, fn) { // sequential execution avoids shared state issues between hooks
   try {
     console.log = console.error = console.warn = () => {};
     fn();
@@ -75,7 +75,7 @@ function assertEqual(actual, expected, message) {
   }
 }
 
-function renderHook(hookFn) {
+function renderHook(hookFn) { // minimal renderer so hooks work without DOM
   let value;
   function TestComponent() {
     value = hookFn();
@@ -102,7 +102,7 @@ suite('Core Hooks', [
         onSuccess: () => { successCalled = true; }
       })
     );
-    assert(Array.isArray(result.current), 'Returns array structure');
+    assert(Array.isArray(result.current), 'Returns array structure'); // verify [run,loading] tuple
     assert(typeof result.current[0] === 'function', 'First element is function');
     assert(typeof result.current[1] === 'boolean', 'Second element is boolean');
   }),

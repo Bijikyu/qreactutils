@@ -37,7 +37,7 @@ function assertEqual(actual, expected, message) {
   }
 }
 
-function runTest(name, testFn) { // queue ensures sequential execution for stability
+function runTest(name, testFn) { // queue ensures sequential execution for stability and readable logs
   testCount++;
   const startTime = Date.now();
   
@@ -69,7 +69,7 @@ function runTest(name, testFn) { // queue ensures sequential execution for stabi
   }
 }
 
-function renderHook(hookFn) {
+function renderHook(hookFn) { // minimal implementation of renderHook for Node
   let value;
   function TestComponent() {
     value = hookFn();
@@ -97,7 +97,7 @@ const mockAxios = {
 };
 
 // Replace axios in the global scope for testing
-global.axios = mockAxios;
+global.axios = mockAxios; // avoids real HTTP calls in this suite
 
 // Mock window object
 global.window = {
@@ -110,7 +110,7 @@ global.window = {
   history: {
     pushState: () => {}
   }
-};
+}; // minimal browser stub for DOM APIs
 
 console.log = originalLog; // Restore logging for test output
 console.log('🚀 Running Simplified Test Suite...\n');
@@ -132,7 +132,7 @@ runTest('All exports exist', () => {
 
 runTest('useAsyncAction basic functionality', () => {
   const { result } = renderHook(() => useAsyncAction(async () => 'test'));
-  assert(Array.isArray(result.current), 'Should return array');
+  assert(Array.isArray(result.current), 'Should return array'); // hook returns [run,isLoading]
   assertEqual(result.current.length, 2, 'Should return [run, isLoading]');
   assert(typeof result.current[0] === 'function', 'First element should be function');
   assert(typeof result.current[1] === 'boolean', 'Second element should be boolean');
