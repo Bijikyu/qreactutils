@@ -27,6 +27,11 @@ const { useAsyncAction, useDropdownData, useToast } = require('qreactutils');
 ### Implementation Status
 The library provides production-ready React hooks with comprehensive error handling, loading states, and authentication patterns. All hooks follow React best practices with stable function references and proper dependency management.
 
+## Commenting Guidelines
+
+All code must follow the "Comment Rationale, Not Just Functionality" rule from AGENTS.md. Each change should explain why the code exists alongside how it works. All future contributions must use this style.
+
+
 ## Hooks API
 
 ### useAsyncAction(asyncFn, options)
