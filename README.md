@@ -30,7 +30,7 @@ The library provides production-ready React hooks with comprehensive error handl
 ## Hooks API
 
 ### useAsyncAction(asyncFn, options)
-React hook for handling async actions with loading state and error handling.
+React hook for handling async actions with loading state using React Query's mutation system.
 
 **Parameters:**
 - `asyncFn` (Function): The async function to execute
@@ -56,7 +56,7 @@ const [fetchData, isLoading] = useAsyncAction(
 ```
 
 ### useDropdownData(fetcher, toast, user)
-Generic React hook for managing dropdown state with loading and error handling.
+Generic React hook for managing dropdown state via a React Query `useQuery` call.
 
 **Parameters:**
 - `fetcher` (Function): Async function that returns array data
