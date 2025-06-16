@@ -9,6 +9,7 @@ module.exports = function helpersTests({ runTest, renderHook, assert, assertEqua
     executeWithLoadingState,
     useDropdownData
   } = require('../lib/hooks.js'); // import functions under test
+  const { withToastLogging } = require('../lib/utils.js'); // import wrapper for async logging tests
 
   runTest('executeWithLoadingState resolves and toggles loading', async () => {
     let loading = false; // tracks loading state changes
@@ -119,6 +120,18 @@ module.exports = function helpersTests({ runTest, renderHook, assert, assertEqua
     rerender({ user: { _id: 'u2' } }); // update user id
     await TestRenderer.act(async () => { await Promise.resolve(); }); // trigger effect
     assertEqual(calls, 2, 'Should refetch for new user');
+  });
+
+  runTest('withToastLogging supports async functions', async () => {
+    const wrapped = withToastLogging('asyncFn', async (t, n) => n + 1); // wrap promise-returning op with toast param
+    const result = await wrapped(null, 1); // call wrapper with dummy toast and number arg
+    assertEqual(result, 2, 'Should resolve and return awaited result');
+
+    const err = new Error('fail');
+    const failWrap = withToastLogging('asyncErr', async () => { throw err; }); // wrap failing async op
+    let threw = false;
+    try { await failWrap(); } catch (e) { threw = e === err; }
+    assert(threw, 'Should rethrow async error');
   });
 };
 
