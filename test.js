@@ -1330,18 +1330,25 @@ runTest('executeWithErrorHandling manages async operations', async () => {
   }
 });
 
-runTest('executeSyncWithErrorHandling manages sync operations', () => {
-  const result = executeSyncWithErrorHandling(() => 2, 'syncTest');
+runTest('executeSyncWithErrorHandling manages sync operations', async () => {
+  const result = await executeSyncWithErrorHandling(() => 2, 'syncTest');
   assertEqual(result, 2, 'Should return sync result');
 
   const failFn = () => { throw new Error('fail'); };
-  assertThrows(() => {
-    executeSyncWithErrorHandling(failFn, 'syncFail');
-  }, 'Should rethrow sync error');
+  let threw = false;
+  try {
+    await executeSyncWithErrorHandling(failFn, 'syncFail');
+  } catch (e) {
+    threw = true;
+  }
+  assert(threw, 'Should rethrow sync error');
 
-  assertThrows(() => {
-    executeSyncWithErrorHandling(failFn, 'syncTrans', () => new Error('wrapped'));
-  }, 'Should throw transformed sync error');
+  try {
+    await executeSyncWithErrorHandling(failFn, 'syncTrans', () => new Error('wrapped'));
+    throw new Error('no throw');
+  } catch (e) {
+    assertEqual(e.message, 'wrapped', 'Should throw transformed sync error');
+  }
 });
 
 runTest('Toast system error recovery', () => {
