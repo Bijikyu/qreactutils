@@ -22,7 +22,7 @@ const {
   useCallbackWithErrorHandling, // callback wrapper with errors // imported for completeness
   useAsyncAction, useDropdownData, createDropdownListHook, useDropdownToggle, // aggregate hook utilities // gathered here to ensure stable references across modules
   useEditForm, useIsMobile, useToast, toast, useToastAction, useAuthRedirect, // UI-related helpers // centralizing UI hooks prevents scattered imports
-  showToast, toastSuccess, toastError, executeWithErrorToast, executeWithToastFeedback, stopEvent, apiRequest, getQueryFn, queryClient, formatAxiosError, axiosClient, getToastListenerCount, resetToastSystem, dispatch // core API & toast utilities // exposes internal tools in one shot for clarity
+  showToast, toastSuccess, toastError, executeWithErrorToast, executeWithToastFeedback, stopEvent, apiRequest, getQueryFn, queryClient, formatAxiosError, axiosClient, getToastListenerCount, resetToastSystem, dispatch, getToastTimeoutCount // core API & toast utilities // exposes internal tools in one shot for clarity
 } = require('./lib/hooks'); // CommonJS import keeps broad Node compatibility // require chosen so Node apps of any version can consume this module
 
 /**
@@ -73,6 +73,7 @@ module.exports = { // CommonJS export consolidating public API
   getToastListenerCount, // Allows tests to inspect active toast listeners // exported to help verify toast state
   resetToastSystem,      // Clears toast listeners between tests // public to reset global state in tests
   dispatch,              // Expose dispatch for advanced control and tests // exported so consumers can trigger custom actions
+  getToastTimeoutCount,  // Count pending toast timeouts // helps verify timers cleaned up
   
   // API and HTTP functionality
   apiRequest,            // Standardized HTTP request wrapper with error handling // public so external code uses shared axios logic

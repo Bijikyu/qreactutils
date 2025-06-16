@@ -101,7 +101,7 @@ mockAxios.isAxiosError = (error) => error && error.isAxiosError === true; // mat
 const {
   useAsyncAction, useDropdownData, createDropdownListHook, useDropdownToggle,
   useEditForm, useIsMobile, useToast, toast, useToastAction, useAuthRedirect,
-  showToast, stopEvent, apiRequest, getQueryFn, queryClient, formatAxiosError, axiosClient, getToastListenerCount, resetToastSystem, dispatch
+  showToast, stopEvent, apiRequest, getQueryFn, queryClient, formatAxiosError, axiosClient, getToastListenerCount, resetToastSystem, dispatch, getToastTimeoutCount
 } = require('./index.js'); // import library after axios stub so axiosClient can be overridden
 const { handle401Error, codexRequest, executeAxiosRequest } = require('./lib/api.js'); // internal API helpers without config helpers
 
@@ -960,6 +960,15 @@ runTest('dispatching unknown action leaves toast state unchanged', () => {
   TestRenderer.act(() => { dispatch({ type: 'UNKNOWN' }); });
   assertEqual(result.current.toasts.length, 1, 'State should remain after unknown action');
   unmount(); // remove listener
+});
+
+runTest('manual REMOVE_TOAST clears pending timer', () => {
+  resetToastSystem(); // ensure starting from empty state
+  const { id } = toast({ title: 'timer' }); // create toast to test timer
+  dispatch({ type: 'DISMISS_TOAST', toastId: id }); // schedule removal timer
+  assertEqual(getToastTimeoutCount(), 1, 'Timer should exist after dismiss');
+  dispatch({ type: 'REMOVE_TOAST', toastId: id }); // remove directly
+  assertEqual(getToastTimeoutCount(), 0, 'Timer should be cleared after remove');
 });
 
 runTest('executeWithErrorToast displays error toast', async () => {
