@@ -283,7 +283,7 @@ npm test
 ```
 
 The `test-setup` script falls back to local stubs when `qtests` is not available.
-React may display "act()" warnings during `npm test`; these warnings are expected and can be safely ignored.
+React may display "act()" warnings during `npm test`; the test runner now wraps `console.error` to filter these messages so output stays readable.
 
 If `qtests` is missing, install it explicitly:
 

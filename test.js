@@ -26,6 +26,12 @@ const React = require('react'); // Load real React for hook rendering //(replace
 const TestRenderer = require('react-test-renderer'); // Renderer for executing hooks //(provide test renderer for hook execution)
 globalThis.IS_REACT_ACT_ENVIRONMENT = true; // flag React act environment for warnings so TestRenderer.act works correctly
 
+const originalConsoleError = console.error; // store original error logger so we can forward non-act messages
+console.error = (msg, ...args) => { // override to filter noisy React act warnings while preserving others
+  if (typeof msg === 'string' && msg.includes('act(')) return; // skip act warnings for clarity in test output
+  return originalConsoleError.call(console, msg, ...args); // forward any other error messages to original logger
+};
+
 /**
  * Render a hook via react-test-renderer to keep tests lightweight.
  *
