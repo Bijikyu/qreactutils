@@ -1202,6 +1202,25 @@ runTest('useDropdownData uses unique key for anonymous fetchers', async () => {
   assertEqual(second, 1, 'Second fetcher should run with separate cache');
 });
 
+runTest('useDropdownData clears cache on logout for anonymous fetcher', async () => {
+  queryClient.clear(); // ensure isolated cache for this test
+  const fetcher = async () => ['a']; // anonymous fetcher
+
+  const { result, rerender } = renderHook(
+    (p) => useDropdownData(fetcher, null, p.user),
+    { user: { _id: 'u1' } }
+  );
+  await TestRenderer.act(async () => { await Promise.resolve(); }); // allow query to resolve
+  const [[key]] = queryClient.getQueriesData({ queryKey: ['dropdown'] }); // capture cache key
+  const stableId = key[1]; // stable id from hook for assertions
+  assert(Array.isArray(queryClient.getQueryData(['dropdown', stableId, 'u1'])), 'Cache populated before logout');
+
+  rerender({ user: null }); // simulate logout
+  await TestRenderer.act(async () => { await Promise.resolve(); }); // wait for effect
+  assert(queryClient.getQueryData(['dropdown', stableId, 'u1']) === undefined, 'Old cache removed after logout');
+  assertEqual(result.current.items.length, 0, 'Items reset when user becomes null');
+});
+
 runTest('useDropdownData skips toast error when not a function', async () => {
   const fetcher = async () => { throw new Error('fail'); };
   const { result } = renderHook(() => useDropdownData(fetcher, 'text', { id: 'u3' }));
