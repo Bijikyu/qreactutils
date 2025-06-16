@@ -556,6 +556,17 @@ runTest('logFunction handles circular data without throwing', () => {
   assert(messages.some(m => m.includes('[Circular Reference]')), 'Should log fallback for circular object');
 });
 
+runTest('logFunction handles undefined without throwing', () => {
+  const messages = [];
+  const orig = console.log;
+  console.log = (msg) => { messages.push(msg); }; // capture logs to verify output
+
+  logFunction('undefFn', 'exit', undefined); // should handle undefined gracefully
+
+  console.log = orig;
+  assert(messages.some(m => m.includes('undefFn is returning')), 'Should log return for undefined');
+});
+
 runTest('withToastLogging wraps function and preserves errors', () => {
   const calls = [];
   const wrapped = withToastLogging('demo', (t, msg) => { calls.push(msg); return 'done'; });
