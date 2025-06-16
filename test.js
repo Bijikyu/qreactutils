@@ -1171,6 +1171,22 @@ runTest('useDropdownData caches with function name key', async () => {
   assert(Array.isArray(cached) && cached[0] === 'z', 'Data should be cached under serializable key');
 });
 
+runTest('useDropdownData uses unique key for anonymous fetchers', async () => {
+  let first = 0; let second = 0; // track calls for each fetcher
+  const fetcherA = async () => { first++; return ['a']; }; // anonymous fetcher one
+  const fetcherB = async () => { second++; return ['b']; }; // anonymous fetcher two
+
+  const { unmount } = renderHook(() => useDropdownData(fetcherA, null, { _id: 'uX' }));
+  await TestRenderer.act(async () => { await Promise.resolve(); }); // allow first query
+  unmount(); // remove first hook to mimic sequential mounts
+
+  renderHook(() => useDropdownData(fetcherB, null, { _id: 'uX' }));
+  await TestRenderer.act(async () => { await Promise.resolve(); }); // second query should run
+
+  assertEqual(first, 1, 'First fetcher should run once');
+  assertEqual(second, 1, 'Second fetcher should run with separate cache');
+});
+
 runTest('useDropdownData skips toast error when not a function', async () => {
   const fetcher = async () => { throw new Error('fail'); };
   const { result } = renderHook(() => useDropdownData(fetcher, 'text', { id: 'u3' }));
