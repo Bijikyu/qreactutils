@@ -178,8 +178,10 @@ Normalizes various error types into consistent Error objects.
 ### queryClient
 Pre-configured React Query client with optimized defaults for typical CRUD operations.
 
-### axiosClient  
-Pre-configured Axios instance with authentication and JSON handling.
+### axiosClient
+Pre-configured Axios instance with authentication and JSON handling. Use this instance for all API calls so session cookies and JSON headers are applied consistently.
+
+**Returns:** Axios instance for performing HTTP requests
 
 ## Utility Functions
 
@@ -198,8 +200,20 @@ Combined preventDefault and stopPropagation utility for React events.
 ### getToastListenerCount()
 Returns the current number of registered toast listeners. Useful for tests verifying cleanup.
 
+**Returns:** number - Current count of active toast listeners
+
 ### resetToastSystem()
 Clears all toast listeners, cancels pending removal timers, and resets toast state. Useful for isolated testing environments.
+
+**Returns:** void
+
+### dispatch(action)
+Centralized dispatch function used by the toast system to update global toast state and notify listeners.
+
+**Parameters:**
+- `action` (Object): Toast action with `type`, `toast`, or `toastId` fields
+
+**Returns:** void
 
 ## Validation Utilities
 
