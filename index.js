@@ -22,7 +22,7 @@ const {
   useCallbackWithErrorHandling, // callback wrapper with errors // imported for completeness
   useAsyncAction, useDropdownData, createDropdownListHook, useDropdownToggle, // aggregate hook utilities // gathered here to ensure stable references across modules
   useEditForm, useIsMobile, useToast, toast, useToastAction, useAuthRedirect, // UI-related helpers // centralizing UI hooks prevents scattered imports
-  showToast, toastSuccess, toastError, stopEvent, apiRequest, getQueryFn, queryClient, formatAxiosError, axiosClient, getToastListenerCount, resetToastSystem, dispatch // core API & toast utilities // exposes internal tools in one shot for clarity
+  showToast, toastSuccess, toastError, executeWithErrorToast, executeWithToastFeedback, stopEvent, apiRequest, getQueryFn, queryClient, formatAxiosError, axiosClient, getToastListenerCount, resetToastSystem, dispatch // core API & toast utilities // exposes internal tools in one shot for clarity
 } = require('./lib/hooks'); // CommonJS import keeps broad Node compatibility // require chosen so Node apps of any version can consume this module
 
 /**
@@ -67,6 +67,8 @@ module.exports = { // CommonJS export consolidating public API
   showToast,             // Helper for displaying toast messages // public so notifications can be fired from any module
   toastSuccess,          // Success toast utility // exported for simple success messages
   toastError,            // Error toast utility // public so error toasts share formatting
+  executeWithErrorToast, // Operation wrapper that shows error toast // public for consistency
+  executeWithToastFeedback, // Operation wrapper with success/error toasts // exposed to unify feedback
   stopEvent,             // Event handling utility for preventing default behavior // kept public for generic DOM helpers
   getToastListenerCount, // Allows tests to inspect active toast listeners // exported to help verify toast state
   resetToastSystem,      // Clears toast listeners between tests // public to reset global state in tests

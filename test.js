@@ -108,7 +108,7 @@ const { handle401Error, codexRequest, executeAxiosRequest } = require('./lib/api
 // Direct imports for internal utilities under test
 const { executeAsyncWithLogging, logFunction, withToastLogging } = require('./lib/utils.js'); // test logging helpers
 const { executeWithErrorHandling, executeSyncWithErrorHandling } = require('./lib/errorHandling.js'); // test error wrappers
-const { executeWithErrorToast, executeWithToastFeedback } = require('./lib/toastIntegration.js'); // test toast integration
+const { executeWithErrorToast, executeWithToastFeedback } = require('./index.js'); // verify toast wrappers exported from main module
 
 const mockedAxiosClient = mockAxios.create(); // Create axios stub instance for API calls
 axiosClient.request = mockedAxiosClient.request; // override request so api layer uses mock
@@ -346,7 +346,7 @@ runTest('All core hooks are exported as functions', () => {
 });
 
 runTest('All utility functions are exported', () => {
-  const utilities = ['toast', 'showToast', 'stopEvent'];
+  const utilities = ['toast', 'showToast', 'executeWithErrorToast', 'executeWithToastFeedback', 'stopEvent'];
   
   utilities.forEach(utilName => {
     const util = eval(utilName);
