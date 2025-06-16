@@ -4,6 +4,7 @@
  */
 
 // Executes sequentially using a simple queue so Node can run the suite without Jest
+// React Test Renderer runs hooks without a DOM which simplifies our environment
 
 const React = require('react'); // standard React allows real hook behavior
 const TestRenderer = require('react-test-renderer'); // renders hooks with no browser
@@ -64,8 +65,8 @@ global.PopStateEvent = class PopStateEvent {
 };
 
 // Suppress verbose output during tests // only final summary should display
-const originalLog = console.log;
-console.log = () => {};
+const originalLog = console.log; // save logger for restoration after the suite
+console.log = () => {}; // silence runtime logs so output is compact
 
 let testCount = 0; // running tally of executed tests
 let passedTests = 0; // count of successful tests
@@ -115,7 +116,7 @@ function renderHook(hookFn) { // minimal hook execution using TestRenderer for d
 }
 
 // Restore console for final output
-console.log = originalLog;
+console.log = originalLog; // re-enable logging for the summary section
 console.log('🔍 Running Final Production Test Suite...\n');
 
 // Execute all tests

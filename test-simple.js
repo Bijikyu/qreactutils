@@ -14,7 +14,7 @@ const {
 } = require('./index.js');
 
 const React = require('react'); // load React so hooks match production behavior
-const TestRenderer = require('react-test-renderer'); // runs hooks without DOM which keeps Node tests light
+const TestRenderer = require('react-test-renderer'); // runs hooks without a DOM so Node tests stay lightweight
 
 // Suppress console.log during tests to prevent output overflow // avoids EPIPE errors on CI
 const originalLog = console.log;
@@ -38,6 +38,7 @@ function assertEqual(actual, expected, message) { // compare actual and expected
 }
 
 function runTest(name, testFn) { // sequential execution avoids needing Jest and prevents test races
+  // each test is chained via Promises so async results finish before the next begins
   testCount++;
   const startTime = Date.now();
   
@@ -112,7 +113,7 @@ global.window = {
   }
 }; // minimal browser stub for DOM APIs
 
-console.log = originalLog; // Restore logging for test output
+console.log = originalLog; // Restore logging for test output so summary prints
 console.log('🚀 Running Simplified Test Suite...\n');
 
 // Core functionality tests

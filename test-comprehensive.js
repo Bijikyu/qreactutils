@@ -6,7 +6,7 @@
 // These tests run in plain Node without Jest using simple helper functions
 
 const React = require('react'); // use real React so hooks behave normally
-const TestRenderer = require('react-test-renderer'); // allows hook execution without a browser
+const TestRenderer = require('react-test-renderer'); // allows hook execution without a browser and keeps the runner light
 
 // Silence all console output during execution // keeps test output concise for CI pipelines
 const originalConsole = { log: console.log, error: console.error, warn: console.warn };
@@ -50,6 +50,7 @@ function suite(name, tests) { // collect tests under a named suite for organized
 }
 
 function test(name, fn) { // simple sequential runner keeps suites deterministic without Jest
+  // logs are muted during execution and restored afterwards so only summary is shown
   try {
     console.log = console.error = console.warn = () => {};
     fn();
