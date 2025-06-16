@@ -186,5 +186,5 @@ module.exports = function helpersTests({ runTest, renderHook, assert, assertEqua
       assertEqual(e.message, 'undefined', 'Undefined becomes error with message');
     }
   });
-};
+}; // module.exports exposes suite for alternate runners
 
