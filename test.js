@@ -1104,6 +1104,31 @@ runTest('useDropdownData refetches when toast changes', async () => {
   assertEqual(calls, 2, 'Fetch should run again when toast instance changes');
 });
 
+runTest('useDropdownData fetches once when user present at mount', async () => {
+  let calls = 0; // track fetcher executions
+  const fetcher = async () => { calls++; return ['x']; }; // simple fetcher
+
+  renderHook(() => useDropdownData(fetcher, null, { id: 'start' })); // mount with user
+  await TestRenderer.act(async () => { await Promise.resolve(); }); // allow query to resolve
+  assertEqual(calls, 1, 'Only the query should fetch data on mount');
+});
+
+runTest('useDropdownData fetches when user becomes truthy', async () => {
+  let calls = 0; // track fetch counts
+  const fetcher = async () => { calls++; return ['y']; }; // mock fetcher
+
+  const { rerender } = renderHook(
+    (p) => useDropdownData(fetcher, null, p.user),
+    { user: null }
+  ); // initial mount without user
+  await TestRenderer.act(async () => { await Promise.resolve(); }); // wait; should not fetch
+  assertEqual(calls, 0, 'No fetch without user');
+
+  rerender({ user: { id: 'u' } }); // supply user
+  await TestRenderer.act(async () => { await Promise.resolve(); }); // allow effect to run
+  assertEqual(calls, 1, 'Fetch should run after user becomes available');
+});
+
 runTest('useDropdownData skips toast error when not a function', async () => {
   const fetcher = async () => { throw new Error('fail'); };
   const { result } = renderHook(() => useDropdownData(fetcher, 'text', { id: 'u3' }));
