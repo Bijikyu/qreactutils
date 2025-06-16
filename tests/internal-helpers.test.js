@@ -112,7 +112,7 @@ module.exports = function helpersTests({ runTest, renderHook, assert, assertEqua
 
     const { rerender } = renderHook(
       (p) => useDropdownData(fetcher, null, p.user), // hook under test with user prop
-      { user: { _id: 'u1' } } // initial user id
+      { user: { _id: 'u3' } } // initial user id unique per test
     );
     await TestRenderer.act(async () => { await Promise.resolve(); }); // allow initial query
     assertEqual(calls, 1, 'Should fetch once for first user');
@@ -120,6 +120,22 @@ module.exports = function helpersTests({ runTest, renderHook, assert, assertEqua
     rerender({ user: { _id: 'u2' } }); // update user id
     await TestRenderer.act(async () => { await Promise.resolve(); }); // trigger effect
     assertEqual(calls, 2, 'Should refetch for new user');
+  });
+
+  runTest('useDropdownData does not fetch when user becomes undefined', async () => {
+    let calls = 0; // track fetcher invocations for assertion
+    const fetcher = async () => { calls++; return ['i']; }; // simple fetcher returning data
+
+    const { rerender } = renderHook(
+      (p) => useDropdownData(fetcher, null, p.user), // hook under test with user prop
+      { user: { _id: 'u4' } } // initial user id unique from other tests
+    );
+    await TestRenderer.act(async () => { await Promise.resolve(); }); // allow initial query
+    assertEqual(calls, 1, 'Should fetch once for first user');
+
+    rerender({ user: undefined }); // simulate logout
+    await TestRenderer.act(async () => { await Promise.resolve(); }); // effect should not refetch
+    assertEqual(calls, 1, 'Should not refetch after user removed');
   });
 
   runTest('executeWithErrorHandling wraps non-error transform', async () => {
