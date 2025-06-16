@@ -27,7 +27,7 @@ global.window = {
 let passed = 0;
 let total = 0;
 
-function test(name, fn) { // run a single test sequentially so shared state stays consistent
+function test(name, fn) { // sequential runner keeps order deterministic without needing Jest
   total++;
   try {
     fn();
@@ -39,11 +39,11 @@ function test(name, fn) { // run a single test sequentially so shared state stay
   }
 }
 
-function assert(condition, message) { // throw when condition is false
+function assert(condition, message) { // small assertion helper keeps test environment simple
   if (!condition) throw new Error(message || 'Assertion failed');
 }
 
-function renderHook(hookFn) { // run hook with react-test-renderer and return current value
+function renderHook(hookFn) { // minimal hook runner; TestRenderer avoids DOM and flushes effects synchronously
   let value;
   function TestComponent() {
     value = hookFn();

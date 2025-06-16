@@ -43,7 +43,7 @@ global.window = {
 
 let testResults = []; // collected sequentially to keep output order stable
 
-function test(name, fn) { // run test sequentially to keep state isolated
+function test(name, fn) { // simple runner keeps order deterministic and avoids Jest overhead
   try {
     // Silence console during test execution
     console.log = () => {};
@@ -68,11 +68,11 @@ function test(name, fn) { // run test sequentially to keep state isolated
   }
 }
 
-function assert(condition, message) { // throw if condition evaluates to false
+function assert(condition, message) { // minimal assertion to stop on first failure and keep queue simple
   if (!condition) throw new Error(message || 'Assertion failed');
 }
 
-function renderHook(hookFn) { // run hook with react-test-renderer for assertions
+function renderHook(hookFn) { // lightweight hook runner, TestRenderer avoids DOM and complex frameworks
   let value;
   function TestComponent() {
     value = hookFn();

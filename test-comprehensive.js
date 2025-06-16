@@ -49,7 +49,7 @@ function suite(name, tests) { // collect tests under a named suite for organized
   testSuites.push({ name, tests });
 }
 
-function test(name, fn) { // run test sequentially to avoid shared state issues
+function test(name, fn) { // simple sequential runner keeps suites deterministic without Jest
   try {
     console.log = console.error = console.warn = () => {};
     fn();
@@ -65,17 +65,17 @@ function test(name, fn) { // run test sequentially to avoid shared state issues
   }
 }
 
-function assert(condition, message) { // throw if condition evaluates to false
+function assert(condition, message) { // minimal assertion helper ensures failures stop subsequent tests
   if (!condition) throw new Error(message || 'Assertion failed');
 }
 
-function assertEqual(actual, expected, message) { // throw when values do not match
+function assertEqual(actual, expected, message) { // equality helper used instead of assertion libs
   if (actual !== expected) {
     throw new Error(`${message}: expected ${expected}, got ${actual}`);
   }
 }
 
-function renderHook(hookFn) { // execute hook with react-test-renderer and return value
+function renderHook(hookFn) { // lightweight hook runner; TestRenderer removes need for a DOM or Jest
   let value;
   function TestComponent() {
     value = hookFn();

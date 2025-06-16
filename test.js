@@ -41,15 +41,15 @@ console.error = (msg, ...args) => { // override to filter noisy React act warnin
  * @param {Function} hookFn - Hook function being tested
  * @returns {{result: {current: any}}} - Structure mimicking Testing Library
  */
-function renderHook(hookFn, props = {}) { // executes hook with react-test-renderer for isolated tests
+function renderHook(hookFn, props = {}) { // minimal hook runner; TestRenderer keeps environment small
   const result = { current: null }; // store latest hook value
   let root; // store renderer instance for cleanup
   function TestComponent(innerProps) { // Minimal component to invoke hook with props
     result.current = hookFn(innerProps); // capture value on each render
     return null;
   }
-  TestRenderer.act(() => { // react-test-renderer lets us execute hooks here
-    root = TestRenderer.create(React.createElement(TestComponent, props)); // avoids need for a browser DOM
+  TestRenderer.act(() => { // use act to ensure React state updates flush synchronously
+    root = TestRenderer.create(React.createElement(TestComponent, props)); // no DOM means less setup and faster tests
   });
   return {
     result, // exposes current hook state to assertions
@@ -194,8 +194,8 @@ const testResults = []; // stores per-test details for the summary output
  * @param {string} name - Description of the test
  * @param {Function} testFn - The test logic to run
  */
-let testQueue = Promise.resolve(); // queue keeps async tests in order so mocks reset correctly between runs
-function runTest(name, testFn) { // executes a test and logs the result while queued to maintain order
+let testQueue = Promise.resolve(); // Promise chain ensures sequential execution so async tests never overlap
+function runTest(name, testFn) { // lightweight runner instead of Jest; queuing avoids race conditions
   testQueue = testQueue.then(async () => { // chain test onto queue
     testCount++;
     const testStart = Date.now();
@@ -227,7 +227,7 @@ function runTest(name, testFn) { // executes a test and logs the result while qu
  * @param {boolean} condition - Value to evaluate
  * @param {string} message - Message when assertion fails
  */
-function assert(condition, message) { // throw if condition is false
+function assert(condition, message) { // tiny check helper keeps suite framework free and deterministic
   if (!condition) {
     throw new Error(message);
   }
@@ -243,7 +243,7 @@ function assert(condition, message) { // throw if condition is false
  * @param {*} expected - Expected value
  * @param {string} message - Message prefix for errors
  */
-function assertEqual(actual, expected, message) { // throw when values differ
+function assertEqual(actual, expected, message) { // equality helper for clarity without third-party assertion libs
   if (actual !== expected) {
     throw new Error(`${message}: expected ${expected}, got ${actual}`);
   }

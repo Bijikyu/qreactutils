@@ -32,7 +32,7 @@ console.log = () => {};
 let passed = 0;
 let total = 0;
 
-function test(name, fn) { // lightweight runner executing tests sequentially
+function test(name, fn) { // sequential runner keeps order deterministic without Jest
   total++;
   try {
     fn();
@@ -46,11 +46,11 @@ function test(name, fn) { // lightweight runner executing tests sequentially
   }
 }
 
-function assert(condition, message) { // throw if condition is false
+function assert(condition, message) { // minimal assertion halts suite on failure for reliability
   if (!condition) throw new Error(message || 'Assertion failed');
 }
 
-function renderHook(hookFn) { // execute a hook and expose its return value for assertions
+function renderHook(hookFn) { // executes hook with TestRenderer; no DOM required and effects flush synchronously
   let value;
   function TestComponent() {
     value = hookFn();

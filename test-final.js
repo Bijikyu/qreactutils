@@ -70,17 +70,17 @@ console.log = () => {};
 let testCount = 0; // running tally of executed tests
 let passedTests = 0; // count of successful tests
 
-function assert(condition, message) { // throw when condition fails
+function assert(condition, message) { // minimal assertion to keep runner dependency free
   if (!condition) throw new Error(message || 'Assertion failed');
 }
 
-function assertEqual(actual, expected, message) { // compare expected and actual values
+function assertEqual(actual, expected, message) { // equality check without external assertion libraries
   if (actual !== expected) {
     throw new Error(`${message}: expected ${expected}, got ${actual}`);
   }
 }
 
-function runTest(name, testFn) { // run queued test and track pass/fail status
+function runTest(name, testFn) { // queued execution prevents race conditions without using Jest
   testCount++;
   try {
     const result = testFn();
@@ -102,7 +102,7 @@ function runTest(name, testFn) { // run queued test and track pass/fail status
   }
 }
 
-function renderHook(hookFn) { // execute hook with react-test-renderer and expose value
+function renderHook(hookFn) { // minimal hook execution using TestRenderer for deterministic output
   let value;
   function TestComponent() {
     value = hookFn();
