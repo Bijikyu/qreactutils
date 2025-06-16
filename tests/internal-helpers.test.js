@@ -122,6 +122,22 @@ module.exports = function helpersTests({ runTest, renderHook, assert, assertEqua
     assertEqual(calls, 2, 'Should refetch for new user');
   });
 
+  runTest('useDropdownData clears items when user becomes null', async () => {
+    let calls = 0; // count fetcher runs for cache validation
+    const fetcher = async () => { calls++; return ['x']; }; // fetch returns single item
+
+    const { result, rerender } = renderHook(
+      (p) => useDropdownData(fetcher, null, p.user), // hook with user prop to control auth
+      { user: { _id: 'u1' } }
+    );
+    await TestRenderer.act(async () => { await Promise.resolve(); }); // allow initial query
+    assertEqual(result.current.items.length, 1, 'Should load item for user');
+
+    rerender({ user: null }); // simulate logout
+    await TestRenderer.act(async () => { await Promise.resolve(); }); // allow effect cleanup
+    assertEqual(result.current.items.length, 0, 'Items should reset when user is null');
+  });
+
   runTest('executeWithErrorHandling wraps non-error transform', async () => {
     const errFn = async () => { throw new Error('orig'); }; // function that throws
     try {
