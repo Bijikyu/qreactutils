@@ -35,6 +35,7 @@ const {
  * Keeping a single export block makes the API easy to scan by new consumers; ensures discoverability.
  * Internal modules can move or reorganize without changing these exports, so existing imports keep working; ensures backward compatibility.
  */
+// Exports are grouped by hook type: async actions, UI helpers, utilities, API // clarifies structure for maintainers
 module.exports = { // CommonJS export consolidating public API
   // Core async functionality hooks
   useAsyncAction,        // Primary hook for async operations with loading states // public so apps share one async pattern
