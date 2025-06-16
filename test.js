@@ -320,6 +320,8 @@ async function assertApiError(endpoint, expectedErrorPattern, testDescription) {
 
 // Import validation utilities after axios mock is in place so axios.isAxiosError uses the stub
 const { isFunction, isObject, safeStringify, isAxiosErrorWithStatus } = require('./lib/validation.js');
+// Load internal helper tests so they run within this suite
+require('./tests/internal-helpers.test.js')({ runTest, renderHook, assert, assertEqual });
 
 console.log('🚀 Starting Enhanced Comprehensive Test Suite...\n');
 

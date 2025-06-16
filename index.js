@@ -16,6 +16,10 @@
 // Import all hooks, utilities, and API functions from the consolidated hooks module
 // The hooks module acts as an aggregator, pulling together functionality from multiple internal modules
 const {
+  executeWithLoadingState, // loading helper // imported for explicit export
+  useStableCallbackWithHandlers, // callback helper with handlers // imported for direct access
+  useAsyncStateWithCallbacks, // async state hook // imported to expose low level helper
+  useCallbackWithErrorHandling, // callback wrapper with errors // imported for completeness
   useAsyncAction, useDropdownData, createDropdownListHook, useDropdownToggle, // aggregate hook utilities // gathered here to ensure stable references across modules
   useEditForm, useIsMobile, useToast, toast, useToastAction, useAuthRedirect, // UI-related helpers // centralizing UI hooks prevents scattered imports
   showToast, toastSuccess, toastError, stopEvent, apiRequest, getQueryFn, queryClient, formatAxiosError, axiosClient, getToastListenerCount, resetToastSystem, dispatch // core API & toast utilities // exposes internal tools in one shot for clarity
@@ -38,6 +42,10 @@ const {
 // Exports are grouped by hook type: async actions, UI helpers, utilities, API // clarifies structure for maintainers
 module.exports = { // CommonJS export consolidating public API
   // Core async functionality hooks
+  executeWithLoadingState, // helper for toggling loading around promises // exposed for external composition
+  useStableCallbackWithHandlers, // callback with success/error handlers // exported for direct usage
+  useAsyncStateWithCallbacks, // async hook with callbacks // public to share low level pattern
+  useCallbackWithErrorHandling, // callback wrapper with error propagation // exported for consistency
   useAsyncAction,        // Primary hook for async operations with loading states // public so apps share one async pattern
   useToastAction,        // Combines async actions with toast updates // public so apps wire loading and toasts consistently
   
