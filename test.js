@@ -1197,6 +1197,16 @@ runTest('useEditForm startEdit handles invalid item', () => {
   assertEqual(result.current.fields.title, 't', 'Fields should remain unchanged when _id missing');
 });
 
+runTest('useEditForm setField merges sequential updates', () => {
+  const { result } = renderHook(() => useEditForm({ name: '', age: 0 }));
+  TestRenderer.act(() => {
+    result.current.setField('name', 'Ann');
+    result.current.setField('age', 4);
+  });
+  assertEqual(result.current.fields.name, 'Ann', 'Name should merge');
+  assertEqual(result.current.fields.age, 4, 'Age should merge');
+});
+
 // =============================================================================
 // ERROR HANDLING TESTS
 // =============================================================================
