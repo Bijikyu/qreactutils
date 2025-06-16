@@ -52,14 +52,14 @@ function assert(condition, message) { // throw if expectation fails
 // Mock implementations // replace real modules so tests run offline
 const mockAxios = {
   create: () => ({
-    request: async ({ url, method, data }) => {
+    request: async ({ url, method, data, params }) => { // capture config for GET vs others // changed
       if (url.includes('/error')) {
         const error = new Error('Network error');
         error.isAxiosError = true;
         error.response = { status: 500, data: 'Server error' };
         throw error;
       }
-      return { data: { success: true, url, method, requestData: data }, status: 200 };
+      return { data: { success: true, url, method, requestData: data, requestParams: params }, status: 200 }; // expose params for assertions // changed
     },
     get: async (url) => ({ data: { success: true, url }, status: 200 })
   }),
@@ -193,9 +193,11 @@ runTest('formatAxiosError handles different error types', () => { // tests axios
 });
 
 runTest('apiRequest handles successful requests', async () => { // uses mocked axios
-  const result = await apiRequest('/api/test', 'GET');
+  const result = await apiRequest('/api/test', 'GET', { a: 2 }); // send data to confirm param usage // changed
   assert(typeof result === 'object', 'Should return object');
   assert(result.success === true, 'Should indicate success');
+  assert(result.requestParams.a === 2, 'Should send params on GET'); // new assertion
+  assert(result.requestData === undefined, 'Should not send body on GET'); // new assertion
 });
 
 runTest('getQueryFn creates valid query function', () => { // ensures callable
