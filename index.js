@@ -5,9 +5,9 @@
  * (require/module.exports) rather than ES modules is intentional to ensure compatibility with
  * Node.js environments that may not have ES module support enabled. This is particularly important
  * for a utility library that needs to work across different Node.js versions and configurations.
- * 
- * The structure imports all functionality from the lib/hooks module and re-exports it, creating
- * a single point of entry. This approach allows for:
+ *
+ * The structure imports all functionality from the lib/hooks module and re-exports it through a single object.
+ * Consolidating exports helps consumers discover all hooks and utilities in one place and keeps existing import paths stable as new functions are added. This approach allows for:
  * 1. Clean separation of implementation (in lib/) from public API (this file)
  * 2. Easy addition of new functionality without changing the import structure for consumers
  * 3. Potential future refactoring of internal organization without breaking external contracts
