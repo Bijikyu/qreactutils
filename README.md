@@ -69,7 +69,7 @@ Generic React hook for managing dropdown state via a React Query `useQuery` call
 - `user` (Object): User object that triggers data fetch when available
 
 Data loads automatically when the `user` argument becomes truthy and refreshes if a new `toast` function is supplied after mount. The hook skips duplicate fetches on the initial render so a user provided at mount triggers only the React Query request.
-The React Query cache key uses `['dropdown', fetcher.name, user && user._id]` so the key is JSON serializable and predictable across renders.
+The React Query cache key uses `['dropdown', fetcher.name || stableId, user && user._id]` where `stableId` is a generated identifier persisted when the fetcher lacks a name, keeping the key predictable across renders.
 If `user` becomes falsy after data has loaded the hook clears the cached query and returns an empty array so dropdowns reset when logging out.
 
 **Returns:** Object - `{items, isLoading, fetchData}`

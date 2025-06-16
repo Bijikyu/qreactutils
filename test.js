@@ -1202,6 +1202,41 @@ runTest('useDropdownData uses unique key for anonymous fetchers', async () => {
   assertEqual(second, 1, 'Second fetcher should run with separate cache');
 });
 
+runTest('useDropdownData stable id persists for nameless fetcher', async () => {
+  let calls = 0; // track fetch executions
+  const makeFetcher = () => async () => { calls++; return ['z']; }; // returns new anonymous fetcher each call
+
+  const { rerender } = renderHook(
+    (p) => useDropdownData(p.fetcher, null, { _id: 'uStable' }),
+    { fetcher: makeFetcher() }
+  );
+  await TestRenderer.act(async () => { await Promise.resolve(); }); // allow first query
+  assertEqual(calls, 1, 'First fetch should run once');
+
+  rerender({ fetcher: makeFetcher() }); // new function with same empty name
+  await TestRenderer.act(async () => { await Promise.resolve(); }); // React Query should not refetch
+  assertEqual(calls, 1, 'Fetcher should not rerun when name is unchanged');
+});
+
+runTest('useDropdownData removes cache with stable id on logout', async () => {
+  const fetcher = async () => ['x']; // nameless fetcher for stable id test
+
+  const { rerender } = renderHook(
+    (p) => useDropdownData(fetcher, null, p.user),
+    { user: { _id: 'uClear' } }
+  );
+  await TestRenderer.act(async () => { await Promise.resolve(); }); // initial fetch
+
+  const keysBefore = queryClient.getQueriesData({ queryKey: ['dropdown'] });
+  const key = keysBefore[0][0]; // capture generated key
+
+  rerender({ user: null }); // trigger logout
+  await TestRenderer.act(async () => { await Promise.resolve(); });
+
+  const keysAfter = queryClient.getQueriesData({ queryKey: key });
+  assertEqual(keysAfter.length, 0, 'Cache for previous user should be removed');
+});
+
 runTest('useDropdownData skips toast error when not a function', async () => {
   const fetcher = async () => { throw new Error('fail'); };
   const { result } = renderHook(() => useDropdownData(fetcher, 'text', { id: 'u3' }));
