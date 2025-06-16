@@ -453,15 +453,15 @@ runTest('stopEvent comprehensive behavior', () => {
 });
 
 runTest('stopEvent edge cases and error conditions', () => {
-  // Test with missing methods
-  assertThrows(() => {
-    stopEvent({});
-  }, 'Should throw when preventDefault missing');
-  
-  assertThrows(() => {
-    stopEvent({ preventDefault: () => {} });
-  }, 'Should throw when stopPropagation missing');
-  
+  // Test with missing methods triggers validation error
+  let err;
+  try { stopEvent({}); } catch (e) { err = e; }
+  assertEqual(err && err.message, 'Invalid event object', 'Should throw when preventDefault missing');
+
+  err = null;
+  try { stopEvent({ preventDefault: () => {} }); } catch (e) { err = e; }
+  assertEqual(err && err.message, 'Invalid event object', 'Should throw when stopPropagation missing');
+
   // Test with methods that throw
   assertThrows(() => {
     stopEvent({
