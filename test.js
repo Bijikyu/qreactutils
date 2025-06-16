@@ -1021,6 +1021,16 @@ runTest('useToastAction integrates async action with toast system', () => {
   assert(typeof testToast.id === 'string', 'Toast integration should work');
 });
 
+runTest('useToastAction skips refresh when not a function', async () => {
+  resetToastSystem(); // ensure clean toast state for the test
+  const { result } = renderHook(() => useToastAction(async () => 'ok', 'done', 'bad')); // pass invalid refresh value
+  let value;
+  await TestRenderer.act(async () => { value = await result.current[0](); }); // invoke run function
+  assertEqual(value, 'ok', 'Run should resolve original result');
+  const { result: toastResult } = renderHook(() => useToast()); // inspect toast state
+  assertEqual(toastResult.current.toasts.length, 1, 'Success toast should still appear');
+});
+
 runTest('API functions integrate with utility functions', async () => {
   // Test that apiRequest can be used with showToast
   const toastCalls = [];
