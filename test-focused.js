@@ -51,7 +51,7 @@ let tests = [];
 let passed = 0;
 let failed = 0;
 
-function test(name, fn) {
+function test(name, fn) { // sequential runner keeps single-threaded order instead of using Jest
   try {
     silenceConsole();
     fn();
@@ -65,11 +65,11 @@ function test(name, fn) {
   }
 }
 
-function assert(condition, message) {
+function assert(condition, message) { // simple assertion helper to keep environment minimal
   if (!condition) throw new Error(message || 'Assertion failed');
 }
 
-function renderHook(hookFn) {
+function renderHook(hookFn) { // run hook via TestRenderer so updates flush immediately without DOM
   let value;
   function TestComponent() {
     value = hookFn();

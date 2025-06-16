@@ -38,17 +38,17 @@ let passedTests = 0;
 let failedTests = 0;
 let testResults = [];
 
-function assert(condition, message) {
+function assert(condition, message) { // basic assertion keeps suite independent of assertion libraries
   if (!condition) throw new Error(message || 'Assertion failed');
 }
 
-function assertEqual(actual, expected, message) {
+function assertEqual(actual, expected, message) { // equality helper for clarity
   if (actual !== expected) {
     throw new Error(`${message}: expected ${expected}, got ${actual}`);
   }
 }
 
-function renderHook(hookFn) {
+function renderHook(hookFn) { // lightweight hook runner; TestRenderer avoids DOM so tests stay fast
   let value;
   function TestComponent() {
     value = hookFn();
@@ -68,7 +68,7 @@ function renderHook(hookFn) {
 }
 
 // Test execution with clean output
-function runTest(name, testFn) {
+function runTest(name, testFn) { // sequential execution and manual logging mimic Jest's behavior without the dependency
   testCount++;
   const testStart = Date.now();
   

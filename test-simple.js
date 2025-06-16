@@ -25,7 +25,7 @@ let passedTests = 0; // incremented for every successful test
 let failedTests = 0; // incremented whenever a test throws
 let testResults = []; // collects summary data for post-run report
 
-function assert(condition, message) { // throw if condition is false
+function assert(condition, message) { // tiny assertion helper keeps runner lightweight and deterministic
   if (!condition) {
     throw new Error(message || 'Assertion failed');
   }
@@ -37,7 +37,7 @@ function assertEqual(actual, expected, message) { // compare actual and expected
   }
 }
 
-function runTest(name, testFn) { // run a single test and record result sequentially
+function runTest(name, testFn) { // sequential execution avoids needing Jest and prevents test races
   testCount++;
   const startTime = Date.now();
   
@@ -69,14 +69,14 @@ function runTest(name, testFn) { // run a single test and record result sequenti
   }
 }
 
-function renderHook(hookFn) { // run hook with react-test-renderer and return its value
+function renderHook(hookFn) { // minimal hook runner; TestRenderer + act keeps state updates synchronous
   let value;
   function TestComponent() {
     value = hookFn();
     return null;
   }
-  TestRenderer.act(() => { // run hook without a real DOM
-    TestRenderer.create(React.createElement(TestComponent)); // keeps dependencies small
+  TestRenderer.act(() => { // use act so effects flush immediately
+    TestRenderer.create(React.createElement(TestComponent)); // avoids DOM and heavy frameworks like Jest
   });
   return { result: { current: value } };
 }
