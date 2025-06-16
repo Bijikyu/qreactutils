@@ -7,7 +7,8 @@ module.exports = function helpersTests({ runTest, renderHook, assert, assertEqua
     useAsyncStateWithCallbacks,
     useCallbackWithErrorHandling,
     executeWithLoadingState,
-    useDropdownData
+    useDropdownData,
+    queryClient
   } = require('../lib/hooks.js'); // import functions under test
   const { executeWithErrorHandling, executeSyncWithErrorHandling } = require('../lib/errorHandling.js'); // error helpers for tests
 
@@ -136,6 +137,26 @@ module.exports = function helpersTests({ runTest, renderHook, assert, assertEqua
     rerender({ user: null }); // simulate logout
     await TestRenderer.act(async () => { await Promise.resolve(); }); // allow effect cleanup
     assertEqual(result.current.items.length, 0, 'Items should reset when user is null');
+  });
+
+  runTest('useDropdownData clears cache for anonymous fetcher on logout', async () => {
+    const fetcher = async () => ['a']; // arrow fetcher has empty name
+
+    const { rerender } = renderHook(
+      (p) => useDropdownData(fetcher, null, p.user), // hook controlling cache by user
+      { user: { _id: 'u9' } }
+    );
+    await TestRenderer.act(async () => { await Promise.resolve(); }); // wait for initial fetch
+
+    const queries = queryClient.getQueriesData({ queryKey: ['dropdown'] });
+    const userKey = queries.find(([key]) => key[2] === 'u9')[0]; // capture key with user id
+    assert(Array.isArray(userKey), 'Previous cache key should exist');
+
+    rerender({ user: null }); // simulate logout which should clear cache
+    await TestRenderer.act(async () => { await Promise.resolve(); });
+
+    const stale = queryClient.getQueryData(userKey);
+    assert(stale === undefined, 'Old user cache should be removed after logout');
   });
 
   runTest('executeWithErrorHandling wraps non-error transform', async () => {
