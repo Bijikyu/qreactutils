@@ -3,9 +3,10 @@
  */
 
 const React = require('react');
-const TestRenderer = require('react-test-renderer');
+const TestRenderer = require('react-test-renderer'); // allows hooks to run without a browser
 
 // Completely silence all output during test execution
+// Tests call silenceConsole() before each run and restoreConsole() afterwards so logs don't pollute results
 const originalConsole = {
   log: console.log,
   error: console.error,
@@ -52,6 +53,7 @@ let passed = 0;
 let failed = 0;
 
 function test(name, fn) { // sequential runner keeps single-threaded order instead of using Jest
+  // logs are silenced during execution and restored after to keep output readable
   try {
     silenceConsole();
     fn();

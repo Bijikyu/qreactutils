@@ -16,7 +16,7 @@ console.warn = () => {};
 
 // Import React and setup
 const React = require('react');
-const TestRenderer = require('react-test-renderer');
+const TestRenderer = require('react-test-renderer'); // lets hooks run in Node without a DOM
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 
 // Import library with silenced console
@@ -69,6 +69,7 @@ function renderHook(hookFn) { // lightweight hook runner; TestRenderer avoids DO
 
 // Test execution with clean output
 function runTest(name, testFn) { // sequential execution and manual logging mimic Jest's behavior without the dependency
+  // console is muted while each test runs and restored before logging results
   testCount++;
   const testStart = Date.now();
   

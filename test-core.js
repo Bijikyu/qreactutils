@@ -4,6 +4,7 @@
  */
 
 // Runs sequentially in Node so full frameworks are unnecessary
+// React Test Renderer allows running hooks without a DOM and with minimal setup
 
 const React = require('react'); // real React provides hook semantics
 const TestRenderer = require('react-test-renderer'); // executes hooks without DOM libraries
@@ -26,8 +27,8 @@ global.window = { // simple window mock so hooks relying on browser APIs run
 }; // minimal window mock so hooks relying on browser APIs run
 
 // Suppress console output during testing // keeps noise low for CI
-const originalLog = console.log;
-console.log = () => {};
+const originalLog = console.log; // save logger so we can restore after tests
+console.log = () => {}; // silence logs while hooks run
 
 let passed = 0;
 let total = 0;
@@ -62,7 +63,7 @@ function renderHook(hookFn) { // executes hook with TestRenderer; no DOM require
   return { result: { current: value } };
 }
 
-console.log = originalLog;
+console.log = originalLog; // restore console output now that tests have finished
 console.log('Testing React Hooks Library Core Functions...\n');
 console.log = () => {};
 

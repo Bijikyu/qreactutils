@@ -1,5 +1,6 @@
 require('./test-setup'); // ensure qtests or fallback stubs before other imports so axios/winston mocks load first
-// Hooks run via react-test-renderer and tests queue sequentially so Node can run this without Jest; this keeps orchestration simple
+// Tests execute using a small promise queue so async cases never overlap; this mimics Jest's sequential behavior without the dependency
+// Hooks run via react-test-renderer so we can execute them in Node without a DOM; this keeps the test harness lightweight
 
 /**
  * Comprehensive Test Suite for React Hooks Utility Library
@@ -26,10 +27,10 @@ const React = require('react'); // Load real React for hook rendering //(replace
 const TestRenderer = require('react-test-renderer'); // Renderer for executing hooks //(provide test renderer for hook execution)
 globalThis.IS_REACT_ACT_ENVIRONMENT = true; // flag React act environment for warnings so TestRenderer.act works correctly
 
-const originalConsoleError = console.error; // store original error logger so we can forward non-act messages
-console.error = (msg, ...args) => { // override to filter noisy React act warnings while preserving others
-  if (typeof msg === 'string' && msg.includes('act(')) return; // skip act warnings for clarity in test output
-  return originalConsoleError.call(console, msg, ...args); // forward any other error messages to original logger
+const originalConsoleError = console.error; // store logger to restore after tests
+console.error = (msg, ...args) => { // intercept to hide noisy React act warnings
+  if (typeof msg === 'string' && msg.includes('act(')) return; // filter act warnings so test output stays readable
+  return originalConsoleError.call(console, msg, ...args); // forward all other errors to the real logger
 };
 
 /**
@@ -195,7 +196,7 @@ const testResults = []; // stores per-test details for the summary output
  * @param {Function} testFn - The test logic to run
  */
 let testQueue = Promise.resolve(); // Promise chain ensures sequential execution so async tests never overlap
-function runTest(name, testFn) { // lightweight runner instead of Jest; queuing avoids race conditions
+function runTest(name, testFn) { // custom runner pushes each test onto the promise queue to maintain order
   testQueue = testQueue.then(async () => { // chain test onto queue
     testCount++;
     const testStart = Date.now();
@@ -1766,8 +1767,8 @@ runTest('Multi-component integration scenario', () => {
 // =============================================================================
 
 testQueue.then(() => { // wait for queued tests before reporting to keep summary accurate
-  // Restore original environment after tests complete
-  require = originalRequire; // restore module loading behavior
+  // Restore original environment after tests complete so other scripts behave normally
+  require = originalRequire; // restore module loading behavior for subsequent tools
   global.window = originalWindow; // restore any mocked browser APIs
   delete global.PopStateEvent; // cleanup custom event constructor
 

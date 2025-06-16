@@ -6,7 +6,7 @@
 // Minimal helpers keep this suite runnable directly with Node
 
 const React = require('react'); // standard React for hook execution
-const TestRenderer = require('react-test-renderer'); // run hooks without browser DOM
+const TestRenderer = require('react-test-renderer'); // run hooks without browser DOM so Node tests stay lightweight
 
 const {
   useAsyncAction, useEditForm, useIsMobile, toast, 
@@ -28,6 +28,7 @@ let passed = 0;
 let total = 0;
 
 function test(name, fn) { // sequential runner keeps order deterministic without needing Jest
+  // only summary logs are shown to keep production output minimal
   total++;
   try {
     fn();
