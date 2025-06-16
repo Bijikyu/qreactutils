@@ -19,7 +19,7 @@ const { useAsyncAction, useDropdownData, useToast } = require('qreactutils');
 ### Recent Updates
 - Enhanced error handling patterns across all hooks
 - Improved React Query integration with v5 features
-- Comprehensive test suite with 25/25 tests passing
+- Comprehensive test suite with over 100 tests passing
 - Advanced async state management with callback patterns
 - Mobile detection with proper SSR support
 - Toast system with centralized state management
