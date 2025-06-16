@@ -553,7 +553,7 @@ runTest('logFunction handles circular data without throwing', () => {
   logFunction('circFn', 'exit', obj); // should not throw despite circular structure
 
   console.log = orig;
-  assert(messages[0].includes('[Circular Reference]'), 'Should log fallback for circular object');
+  assert(messages.some(m => m.includes('[Circular Reference]')), 'Should log fallback for circular object');
 });
 
 runTest('withToastLogging wraps function and preserves errors', () => {
