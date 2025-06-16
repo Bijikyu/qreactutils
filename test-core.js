@@ -100,9 +100,9 @@ test('toast notification creation', () => { // verifies basic toast fields
   assert(typeof result.dismiss === 'function', 'Should have dismiss function');
 });
 
-// Test 5: wrapper uses default toast implementation
-test('showToast wrapper', () => { // ensures a toast object is returned
-  const result = showToast('Test message');
+// Test 5: wrapper uses injected toast implementation
+test('showToast wrapper', () => { // ensures a toast object is returned using provided toast helper
+  const result = showToast(toast, 'Test message'); // pass exported toast so wrapper executes correctly
   assert(typeof result === 'object', 'Should return toast object');
   assert(typeof result.id === 'string', 'Should have id');
 });
