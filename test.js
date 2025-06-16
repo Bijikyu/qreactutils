@@ -694,6 +694,13 @@ runTest('apiRequest with different HTTP methods and data', async () => {
   assertEqual(defaultResult.method, 'POST', 'Should default to POST method');
 });
 
+runTest('apiRequest handles lowercase method', async () => {
+  const upperRes = await apiRequest('/api/test', 'GET', { q: 5 }); // baseline uppercase method
+  const lowerRes = await apiRequest('/api/test', 'get', { q: 5 }); // same call using lowercase method
+  assertEqual(JSON.stringify(lowerRes), JSON.stringify(upperRes), 'Lowercase method should behave like uppercase');
+  assert(lowerRes.method === 'GET', 'Method should be normalized to uppercase');
+});
+
 runTest('apiRequest error handling scenarios', async () => {
   // Test 500 error
   try {
