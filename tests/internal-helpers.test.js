@@ -9,6 +9,7 @@ module.exports = function helpersTests({ runTest, renderHook, assert, assertEqua
     executeWithLoadingState,
     useDropdownData
   } = require('../lib/hooks.js'); // import functions under test
+  const { executeWithErrorHandling, executeSyncWithErrorHandling } = require('../lib/errorHandling.js'); // error helpers for tests
 
   runTest('executeWithLoadingState resolves and toggles loading', async () => {
     let loading = false; // tracks loading state changes
@@ -119,6 +120,38 @@ module.exports = function helpersTests({ runTest, renderHook, assert, assertEqua
     rerender({ user: { _id: 'u2' } }); // update user id
     await TestRenderer.act(async () => { await Promise.resolve(); }); // trigger effect
     assertEqual(calls, 2, 'Should refetch for new user');
+  });
+
+  runTest('executeWithErrorHandling wraps non-error transform', async () => {
+    const errFn = async () => { throw new Error('orig'); }; // function that throws
+    try {
+      await executeWithErrorHandling(errFn, 'wrapTest', () => 'bad'); // transform returns string
+      throw new Error('no throw');
+    } catch (e) {
+      assert(e instanceof Error, 'Should throw Error');
+      assertEqual(e.message, 'bad', 'Message preserved');
+    }
+  });
+
+  runTest('executeWithErrorHandling awaits promise transform', async () => {
+    const errFn = async () => { throw new Error('orig'); }; // function that throws
+    const trans = async () => { await Promise.resolve(); return null; }; // transform resolves to null
+    try {
+      await executeWithErrorHandling(errFn, 'awaitTest', trans); // should await transform
+      throw new Error('no throw');
+    } catch (e) {
+      assertEqual(e.message, 'null', 'Null becomes error with message');
+    }
+  });
+
+  runTest('executeSyncWithErrorHandling wraps non-error transform', async () => {
+    const fn = () => { throw new Error('orig'); }; // sync function throwing error
+    try {
+      await executeSyncWithErrorHandling(fn, 'syncWrap', () => undefined); // transform undefined
+      throw new Error('no throw');
+    } catch (e) {
+      assertEqual(e.message, 'undefined', 'Undefined becomes error with message');
+    }
   });
 };
 
