@@ -1,3 +1,17 @@
+/*
+  internal-helpers.test.js provides a collection of unit tests for the library's helper utilities.
+  test.js imports this module and supplies { runTest, renderHook, assert, assertEqual } so these
+  tests run under the same harness while remaining separated from the public API tests. React Test
+  Renderer executes hooks here to avoid DOM requirements.
+  Each exported test verifies one helper:
+    - executeWithLoadingState toggles loading and forwards errors.
+    - useStableCallbackWithHandlers triggers success and error callbacks.
+    - useAsyncStateWithCallbacks manages async state with callbacks.
+    - useCallbackWithErrorHandling returns results and propagates errors.
+    - useDropdownData refetches on user changes and clears on logout.
+    - executeWithErrorHandling and executeSyncWithErrorHandling wrap thrown errors.
+  Keeping these tests isolated ensures internal utilities work correctly before higher level hooks rely on them.
+*/
 const React = require('react'); // React for hook execution
 const TestRenderer = require('react-test-renderer'); // renderer to run hooks
 
