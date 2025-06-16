@@ -154,22 +154,19 @@ test('Error handling with invalid inputs', () => { // passing null should throw
 // Test 10: hook should maintain stable function references across renders
 // verifies that useEditForm returns memoized handlers so components don't re-render unnecessarily
 test('Hook function stability', () => { // ensures memoization works
-  let renderCount = 0;
-  const { result } = renderHook(() => {
-    renderCount++;
-    return useEditForm({ test: 'value' });
-  });
-  
+  const { result } = renderHook(() => useEditForm({ test: 'value' }));
+
   const firstSetField = result.current.setField;
   const firstStartEdit = result.current.startEdit;
-  
-  // Re-render the hook
+  const firstCancelEdit = result.current.cancelEdit;
+
   TestRenderer.act(() => {
-    renderHook(() => useEditForm({ test: 'value' }));
+    result.current.setField('test', 'changed');
   });
-  
-  assert(typeof firstSetField === 'function', 'setField should be stable function');
-  assert(typeof firstStartEdit === 'function', 'startEdit should be stable function');
+
+  assert(result.current.setField === firstSetField, 'setField reference stable after update');
+  assert(result.current.startEdit === firstStartEdit, 'startEdit reference stable after update');
+  assert(result.current.cancelEdit === firstCancelEdit, 'cancelEdit reference stable after update');
 });
 
 console.log = originalLog;

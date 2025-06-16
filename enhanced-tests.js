@@ -23,15 +23,16 @@ const TestRenderer = require('react-test-renderer');
  * @returns {{result: {current: any}}} Current hook state for assertions
  */
 function renderHook(hookFn) { // execute hook with react-test-renderer for inspection
-  let value;
-  function TestComponent() {
-    value = hookFn();
+  const result = { current: null }; // mutable holder updated on each render
+  let root;
+  function TestComponent() { // runs hook and stores latest value
+    result.current = hookFn();
     return null;
   }
-  TestRenderer.act(() => {
-    TestRenderer.create(React.createElement(TestComponent));
+  TestRenderer.act(() => { // initial render to mount component
+    root = TestRenderer.create(React.createElement(TestComponent));
   });
-  return { result: { current: value } };
+  return { result, rerender: () => TestRenderer.act(() => root.update(React.createElement(TestComponent))) };
 }
 
 /**
@@ -313,13 +314,15 @@ runTest('useAsyncAction handles rejected promises', async () => { // ensures onE
 
 runTest('useEditForm setField updates correctly', () => { // setField modifies fields
   const { result } = renderHook(() => useEditForm({ name: 'initial' }));
-  
+  const firstRef = result.current.setField; // capture to verify stability
+
   TestRenderer.act(() => {
-    result.current.setField('name', 'updated');
+    result.current.setField('name', 'first');
+    result.current.setField('name', 'second');
   });
-  
-  // Note: In real scenarios, this would be tested with state updates
-  assert(typeof result.current.setField === 'function', 'setField should remain functional');
+
+  assert(result.current.fields.name === 'second', 'Latest value should win after multiple calls');
+  assert(result.current.setField === firstRef, 'setField reference should remain stable');
 });
 
 runTest('useDropdownData handles fetcher errors gracefully', () => { // error fetcher results empty list
