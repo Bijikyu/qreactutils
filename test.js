@@ -695,6 +695,12 @@ runTest('apiRequest with different HTTP methods and data', async () => {
   assert(getResult.method === 'GET', 'Should use correct method');
   assert(getResult.requestParams.q === 2, 'Should send params for GET'); // new check
   assert(getResult.requestData === undefined, 'Should not send body for GET'); // new check
+
+  // Test GET request without data
+  const emptyGet = await apiRequest('/api/test', 'GET'); // omit data to verify params handling // added
+  assert(emptyGet.success === true, 'GET without data should succeed'); // added
+  assert(emptyGet.requestParams === undefined, 'Should not send params when data missing'); // added
+  assert(emptyGet.requestData === undefined, 'Should not send body when data missing'); // added
   
   // Test POST request with data
   const postData = { name: 'test', value: 123 };
