@@ -84,14 +84,14 @@ function renderHook(hookFn) { // run hook with react-test-renderer and return it
 // Mock axios for testing // prevents real HTTP requests during unit tests
 const mockAxios = {
   create: () => ({
-    request: async ({ url, method }) => {
+    request: async ({ url, method, data, params }) => { // capture request body and params for assertions // changed
       if (url.includes('/error')) {
         throw { isAxiosError: true, response: { status: 500, data: 'Server error' } };
       }
       if (url.includes('/401')) {
         throw { isAxiosError: true, response: { status: 401, data: 'Unauthorized' } };
       }
-      return { data: { success: true, url, method }, status: 200 };
+      return { data: { success: true, url, method, data, params }, status: 200 }; // expose config values for tests // changed
     }
   })
 };
@@ -176,8 +176,10 @@ runTest('formatAxiosError handles errors', () => { // converts axios error
 
 // verifies that apiRequest handles a simple GET using the mocked axios client
 runTest('apiRequest basic functionality', async () => { // makes mocked request
-  const result = await apiRequest('/api/test', 'GET');
+  const result = await apiRequest('/api/test', 'GET', { q: 1 }); // pass data to verify query params // changed
   assert(result.success === true, 'Should return success response');
+  assert(result.params.q === 1, 'Should send data as query params'); // new check
+  assert(result.data === undefined, 'Should not send request body for GET'); // new check
 });
 
 runTest('getQueryFn creates query function', () => { // factory returns function

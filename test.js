@@ -57,7 +57,7 @@ const mockAxios = require('axios'); // base stub from qtests setup to intercept 
 mockAxios.create = (config) => { // provide axios.create capability for tests to support instances
     const instance = async (requestConfig) => instance.request(requestConfig); // callable like real axios
     instance.request = async (requestConfig) => { // simulate axios.request behaviour so network calls are deterministic
-      const { url, method, data } = requestConfig;
+      const { url, method, data, params } = requestConfig; // capture params for GET verification // changed
       
       // Convert relative URLs to absolute for testing
       const absoluteUrl = url.startsWith('/') ? `http://localhost:3000${url}` : url;
@@ -86,7 +86,7 @@ mockAxios.create = (config) => { // provide axios.create capability for tests to
       
       // Default successful response - return structure mirroring real axios for realistic assertions
       return {
-        data: { success: true, url: absoluteUrl, method, requestData: data },
+        data: { success: true, url: absoluteUrl, method, requestData: data, requestParams: params }, // expose params // changed
         status: 200,
         statusText: 'OK'
       };
@@ -676,9 +676,11 @@ runTest('formatAxiosError with various error types', () => {
 
 runTest('apiRequest with different HTTP methods and data', async () => {
   // Test GET request
-  const getResult = await apiRequest('/api/test', 'GET');
+  const getResult = await apiRequest('/api/test', 'GET', { q: 2 }); // send query data for verification // changed
   assert(getResult.success === true, 'GET request should succeed');
   assert(getResult.method === 'GET', 'Should use correct method');
+  assert(getResult.requestParams.q === 2, 'Should send params for GET'); // new check
+  assert(getResult.requestData === undefined, 'Should not send body for GET'); // new check
   
   // Test POST request with data
   const postData = { name: 'test', value: 123 };
@@ -1040,10 +1042,11 @@ runTest('API functions integrate with utility functions', async () => {
   };
   
   try {
-    const result = await apiRequest('/api/test', 'GET');
+    const result = await apiRequest('/api/test', 'GET', { id: 5 }); // use data to confirm params // changed
     showToast(mockToast, 'API call successful', 'Success');
     
     assert(result.success === true, 'API should return success');
+    assert(result.requestParams.id === 5, 'Should send params on GET'); // new assertion
     assert(toastCalls.length === 1, 'Toast should be called');
     assertEqual(toastCalls[0].title, 'Success', 'Toast should have correct title');
   } catch (error) {
@@ -1582,8 +1585,9 @@ runTest('Complete user workflow simulation', async () => {
   
   // Step 1: Initial API call
   try {
-    const userData = await apiRequest('/api/test', 'GET');
+    const userData = await apiRequest('/api/test', 'GET', { page: 1 }); // send data to verify GET uses params // changed
     workflow.push('api_success');
+    if (userData.requestParams?.page !== 1 || userData.requestData !== undefined) { throw new Error('GET should use params'); } // ensure query param used // added
     
     // Step 2: Show success toast
     const mockToast = (params) => {
