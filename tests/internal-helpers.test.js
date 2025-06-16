@@ -7,8 +7,9 @@ module.exports = function helpersTests({ runTest, renderHook, assert, assertEqua
     useAsyncStateWithCallbacks,
     useCallbackWithErrorHandling,
     executeWithLoadingState,
-    useDropdownData
-  } = require('../lib/hooks.js'); // import functions under test
+    useDropdownData,
+    apiRequest
+  } = require('../lib/hooks.js'); // import functions under test and apiRequest for HTTP checks // modified
   const { executeWithErrorHandling, executeSyncWithErrorHandling } = require('../lib/errorHandling.js'); // error helpers for tests
 
   runTest('executeWithLoadingState resolves and toggles loading', async () => {
@@ -168,6 +169,13 @@ module.exports = function helpersTests({ runTest, renderHook, assert, assertEqua
     } catch (e) {
       assertEqual(e.message, 'undefined', 'Undefined becomes error with message');
     }
+  });
+
+  runTest('apiRequest GET lowercase method attaches query params', async () => {
+    const res = await apiRequest('/x', 'get', { id: 1 }); // call with lowercase method to verify normalization // added
+    assert(res.success === true, 'Request should succeed'); // confirm mock success // added
+    assert(res.requestParams.id === 1, 'Should send data as query params'); // confirm params usage // added
+    assert(res.requestData === undefined, 'Should not send body for GET'); // ensure body omitted // added
   });
 };
 
