@@ -1104,6 +1104,22 @@ runTest('useDropdownData refetches when toast changes', async () => {
   assertEqual(calls, 2, 'Fetch should run again when toast instance changes');
 });
 
+runTest('useDropdownData does not refetch when toast changes with no user', async () => {
+  let calls = 0; // track fetcher usage when user absent
+  const fetcher = async () => { calls++; return ['z']; }; // simple fetcher for test
+
+  const { rerender } = renderHook(
+    (p) => useDropdownData(fetcher, p.toast, null),
+    { toast: () => {} }
+  ); // mount without user
+  await TestRenderer.act(async () => { await Promise.resolve(); }); // wait; should not fetch
+  assertEqual(calls, 0, 'No fetch should run without user');
+
+  rerender({ toast: () => {} }); // update toast while user still null
+  await TestRenderer.act(async () => { await Promise.resolve(); }); // allow effect to run
+  assertEqual(calls, 0, 'Toast change should not trigger fetch without user');
+});
+
 runTest('useDropdownData fetches once when user present at mount', async () => {
   let calls = 0; // track fetcher executions
   const fetcher = async () => { calls++; return ['x']; }; // simple fetcher
