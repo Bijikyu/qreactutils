@@ -567,6 +567,21 @@ runTest('logFunction handles undefined without throwing', () => {
   assert(messages.some(m => m.includes('undefFn is returning')), 'Should log return for undefined');
 });
 
+runTest('logFunction does not log in production', () => {
+  const messages = [];
+  const origLog = console.log;
+  const origEnv = process.env.NODE_ENV;
+  process.env.NODE_ENV = 'production'; // simulate production env
+  console.log = (msg) => { messages.push(msg); }; // capture logs
+
+  logFunction('prodFn', 'entry', 'p'); // should not output
+  logFunction('prodFn', 'exit', 'r');
+
+  console.log = origLog;
+  process.env.NODE_ENV = origEnv; // restore environment
+  assertEqual(messages.length, 0, 'No logs in production mode');
+});
+
 runTest('withToastLogging wraps function and preserves errors', () => {
   const calls = [];
   const wrapped = withToastLogging('demo', (t, msg) => { calls.push(msg); return 'done'; });
