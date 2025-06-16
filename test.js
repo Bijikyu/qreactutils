@@ -1152,6 +1152,14 @@ runTest('useDropdownData fetches when user becomes truthy', async () => {
   assertEqual(calls, 1, 'Fetch should run after user becomes available');
 });
 
+runTest('useDropdownData caches with function name key', async () => {
+  async function namedFetcher() { return ['z']; }
+  renderHook(() => useDropdownData(namedFetcher, null, { _id: 'user' }));
+  await TestRenderer.act(async () => { await Promise.resolve(); });
+  const cached = queryClient.getQueryData(['dropdown', namedFetcher.name, 'user']);
+  assert(Array.isArray(cached) && cached[0] === 'z', 'Data should be cached under serializable key');
+});
+
 runTest('useDropdownData skips toast error when not a function', async () => {
   const fetcher = async () => { throw new Error('fail'); };
   const { result } = renderHook(() => useDropdownData(fetcher, 'text', { id: 'u3' }));
