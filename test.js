@@ -1149,11 +1149,11 @@ runTest('useIsMobile integration with window API', () => {
   assert(desktop.current === false, 'Should detect desktop width correctly');
 });
 
-runTest('useIsMobile returns false when window missing', () => {
+runTest('useIsMobile uses deviceWidth when window missing', () => {
   const prevWindow = global.window; // save current window for restoration
   global.window = undefined; // remove window to simulate server environment
   const { result } = renderHook(() => useIsMobile()); // invoke hook without window
-  assert(result.current === false, 'Should return false with no window');
+  assert(result.current === false, 'Should compute result from deviceWidth');
   global.window = prevWindow; // restore window after test
 });
 
