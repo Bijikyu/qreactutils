@@ -199,22 +199,27 @@ Runs an async operation and displays a success toast when it resolves or an erro
 Combined preventDefault and stopPropagation utility for React events.
 
 ### getToastListenerCount()
-Returns the current number of registered toast listeners. Useful for tests verifying cleanup.
+Returns the current number of registered toast listeners. Exposed solely so tests
+can confirm components clean up subscriptions and avoid memory leaks.
 
 **Returns:** number - Current count of active toast listeners
 
 ### resetToastSystem()
-Clears all toast listeners, cancels pending removal timers, and resets toast state. Useful for isolated testing environments.
+Clears all toast listeners, cancels pending removal timers, and resets toast state. Provided for tests to start from a known baseline without leftover toasts.
 
 **Returns:** void
 
 ### dispatch(action)
-Centralized dispatch function used by the toast system to update global toast state and notify listeners.
+Centralized dispatch function used by the toast system to update global toast state and notify listeners. Each listener is called inside a try/catch so one failing component does not block others.
 
 **Parameters:**
 - `action` (Object): Toast action with `type`, `toast`, or `toastId` fields
 
 **Returns:** void
+
+### getToastTimeoutCount()
+Returns the number of pending toast removal timeouts. This diagnostic helper is
+used in tests to ensure dismissals clear timers and prevent memory leaks.
 
 ## Validation Utilities
 
