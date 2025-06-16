@@ -16,7 +16,7 @@
 // Import all hooks, utilities, and API functions from the consolidated hooks module
 // The hooks module acts as an aggregator, pulling together functionality from multiple internal modules
 const {
-  executeWithLoadingState, // loading helper // imported for explicit export
+  executeWithLoadingState, // loading helper // imported for explicit export // toggles loading state around promises to unify async flows
   useStableCallbackWithHandlers, // callback helper with handlers // imported for direct access
   useAsyncStateWithCallbacks, // async state hook // imported to expose low level helper
   useCallbackWithErrorHandling, // callback wrapper with errors // imported for completeness
@@ -42,43 +42,43 @@ const {
 // Exports are grouped by hook type: async actions, UI helpers, utilities, API // clarifies structure for maintainers
 module.exports = { // CommonJS export consolidating public API
   // Core async functionality hooks
-  executeWithLoadingState, // helper for toggling loading around promises // exposed for external composition
-  useStableCallbackWithHandlers, // callback with success/error handlers // exported for direct usage
-  useAsyncStateWithCallbacks, // async hook with callbacks // public to share low level pattern
-  useCallbackWithErrorHandling, // callback wrapper with error propagation // exported for consistency
-  useAsyncAction,        // Primary hook for async operations with loading states // public so apps share one async pattern
-  useToastAction,        // Combines async actions with toast updates // public so apps wire loading and toasts consistently
+  executeWithLoadingState, // helper for toggling loading around promises // exposed for external composition // ensures consistent async flows
+  useStableCallbackWithHandlers, // callback with success/error handlers // exported for direct usage // keeps re-render count low across apps
+  useAsyncStateWithCallbacks, // async hook with callbacks // public to share low level pattern // unifies resolve/reject handling across hooks
+  useCallbackWithErrorHandling, // callback wrapper with error propagation // exported for consistency // ensures errors bubble similarly across hooks
+  useAsyncAction,        // Primary hook for async operations with loading states // public so apps share one async pattern // consolidates error handling logic
+  useToastAction,        // Combines async actions with toast updates // public so apps wire loading and toasts consistently // reduces toast boilerplate
   
   // Dropdown and form management hooks
-  useDropdownData,       // Generic dropdown state management with async data fetching // exported to avoid reimplementing dropdown logic
-  createDropdownListHook,// Factory for creating typed dropdown hooks // public so apps can create tailored dropdowns
-  useDropdownToggle,     // Simple open/close state management for dropdowns // public for consistent toggle behavior
-  useEditForm,           // Form editing state with field management // exported to share standardized form editing
+  useDropdownData,       // Generic dropdown state management with async data fetching // exported to avoid reimplementing dropdown logic // keeps data fetch pattern consistent
+  createDropdownListHook,// Factory for creating typed dropdown hooks // public so apps can create tailored dropdowns // fosters uniform dropdown implementations
+  useDropdownToggle,     // Simple open/close state management for dropdowns // public for consistent toggle behavior // ensures toggling UI behaves identically
+  useEditForm,           // Form editing state with field management // exported to share standardized form editing // centralizes form field logic
   
   // UI and responsive hooks
-  useIsMobile,           // Responsive design hook for mobile detection // public for consistent responsive checks
-  useToast,              // Toast notification system with centralized state // exposed so components subscribe to toast updates
-  toast,                 // Standalone toast function for imperative usage // public so non-hook code triggers notifications
+  useIsMobile,           // Responsive design hook for mobile detection // public for consistent responsive checks // shares single breakpoint across library
+  useToast,              // Toast notification system with centralized state // exposed so components subscribe to toast updates // central hub for toast state
+  toast,                 // Standalone toast function for imperative usage // public so non-hook code triggers notifications // lets non-hook code trigger toasts
   
   // Authentication and navigation
-  useAuthRedirect,       // Authentication-based client-side routing // part of API to unify auth-based navigation
+  useAuthRedirect,       // Authentication-based client-side routing // part of API to unify auth-based navigation // ensures unauthorized users are routed consistently
   
   // Utility functions
-  showToast,             // Helper for displaying toast messages // public so notifications can be fired from any module
-  toastSuccess,          // Success toast utility // exported for simple success messages
-  toastError,            // Error toast utility // public so error toasts share formatting
-  executeWithErrorToast, // Operation wrapper that shows error toast // public for consistency
-  executeWithToastFeedback, // Operation wrapper with success/error toasts // exposed to unify feedback
-  stopEvent,             // Event handling utility for preventing default behavior // kept public for generic DOM helpers
-  getToastListenerCount, // Allows tests to inspect active toast listeners // exported to help verify toast state
-  resetToastSystem,      // Clears toast listeners between tests // public to reset global state in tests
-  dispatch,              // Expose dispatch for advanced control and tests // exported so consumers can trigger custom actions
-  getToastTimeoutCount,  // Count pending toast timeouts // helps verify timers cleaned up
+  showToast,             // Helper for displaying toast messages // public so notifications can be fired from any module // universal entry point for toast system
+  toastSuccess,          // Success toast utility // exported for simple success messages // keeps success formatting consistent
+  toastError,            // Error toast utility // public so error toasts share formatting // ensures error messages look the same
+  executeWithErrorToast, // Operation wrapper that shows error toast // public for consistency // surfaces failures to users automatically
+  executeWithToastFeedback, // Operation wrapper with success/error toasts // exposed to unify feedback // standardizes success and failure UX
+  stopEvent,             // Event handling utility for preventing default behavior // kept public for generic DOM helpers // quick DOM helper for forms
+  getToastListenerCount, // Allows tests to inspect active toast listeners // exported to help verify toast state // ensures toasts clean up between tests
+  resetToastSystem,      // Clears toast listeners between tests // public to reset global state in tests // necessary for isolated test runs
+  dispatch,              // Expose dispatch for advanced control and tests // exported so consumers can trigger custom actions // allows custom toast actions externally
+  getToastTimeoutCount,  // Count pending toast timeouts // helps verify timers cleaned up // confirms timers clear properly
   
   // API and HTTP functionality
-  apiRequest,            // Standardized HTTP request wrapper with error handling // public so external code uses shared axios logic
-  getQueryFn,            // React Query integration for server state management // exported to build queries with 401 handling
-  queryClient,           // Pre-configured React Query client instance // public to reuse a single query client
-  formatAxiosError,      // Error normalization for consistent error handling // exported to keep error objects uniform
-  axiosClient            // Pre-configured axios instance with sensible defaults // public so consumers share axios configuration
+  apiRequest,            // Standardized HTTP request wrapper with error handling // public so external code uses shared axios logic // centralizes axios with error conventions
+  getQueryFn,            // React Query integration for server state management // exported to build queries with 401 handling // ensures 401s handled the same way
+  queryClient,           // Pre-configured React Query client instance // public to reuse a single query client // avoids creating multiple clients per app
+  formatAxiosError,      // Error normalization for consistent error handling // exported to keep error objects uniform // simplifies logging and user messages
+  axiosClient            // Pre-configured axios instance with sensible defaults // public so consumers share axios configuration // shares same baseURL and credentials
 }; // end consolidated export object

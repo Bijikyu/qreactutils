@@ -44,6 +44,7 @@ global.window = {
 let testResults = []; // collected sequentially to keep output order stable
 
 function test(name, fn) { // simple runner keeps order deterministic and avoids Jest overhead
+  // console is silenced while each test runs and restored immediately after
   try {
     // Silence console during test execution
     console.log = () => {};

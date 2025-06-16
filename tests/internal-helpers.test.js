@@ -1,7 +1,10 @@
 const React = require('react'); // React for hook execution
-const TestRenderer = require('react-test-renderer'); // renderer to run hooks
+const TestRenderer = require('react-test-renderer'); // renderer to run hooks in Node without DOM
 
 module.exports = function helpersTests({ runTest, renderHook, assert, assertEqual }) {
+  // runTest comes from the main suite and pushes each check onto a promise queue so tests execute sequentially
+  // renderHook uses react-test-renderer which lets us execute hooks without a browser
+  // console output is already silenced by the parent runner to keep results clean
   const {
     useStableCallbackWithHandlers,
     useAsyncStateWithCallbacks,
