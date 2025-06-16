@@ -183,6 +183,12 @@ Pre-configured Axios instance with authentication and JSON handling.
 ### showToast(toast, message, title, variant)
 Framework-agnostic toast creation utility.
 
+### executeWithErrorToast(operation, toast, errorTitle)
+Runs an async operation and shows a destructive toast when the operation throws. The original error is re-thrown for caller handling.
+
+### executeWithToastFeedback(operation, toast, successMessage, errorTitle)
+Runs an async operation and displays a success toast when it resolves or an error toast on failure.
+
 ### stopEvent(event)
 Combined preventDefault and stopPropagation utility for React events.
 
