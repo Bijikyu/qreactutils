@@ -1635,11 +1635,11 @@ console.log('\n📊 DETAILED TEST SUMMARY');
 console.log('='.repeat(60));
 
 // Performance analysis
-const avgDuration = testResults.reduce((sum, test) => sum + test.duration, 0) / testResults.length;
-const slowestTest = testResults.reduce((slowest, test) => 
-  test.duration > slowest.duration ? test : slowest, { duration: 0 });
-const fastestTest = testResults.reduce((fastest, test) => 
-  test.duration < fastest.duration ? test : fastest, { duration: Infinity });
+const avgDuration = testResults.reduce((sum, test) => sum + test.duration, 0) / testResults.length; // mean duration across all tests
+const slowestTest = testResults.reduce((slowest, test) =>
+  test.duration > slowest.duration ? test : slowest, { duration: 0 }); // slowest test case for reference
+const fastestTest = testResults.reduce((fastest, test) =>
+  test.duration < fastest.duration ? test : fastest, { duration: Infinity }); // fastest test case for reference
 
 console.log(`Total Tests: ${testCount}`);
 console.log(`✅ Passed: ${passedTests}`);
@@ -1650,7 +1650,7 @@ console.log(`Slowest Test: ${slowestTest.name} (${slowestTest.duration}ms)`);
 console.log(`Fastest Test: ${fastestTest.name} (${fastestTest.duration}ms)`);
 
 // Failed tests details
-if (failedTests > 0) {
+if (failedTests > 0) { // print details only when failures occurred
   console.log('\n❌ FAILED TESTS DETAILS:');
   testResults
     .filter(test => test.status === 'FAILED')
@@ -1667,7 +1667,7 @@ const testCategories = {
   'ERROR HANDLING': testResults.filter(t => t.name.includes('error') || t.name.includes('Error')).length,
   'EDGE CASES': testResults.filter(t => t.name.includes('edge') || t.name.includes('boundary')).length,
   'PERFORMANCE': testResults.filter(t => t.name.includes('performance') || t.name.includes('scale')).length
-};
+}; // counts tests matching keywords for each category
 
 console.log('\n📈 TEST COVERAGE BY CATEGORY:');
 Object.entries(testCategories).forEach(([category, count]) => {
