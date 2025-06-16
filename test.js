@@ -569,6 +569,20 @@ runTest('withToastLogging wraps function and preserves errors', () => {
   assert(threw, 'Wrapped errors should propagate');
 });
 
+runTest('withToastLogging handles async rejection', async () => {
+  const messages = [];
+  const orig = console.log;
+  console.log = (msg) => { messages.push(msg); };
+  const asyncWrap = withToastLogging('asyncToast', () => Promise.reject(new Error('bad')));
+  const promise = asyncWrap();
+  let threw = false;
+  try { await promise; } catch (e) { threw = e && e.message === 'bad'; }
+  console.log = orig;
+  assertEqual(typeof promise.then, 'function', 'Wrapped function should return Promise');
+  assert(threw, 'Wrapped async errors should propagate');
+  assert(messages.some(m => m.includes('asyncToast encountered error')), 'Should log rejection');
+});
+
 // =============================================================================
 // UNIT TESTS - VALIDATION UTILITIES
 // =============================================================================
