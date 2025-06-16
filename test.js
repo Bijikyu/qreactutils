@@ -1163,12 +1163,14 @@ runTest('useDropdownData fetches when user becomes truthy', async () => {
   assertEqual(calls, 1, 'Fetch should run after user becomes available');
 });
 
-runTest('useDropdownData caches with function name key', async () => {
-  async function namedFetcher() { return ['z']; }
-  renderHook(() => useDropdownData(namedFetcher, null, { _id: 'user' }));
+runTest('useDropdownData caches with unique fetcher id', async () => {
+  renderHook(() => useDropdownData(() => Promise.resolve(['x']), null, { _id: 'u1' }));
+  renderHook(() => useDropdownData(() => Promise.resolve(['y']), null, { _id: 'u1' }));
   await TestRenderer.act(async () => { await Promise.resolve(); });
-  const cached = queryClient.getQueryData(['dropdown', namedFetcher.name, 'user']);
-  assert(Array.isArray(cached) && cached[0] === 'z', 'Data should be cached under serializable key');
+  const queries = queryClient.getQueriesData({ queryKey: ['dropdown'] });
+  assertEqual(queries.length, 2, 'Each fetcher should produce separate cache entry');
+  const vals = queries.map(q => q[1][0]).sort();
+  assert(vals.includes('x') && vals.includes('y'), 'Cache entries preserve respective data');
 });
 
 runTest('useDropdownData skips toast error when not a function', async () => {
