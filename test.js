@@ -740,6 +740,13 @@ runTest('apiRequest with different HTTP methods and data', async () => {
   assertEqual(defaultResult.method, 'POST', 'Should default to POST method');
 });
 
+runTest('apiRequest accepts lowercase method', async () => { // verify case normalization
+  const lowerGet = await apiRequest('/api/test', 'get', { id: 3 });
+  assert(lowerGet.success === true, 'Should succeed with lowercase method');
+  assert(lowerGet.method === 'GET', 'Should normalize method to uppercase');
+  assert(lowerGet.requestParams.id === 3, 'Should send params correctly');
+});
+
 runTest('apiRequest error handling scenarios', async () => {
   // Test 500 error
   try {
