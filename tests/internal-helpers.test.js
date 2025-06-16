@@ -6,7 +6,8 @@ module.exports = function helpersTests({ runTest, renderHook, assert, assertEqua
     useStableCallbackWithHandlers,
     useAsyncStateWithCallbacks,
     useCallbackWithErrorHandling,
-    executeWithLoadingState
+    executeWithLoadingState,
+    useDropdownData
   } = require('../lib/hooks.js'); // import functions under test
 
   runTest('executeWithLoadingState resolves and toggles loading', async () => {
@@ -102,6 +103,22 @@ module.exports = function helpersTests({ runTest, renderHook, assert, assertEqua
     try { await result.current(); } catch (e) { threw = e === error; }
     assert(threw, 'Error should be thrown');
     assertEqual(errOut, error, 'onError invoked with error');
+  });
+
+  runTest('useDropdownData refetches when user changes', async () => {
+    let calls = 0; // track fetcher invocations for assertion
+    const fetcher = async () => { calls++; return ['i']; }; // simple fetcher returning data
+
+    const { rerender } = renderHook(
+      (p) => useDropdownData(fetcher, null, p.user), // hook under test with user prop
+      { user: { _id: 'u1' } } // initial user id
+    );
+    await TestRenderer.act(async () => { await Promise.resolve(); }); // allow initial query
+    assertEqual(calls, 1, 'Should fetch once for first user');
+
+    rerender({ user: { _id: 'u2' } }); // update user id
+    await TestRenderer.act(async () => { await Promise.resolve(); }); // trigger effect
+    assertEqual(calls, 2, 'Should refetch for new user');
   });
 };
 
