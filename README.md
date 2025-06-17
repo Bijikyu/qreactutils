@@ -331,6 +331,10 @@ used in tests to ensure dismissals clear timers and prevent memory leaks.
 ### executeAsyncWithLogging(operation, name, errorHandler)
 Runs an async function with entry/exit/error logging.
 
+```javascript
+const { executeAsyncWithLogging } = require('qreactutils/lib/utils');
+```
+
 **Parameters:**
 - `operation` (Function): Async function to execute
 - `name` (string): Label for log output
@@ -340,6 +344,10 @@ Runs an async function with entry/exit/error logging.
 
 ### logFunction(name, phase, extra)
 Internal helper for consistent console output across utilities.
+
+```javascript
+const { logFunction } = require('qreactutils/lib/utils');
+```
 
 **Parameters:**
 - `name` (string): Function name being logged
@@ -351,6 +359,10 @@ Internal helper for consistent console output across utilities.
 ### withToastLogging(name, fn)
 Higher-order wrapper adding logging around toast helpers.
 
+```javascript
+const { withToastLogging } = require('qreactutils/lib/utils');
+```
+
 **Parameters:**
 - `name` (string): Name for log entries
 - `fn` (Function): Toast helper to wrap
@@ -359,6 +371,10 @@ Higher-order wrapper adding logging around toast helpers.
 
 ### executeWithErrorHandling(fn, functionName, errorTransform)
 Async wrapper that maps errors before rethrowing.
+
+```javascript
+const { executeWithErrorHandling } = require('qreactutils/lib/errorHandling');
+```
 
 **Parameters:**
 - `fn` (Function): Function to execute
@@ -369,6 +385,10 @@ Async wrapper that maps errors before rethrowing.
 
 ### executeSyncWithErrorHandling(fn, functionName, errorTransform)
 Synchronous counterpart supporting async error transforms.
+
+```javascript
+const { executeSyncWithErrorHandling } = require('qreactutils/lib/errorHandling');
+```
 
 **Parameters:**
 - `fn` (Function): Synchronous function to run
