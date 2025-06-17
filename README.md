@@ -226,6 +226,15 @@ Runs an Axios request through `codexRequest` and normalizes errors.
 
 **Returns:** Promise resolving to the Axios response
 
+These helpers live in the `lib/api` submodule and are not part of the library's
+default exports. Import them directly when needed:
+
+```javascript
+// Access internal API helpers
+const { handle401Error, codexRequest, executeAxiosRequest } =
+  require('qreactutils/lib/api');
+```
+
 ### apiRequest(url, method, data)
 Standardized HTTP request wrapper using `axiosClient`. `GET` requests send `data` as query parameters while other methods send it as the body.
 
