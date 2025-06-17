@@ -22,7 +22,7 @@ globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 // Import library with silenced console
 const {
   useAsyncAction, useDropdownData, createDropdownListHook, useDropdownToggle,
-  useEditForm, useIsMobile, useToast, toast, useToastAction, useAuthRedirect,
+  useEditForm, useIsMobile, useToast, toast, useToastAction, useAuthRedirect, useSocket,
   showToast, toastSuccess, toastError, stopEvent, apiRequest, getQueryFn, 
   queryClient, formatAxiosError, axiosClient
 } = require('./index.js');
@@ -206,6 +206,36 @@ runTest('showToast with custom toast function', () => {
   const result = showToast(mockToast, 'Test message', 'Test Title');
   assert(result.id === 'custom-id', 'Should use provided toast function');
   assert(result.title === 'Test Title', 'Should pass through title');
+});
+
+runTest('useSocket hook provides correct structure', () => {
+  // Mock socket.io-client to avoid actual network connections during testing
+  const mockSocket = {
+    emit: () => {},
+    on: () => {},
+    off: () => {},
+    disconnect: () => {}
+  };
+  
+  // Override require to return mock socket
+  const originalRequire = require;
+  require = (moduleName) => {
+    if (moduleName === 'socket.io-client') {
+      return { io: () => mockSocket };
+    }
+    return originalRequire(moduleName);
+  };
+  
+  const { result } = renderHook(() => useSocket('test-user-123'));
+  
+  // Restore original require
+  require = originalRequire;
+  
+  assert(typeof result.current === 'object', 'Should return state object');
+  assert(result.current.hasOwnProperty('paymentOutcome'), 'Should have paymentOutcome property');
+  assert(result.current.hasOwnProperty('usageUpdate'), 'Should have usageUpdate property');
+  assert(result.current.paymentOutcome === null, 'Initial paymentOutcome should be null');
+  assert(result.current.usageUpdate === null, 'Initial usageUpdate should be null');
 });
 
 // Final results
