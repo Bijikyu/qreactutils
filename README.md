@@ -323,6 +323,8 @@ const { executeAsyncWithLogging } = require('qreactutils/lib/utils');
 ### logFunction(name, phase, extra)
 Internal helper for consistent console output across utilities.
 
+Logging is automatically skipped when `NODE_ENV` is set to `production`, so set this environment variable to silence logs in production deployments.
+
 ```javascript
 const { logFunction } = require('qreactutils/lib/utils');
 ```
