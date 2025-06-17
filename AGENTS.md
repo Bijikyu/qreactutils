@@ -106,4 +106,4 @@ The **offline-first development approach** embedded throughout (via `codexReques
 - **Mobile Breakpoint Standard**: The 768px breakpoint in `useIsMobile` aligns with Bootstrap's md breakpoint and should not be changed without considering existing applications
 - **Query Client Configuration**: The React Query client uses default settings optimized for typical CRUD operations. Custom configurations should be applied at the application level, not in this library
 - **Error Propagation Pattern**: Functions always re-throw errors after handling them (logging, toasts) to preserve the error chain for calling code
-- **Codex Request Infrastructure**: The `codexRequest` wrapper exists for offline development scenarios but currently passes through to live requests. This infrastructure should be preserved for future enhancement
+- **Codex Request Infrastructure**: The `codexRequest` wrapper returns `{status: 200, data: null}` when `OFFLINE_MODE=true`, otherwise it performs live requests. This infrastructure ensures frontend work continues when backends are unavailable.
