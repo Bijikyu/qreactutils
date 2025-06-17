@@ -164,44 +164,6 @@ React hook for handling authentication-based redirects.
 - The hook first attempts SPA-style navigation by calling `window.history.pushState` and dispatching a `PopStateEvent`
 - Falls back to `window.location.assign` when history APIs are missing
 
-### executeWithLoadingState(setIsLoading, asyncOperation)
-Runs an async operation while toggling a loading boolean.
-
-**Parameters:**
-- `setIsLoading` (Function): State setter for loading status
-- `asyncOperation` (Function): Async function to execute
-
-**Returns:** Promise resolving to the operation result
-
-### useStableCallbackWithHandlers(operation, callbacks, deps)
-Hook returning a memoized callback that triggers optional success and error handlers.
-
-**Parameters:**
-- `operation` (Function): Function invoked by the callback
-- `callbacks` (Object): Optional `onSuccess` and `onError` handlers
-- `deps` (Array): Dependency list for `useCallback`
-
-**Returns:** Function - Stable callback with error handling
-
-### useAsyncStateWithCallbacks(asyncFn, options)
-Hook for async operations with internal loading state and callbacks.
-
-**Parameters:**
-- `asyncFn` (Function): The async operation to run
-- `options` (Object): Optional `onSuccess` and `onError` callbacks
-
-**Returns:** Array - `[run, isLoading]`
-
-### useCallbackWithErrorHandling(operation, options, deps)
-Hook returning a memoized callback wrapped in try/catch.
-
-**Parameters:**
-- `operation` (Function): Function to execute
-- `options` (Object): `onSuccess` and `onError` handlers
-- `deps` (Array): Dependency list for `useCallback`
-
-**Returns:** Function - Memoized callback with error handling
-
 ## Utility Functions
 
 ### toast(props)
