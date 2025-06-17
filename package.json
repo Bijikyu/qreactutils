@@ -1,6 +1,6 @@
 {
   "name": "qreactutils",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A comprehensive React hooks library providing common functionality for async actions, dropdown management, form editing, mobile detection, toast notifications, and authentication redirects.",
   "main": "index.js",
   "directories": {
