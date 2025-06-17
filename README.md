@@ -125,6 +125,44 @@ React hook for handling authentication-based redirects.
 - `condition` (boolean): The condition that triggers the redirect
 - Gracefully skips navigation when `window.history.pushState` is unavailable
 
+### executeWithLoadingState(setIsLoading, asyncOperation)
+Runs an async operation while toggling a loading boolean.
+
+**Parameters:**
+- `setIsLoading` (Function): State setter for loading status
+- `asyncOperation` (Function): Async function to execute
+
+**Returns:** Promise resolving to the operation result
+
+### useStableCallbackWithHandlers(operation, callbacks, deps)
+Hook returning a memoized callback that triggers optional success and error handlers.
+
+**Parameters:**
+- `operation` (Function): Function invoked by the callback
+- `callbacks` (Object): Optional `onSuccess` and `onError` handlers
+- `deps` (Array): Dependency list for `useCallback`
+
+**Returns:** Function - Stable callback with error handling
+
+### useAsyncStateWithCallbacks(asyncFn, options)
+Hook for async operations with internal loading state and callbacks.
+
+**Parameters:**
+- `asyncFn` (Function): The async operation to run
+- `options` (Object): Optional `onSuccess` and `onError` callbacks
+
+**Returns:** Array - `[run, isLoading]`
+
+### useCallbackWithErrorHandling(operation, options, deps)
+Hook returning a memoized callback wrapped in try/catch.
+
+**Parameters:**
+- `operation` (Function): Function to execute
+- `options` (Object): `onSuccess` and `onError` handlers
+- `deps` (Array): Dependency list for `useCallback`
+
+**Returns:** Function - Memoized callback with error handling
+
 ## Utility Functions
 
 ### toast(props)
@@ -220,6 +258,55 @@ Centralized dispatch function used by the toast system to update global toast st
 ### getToastTimeoutCount()
 Returns the number of pending toast removal timeouts. This diagnostic helper is
 used in tests to ensure dismissals clear timers and prevent memory leaks.
+
+### executeAsyncWithLogging(operation, name, errorHandler)
+Runs an async function with entry/exit/error logging.
+
+**Parameters:**
+- `operation` (Function): Async function to execute
+- `name` (string): Label for log output
+- `errorHandler` (Function, optional): Handler called when the operation throws
+
+**Returns:** Promise resolving to the result or handler output
+
+### logFunction(name, phase, extra)
+Internal helper for consistent console output across utilities.
+
+**Parameters:**
+- `name` (string): Function name being logged
+- `phase` (string): Execution phase such as `entry` or `exit`
+- `extra` (any): Additional data to log
+
+**Returns:** void
+
+### withToastLogging(name, fn)
+Higher-order wrapper adding logging around toast helpers.
+
+**Parameters:**
+- `name` (string): Name for log entries
+- `fn` (Function): Toast helper to wrap
+
+**Returns:** Function - Wrapped operation
+
+### executeWithErrorHandling(fn, functionName, errorTransform)
+Async wrapper that maps errors before rethrowing.
+
+**Parameters:**
+- `fn` (Function): Function to execute
+- `functionName` (string): Name used in logs
+- `errorTransform` (Function, optional): Maps thrown error
+
+**Returns:** Promise resolving to the function result
+
+### executeSyncWithErrorHandling(fn, functionName, errorTransform)
+Synchronous counterpart supporting async error transforms.
+
+**Parameters:**
+- `fn` (Function): Synchronous function to run
+- `functionName` (string): Name used in logs
+- `errorTransform` (Function, optional): Maps thrown error
+
+**Returns:** Promise resolving to the function result
 
 ## Validation Utilities
 
