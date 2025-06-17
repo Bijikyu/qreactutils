@@ -236,7 +236,7 @@ Standardized HTTP request wrapper with consistent error handling and authenticat
 **Parameters:**
 - `url` (string): The API endpoint URL
 - `method` (string, optional): HTTP method (defaults to 'POST')
-- `data` (any, optional): Request body data
+- `data` (any, optional): Data to send with the request. For `GET` calls it becomes query parameters while other methods send it in the body.
 
 **Returns:** Promise resolving to response data
 
