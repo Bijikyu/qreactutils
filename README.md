@@ -230,13 +230,41 @@ Helper function for displaying error toast messages with destructive variant.
 
 ## API Functions
 
+### handle401Error(error, behavior)
+Gracefully handles 401 errors returned from Axios requests. Use `'returnNull'` to treat the response as missing data or `'throw'` to propagate the error.
+
+**Parameters:**
+- `error` (Error): The Axios error object
+- `behavior` (string): `'returnNull'` or `'throw'`
+
+**Returns:** boolean - `true` if the 401 was handled
+
+### codexRequest(requestFn, mockResponse)
+Wrapper enabling offline mode by returning a mock response when `OFFLINE_MODE=true`.
+
+**Parameters:**
+- `requestFn` (Function): Function executing the real Axios request
+- `mockResponse` (Object, optional): Response to return when offline
+
+**Returns:** Promise resolving to the Axios response object
+
+### executeAxiosRequest(axiosCall, unauthorizedBehavior, mockResponse)
+Runs an Axios request through `codexRequest` and normalizes errors.
+
+**Parameters:**
+- `axiosCall` (Function): Function performing the Axios request
+- `unauthorizedBehavior` (string): `'returnNull'` or `'throw'` for 401 handling
+- `mockResponse` (Object, optional): Offline mode response
+
+**Returns:** Promise resolving to the Axios response
+
 ### apiRequest(url, method, data)
-Standardized HTTP request wrapper with consistent error handling and authentication.
+Standardized HTTP request wrapper using `axiosClient`. `GET` requests send `data` as query parameters while other methods send it as the body.
 
 **Parameters:**
 - `url` (string): The API endpoint URL
 - `method` (string, optional): HTTP method (defaults to 'POST')
-- `data` (any, optional): Request body data
+- `data` (any, optional): Request payload or query params
 
 **Returns:** Promise resolving to response data
 
