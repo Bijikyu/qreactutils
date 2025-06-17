@@ -1,0 +1,39 @@
+// Mobile device detection hook for responsive UI adaptations
+// Uses standard 768px breakpoint to match Tailwind CSS and modern design systems
+// Provides real-time updates when user rotates device or resizes browser window
+import * as React from "react"
+
+// Standard mobile breakpoint matching Tailwind CSS 'md' breakpoint (768px)
+// This ensures consistency between CSS classes and JavaScript logic
+// Chosen because it represents the transition point where layouts need significant changes
+const MOBILE_BREAKPOINT = 768
+
+/**
+ * Custom hook to detect mobile viewport and respond to screen size changes
+ * Returns boolean indicating whether current viewport is considered mobile
+ * Handles server-side rendering by starting with undefined state
+ * @returns boolean - true if mobile viewport, false if desktop
+ */
+export function useIsMobile() {
+  // Initialize with undefined to handle server-side rendering safely
+  // Prevents hydration mismatches between server and client rendering
+  const [isMobile, setIsMobile] = React.useState<boolean | undefined>(undefined)
+
+  React.useEffect(() => {
+    // Use matchMedia for efficient viewport monitoring with browser optimization
+    // More performant than resize event listeners for responsive design queries
+    const mql = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`)
+    const onChange = () => {
+      // Direct width check ensures immediate accuracy on initial load
+      // matchMedia change events may not fire on page load in some browsers
+      setIsMobile(window.innerWidth < MOBILE_BREAKPOINT)
+    }
+    mql.addEventListener("change", onChange) // Monitor viewport changes efficiently
+    setIsMobile(window.innerWidth < MOBILE_BREAKPOINT) // Set initial state immediately
+    return () => mql.removeEventListener("change", onChange) // Clean up to prevent memory leaks
+  }, [])
+
+  // Convert undefined to false for consistent boolean return type
+  // Prevents components from receiving undefined during SSR hydration
+  return !!isMobile
+}

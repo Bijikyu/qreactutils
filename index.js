@@ -21,7 +21,7 @@ const {
   useAsyncStateWithCallbacks, // async state hook // imported to expose low level helper
   useCallbackWithErrorHandling, // callback wrapper with errors // imported for completeness
   useAsyncAction, useDropdownData, createDropdownListHook, useDropdownToggle, // aggregate hook utilities // gathered here to ensure stable references across modules
-  useEditForm, useIsMobile, useToast, toast, useToastAction, useAuthRedirect, useSocket, // UI-related helpers // centralizing UI hooks prevents scattered imports
+  useEditForm, useIsMobile, useToast, toast, useToastAction, useAuthRedirect, usePageFocus, useSocket, // UI-related helpers // centralizing UI hooks prevents scattered imports
   showToast, toastSuccess, toastError, executeWithErrorToast, executeWithToastFeedback, stopEvent, apiRequest, getQueryFn, queryClient, formatAxiosError, axiosClient, getToastListenerCount, resetToastSystem, dispatch, getToastTimeoutCount // core API & toast utilities // exposes internal tools in one shot for clarity
 } = require('./lib/hooks'); // CommonJS import keeps broad Node compatibility // require chosen so Node apps of any version can consume this module
 
@@ -62,6 +62,9 @@ module.exports = { // CommonJS export consolidating public API
   
   // Authentication and navigation
   useAuthRedirect,       // Authentication-based client-side routing // part of API to unify auth-based navigation // ensures unauthorized users are routed consistently
+  
+  // Accessibility and focus management
+  usePageFocus,          // Keyboard focus management for route changes // public for accessibility compliance // automatically focuses main content for screen readers
   
   // Real-time communication
   useSocket,             // WebSocket communication for payment outcomes and usage updates // public for real-time data integration // manages Socket.IO connections with automatic cleanup

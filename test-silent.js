@@ -22,7 +22,7 @@ globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 // Import library with silenced console
 const {
   useAsyncAction, useDropdownData, createDropdownListHook, useDropdownToggle,
-  useEditForm, useIsMobile, useToast, toast, useToastAction, useAuthRedirect, useSocket,
+  useEditForm, useIsMobile, useToast, toast, useToastAction, useAuthRedirect, usePageFocus, useSocket,
   showToast, toastSuccess, toastError, stopEvent, apiRequest, getQueryFn, 
   queryClient, formatAxiosError, axiosClient
 } = require('./index.js');
@@ -206,6 +206,33 @@ runTest('showToast with custom toast function', () => {
   const result = showToast(mockToast, 'Test message', 'Test Title');
   assert(result.id === 'custom-id', 'Should use provided toast function');
   assert(result.title === 'Test Title', 'Should pass through title');
+});
+
+runTest('usePageFocus manages focus correctly', () => {
+  // Mock document and main content element for focus testing
+  let focusCalled = false;
+  const mockMainElement = {
+    focus: () => { focusCalled = true; }
+  };
+  
+  // Mock document.getElementById to return our test element
+  const originalDocument = global.document;
+  global.document = {
+    getElementById: (id) => {
+      if (id === 'main-content') {
+        return mockMainElement;
+      }
+      return null;
+    }
+  };
+  
+  // Test the hook with a location parameter
+  renderHook(() => usePageFocus('/test-route'));
+  
+  // Restore original document
+  global.document = originalDocument;
+  
+  assert(focusCalled, 'Should call focus on main-content element');
 });
 
 runTest('useSocket hook provides correct structure', () => {

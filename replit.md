@@ -33,6 +33,8 @@ The library follows a hierarchical module organization:
 - **useIsMobile**: Mobile device detection with SSR support
 - **useToast**: Centralized toast notification system
 - **useAuthRedirect**: Authentication flow management
+- **usePageFocus**: Accessibility-focused keyboard focus management for route changes
+- **useSocket**: Real-time WebSocket communication for payment outcomes and usage updates
 
 ### API Layer
 - **axiosClient**: Pre-configured Axios instance with credentials and error handling
@@ -72,6 +74,7 @@ The library follows a hierarchical module organization:
 - **@tanstack/react-query**: Server state management, caching, and background updates
 - **axios**: HTTP client for API requests with interceptors and error handling
 - **react-responsive**: Media query management for responsive design
+- **socket.io-client**: Real-time WebSocket communication for payment and usage tracking
 
 ### Development Dependencies
 - **react-test-renderer**: Hook testing without DOM requirements
@@ -107,7 +110,9 @@ The library follows a hierarchical module organization:
 
 ## Changelog
 
-- June 17, 2025. Initial setup
+- June 17, 2025: Initial setup
+- June 17, 2025: Added useSocket hook for real-time WebSocket communication with Socket.IO
+- June 17, 2025: Added usePageFocus hook for accessibility-focused keyboard navigation
 
 ## User Preferences
 

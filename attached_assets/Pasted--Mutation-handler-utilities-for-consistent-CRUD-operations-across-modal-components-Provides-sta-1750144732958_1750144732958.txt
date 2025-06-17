@@ -1,0 +1,89 @@
+// Mutation handler utilities for consistent CRUD operations across modal components
+// Provides standard patterns for cache invalidation, user feedback, and error handling
+// Reduces duplicate mutation code while maintaining flexibility for different use cases
+//
+// RATIONALE: Without these helpers, each component would need 15-20 lines of boilerplate code
+// for every mutation (create, update, delete). This abstraction eliminates ~300 lines of
+// duplicate code across the application while ensuring consistent UX patterns.
+// 
+// The pattern standardization also prevents bugs where developers forget to:
+// 1. Invalidate relevant cache queries after mutations
+// 2. Show appropriate success/error feedback to users  
+// 3. Close modals after successful operations
+// 4. Handle edge cases in error messaging consistently
+
+import { queryClient } from "@/lib/queryClient";
+
+/**
+ * Standard cache invalidation helper for mutations
+ * Ensures data freshness after successful operations
+ */
+export function invalidateQueries(keys: string[]) {
+  keys.forEach(key => {
+    queryClient.invalidateQueries({ queryKey: [key] });
+  });
+}
+
+/**
+ * Standard success toast helper for consistent user feedback
+ */
+export function showSuccessToast(
+  toast: any,
+  title: string = "Success",
+  description: string
+) {
+  toast({
+    title,
+    description,
+  });
+}
+
+/**
+ * Standard error toast helper for consistent error feedback
+ */
+export function showErrorToast(
+  toast: any,
+  title: string = "Error",
+  description: string
+) {
+  toast({
+    title,
+    description,
+    variant: "destructive",
+  });
+}
+
+/**
+ * Combined mutation success pattern
+ * Handles the most common success flow: invalidate cache, show toast, close modal
+ */
+export function handleMutationSuccess(
+  invalidateKeys: string[],
+  toast: any,
+  successMessage: string,
+  onClose?: () => void
+) {
+  invalidateQueries(invalidateKeys);
+  showSuccessToast(toast, "Success", successMessage);
+  if (onClose) onClose();
+}
+
+/**
+ * Combined mutation error pattern
+ * Provides consistent error handling across all mutations
+ */
+export function handleMutationError(
+  toast: any,
+  errorMessage: string,
+  error?: Error
+) {
+  showErrorToast(toast, "Error", error?.message || errorMessage);
+}
+
+// Pre-configured patterns for specific entity types
+// These provide consistent cache invalidation and messaging for common operations
+
+export const PROMPT_LIST_CACHE_KEYS = ["/api/prompt-lists", "/api/prompts-map"];
+export const PROMPT_CACHE_KEYS = ["/api/prompts-map"];
+export const REPOSITORY_CACHE_KEYS = ["/api/repositories"];
+export const EXECUTION_CACHE_KEYS = ["/api/executions", "/api/repositories"];

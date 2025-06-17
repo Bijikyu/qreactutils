@@ -1,0 +1,92 @@
+// Form validation utilities for consistent error handling across components
+// Centralizes validation logic to ensure uniform user experience and reduce code duplication
+// All validation functions return empty string for valid input, error message for invalid input
+
+/**
+ * Validates GitHub repository URL format with strict pattern matching
+ * Only accepts standard GitHub repository URLs to prevent automation against invalid targets
+ * @param url - The GitHub repository URL to validate
+ * @returns Empty string if valid, error message if invalid
+ */
+export function validateGitHubUrl(url: string): string {
+  if (!url.trim()) return "Repository URL is required";
+  // Regex pattern ensures proper GitHub URL format: https://github.com/owner/repo
+  if (!url.match(/^https:\/\/github\.com\/[\w.-]+\/[\w.-]+\/?$/)) {
+    return "Please enter a valid GitHub repository URL (e.g., https://github.com/user/repo)";
+  }
+  return "";
+}
+
+/**
+ * Validates email address format using standard email regex
+ * Ensures notification emails can be delivered successfully
+ * @param email - The email address to validate
+ * @returns Empty string if valid, error message if invalid
+ */
+export function validateEmail(email: string): string {
+  if (!email.trim()) return "Email address is required";
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    return "Please enter a valid email address";
+  }
+  return "";
+}
+
+/**
+ * Validates required text fields with optional minimum length
+ * Provides consistent validation for form fields that cannot be empty
+ * @param value - The field value to validate
+ * @param fieldName - Human-readable field name for error messages
+ * @param minLength - Optional minimum length requirement (default: 1)
+ * @returns Empty string if valid, error message if invalid
+ */
+export function validateRequired(value: string, fieldName: string, minLength: number = 1): string {
+  if (!value.trim()) return `${fieldName} is required`;
+  if (value.trim().length < minLength) {
+    return `${fieldName} must be at least ${minLength} character${minLength === 1 ? '' : 's'} long`;
+  }
+  return "";
+}
+
+/**
+ * Validates text fields with maximum length constraints
+ * Ensures form data fits within database schema limits
+ * @param value - The field value to validate
+ * @param fieldName - Human-readable field name for error messages
+ * @param maxLength - Maximum allowed length
+ * @returns Empty string if valid, error message if invalid
+ */
+export function validateMaxLength(value: string, fieldName: string, maxLength: number): string {
+  if (value.length > maxLength) {
+    return `${fieldName} cannot exceed ${maxLength} characters`;
+  }
+  return "";
+}
+
+/**
+ * Validates that a selection has been made from a dropdown or select field
+ * Ensures required selections are not left empty
+ * @param value - The selected value to validate
+ * @param fieldName - Human-readable field name for error messages
+ * @returns Empty string if valid, error message if invalid
+ */
+export function validateSelection(value: string, fieldName: string): string {
+  if (!value || value.trim() === "") {
+    return `Please select a ${fieldName.toLowerCase()}`;
+  }
+  return "";
+}
+
+/**
+ * Combines multiple validation functions and returns the first error encountered
+ * Allows chaining multiple validation rules for comprehensive field validation
+ * @param validators - Array of validation functions that return error strings
+ * @returns Empty string if all validations pass, first error message if any fail
+ */
+export function combineValidations(...validators: (() => string)[]): string {
+  for (const validator of validators) {
+    const error = validator();
+    if (error) return error;
+  }
+  return "";
+}
