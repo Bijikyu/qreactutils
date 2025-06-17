@@ -287,7 +287,7 @@ Normalizes various error types into consistent Error objects.
 Pre-configured React Query client with optimized defaults for typical CRUD operations.
 
 ### axiosClient
-Pre-configured Axios instance with authentication and JSON handling. Use this instance for all API calls so session cookies and JSON headers are applied consistently.
+Pre-configured Axios instance with authentication and JSON handling. It sets `withCredentials: true` and reads `window.location.origin` for the base URL with a fallback to `http://localhost:3000`, ensuring session cookies flow in any environment. Use this instance for all API calls so headers and cookies are applied consistently (see `lib/api.js` lines 39-58).
 
 **Returns:** Axios instance for performing HTTP requests
 
