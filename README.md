@@ -466,7 +466,9 @@ All tests pass with 100% functional coverage including:
 
 ## Offline Development Mode
 
+When `OFFLINE_MODE=true`, `codexRequest` returns the `mockResponse` argument or a default `{status: 200, data: null}` so frontend code can proceed without a backend. With the variable unset or `false`, `requestFn` executes normally and the real response is returned.
 The library includes infrastructure for offline development via the `codexRequest` wrapper. Set the environment variable `OFFLINE_MODE=true` to force `codexRequest` to return a mock response. When no custom mock is provided it resolves to `{status: 200, data: null}` so the API layer stays predictable. Using `false` or leaving the variable unset runs real network requests. While currently implemented as a pass-through, this enables future enhancement for mock responses during development when backends are unavailable.
+
 
 ## License
 
