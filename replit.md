@@ -1,7 +1,7 @@
 # React Hooks Utility Library
 
 ## Overview
-A comprehensive npm module providing React hooks for common UI patterns including async actions, form management, dropdown handling, mobile detection, toast notifications, and authentication redirects. Built with TypeScript support and modern React patterns.
+A comprehensive npm module providing React hooks for common UI patterns including async actions, form management, dropdown handling, mobile detection, toast notifications, and authentication redirects, built with modern React patterns.
 
 ## Recent Changes
 - **2025-06-15**: Fixed package.json JSON syntax errors and dependency compatibility issues
