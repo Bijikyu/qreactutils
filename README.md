@@ -25,8 +25,10 @@ const { useAsyncAction, useDropdownData, useToast, apiRequest } = require('qreac
 - Advanced async state management with callback patterns
 - Mobile detection with proper SSR support
 - Toast system with centralized state management
+- Addition of `withToastLogging` and `executeAsyncWithLogging` for standardized toast/error logging
 - Offline development mode enabled with `OFFLINE_MODE=true` uses `codexRequest`
   to bypass live API calls
+
 
 ### Implementation Status
 The library provides production-ready React hooks with comprehensive error handling, loading states, and authentication patterns. All hooks follow React best practices with stable function references and proper dependency management.
