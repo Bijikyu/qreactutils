@@ -21,7 +21,7 @@ const { useAsyncAction, useDropdownData, useToast, apiRequest } = require('qreac
 - Enhanced error handling patterns across all hooks
 - Dropdown data now caches by `['dropdown', fetcher.name || generatedId, user._id]` for predictable keys
 - Improved React Query integration with v5 features
-- Comprehensive test suite with 147 tests passing
+- Comprehensive test suite with 92 tests passing
 - Advanced async state management with callback patterns
 - Mobile detection with proper SSR support
 - Toast system with centralized state management
