@@ -22,7 +22,8 @@ const {
   useCallbackWithErrorHandling, // callback wrapper with errors // imported for completeness
   useAsyncAction, useDropdownData, createDropdownListHook, useDropdownToggle, // aggregate hook utilities // gathered here to ensure stable references across modules
   useEditForm, useIsMobile, useToast, toast, useToastAction, useAuthRedirect, usePageFocus, useSocket, // UI-related helpers // centralizing UI hooks prevents scattered imports
-  showToast, toastSuccess, toastError, executeWithErrorToast, executeWithToastFeedback, stopEvent, apiRequest, getQueryFn, queryClient, formatAxiosError, axiosClient, getToastListenerCount, resetToastSystem, dispatch, getToastTimeoutCount // core API & toast utilities // exposes internal tools in one shot for clarity
+  showToast, toastSuccess, toastError, executeWithErrorToast, executeWithToastFeedback, stopEvent, apiRequest, getQueryFn, queryClient, formatAxiosError, axiosClient, getToastListenerCount, resetToastSystem, dispatch, getToastTimeoutCount, // core API & toast utilities // exposes internal tools in one shot for clarity
+  isFunction, isObject, safeStringify, isAxiosErrorWithStatus, executeWithErrorHandling, executeSyncWithErrorHandling // validation and error handling utilities // imported for external use
 } = require('./lib/hooks'); // CommonJS import keeps broad Node compatibility // require chosen so Node apps of any version can consume this module
 
 /**
@@ -80,6 +81,16 @@ module.exports = { // CommonJS export consolidating public API
   resetToastSystem,      // Clears toast listeners between tests // public to reset global state in tests // necessary for isolated test runs
   dispatch,              // Expose dispatch for advanced control and tests // exported so consumers can trigger custom actions // allows custom toast actions externally
   getToastTimeoutCount,  // Count pending toast timeouts // helps verify timers cleaned up // confirms timers clear properly
+  
+  // Validation and type checking utilities
+  isFunction,            // Type guard for function validation // public for callback verification across apps // prevents runtime type errors
+  isObject,              // Type guard for object validation // exported for safe property access // avoids null reference errors
+  safeStringify,         // Safe JSON stringify with circular reference handling // public for consistent logging // prevents JSON.stringify errors
+  isAxiosErrorWithStatus,// Axios error status checker // exported for HTTP error handling // simplifies status code branching
+  
+  // Error handling utilities
+  executeWithErrorHandling, // Async error handling wrapper // public for consistent async error patterns // standardizes error logging and transformation
+  executeSyncWithErrorHandling, // Sync error handling wrapper // exported for consistent sync error patterns // unifies error handling across sync operations
   
   // API and HTTP functionality
   apiRequest,            // Standardized HTTP request wrapper with error handling // public so external code uses shared axios logic // centralizes axios with error conventions

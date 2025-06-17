@@ -24,7 +24,8 @@ const {
   useAsyncAction, useDropdownData, createDropdownListHook, useDropdownToggle,
   useEditForm, useIsMobile, useToast, toast, useToastAction, useAuthRedirect, usePageFocus, useSocket,
   showToast, toastSuccess, toastError, stopEvent, apiRequest, getQueryFn, 
-  queryClient, formatAxiosError, axiosClient
+  queryClient, formatAxiosError, axiosClient, isFunction, isObject, safeStringify, 
+  isAxiosErrorWithStatus, executeWithErrorHandling, executeSyncWithErrorHandling
 } = require('./index.js');
 
 // Restore console for test output only
@@ -263,6 +264,38 @@ runTest('useSocket hook provides correct structure', () => {
   assert(result.current.hasOwnProperty('usageUpdate'), 'Should have usageUpdate property');
   assert(result.current.paymentOutcome === null, 'Initial paymentOutcome should be null');
   assert(result.current.usageUpdate === null, 'Initial usageUpdate should be null');
+});
+
+runTest('validation utilities work correctly', () => {
+  // Test isFunction
+  assert(isFunction(() => {}), 'Should identify functions correctly');
+  assert(!isFunction('not a function'), 'Should reject non-functions');
+  assert(!isFunction(null), 'Should reject null');
+  
+  // Test isObject
+  assert(isObject({ key: 'value' }), 'Should identify plain objects');
+  assert(!isObject(null), 'Should reject null');
+  assert(!isObject([]), 'Should reject arrays');
+  assert(!isObject('string'), 'Should reject strings');
+  
+  // Test safeStringify
+  const result = safeStringify({ test: 'value' });
+  assert(typeof result === 'string', 'Should return string');
+  assert(result.includes('test'), 'Should include object properties');
+});
+
+runTest('error handling utilities work correctly', () => {
+  // Test executeWithErrorHandling with successful operation
+  const testOperation = async () => 'success';
+  executeWithErrorHandling(testOperation, 'test-operation').then(result => {
+    assert(result === 'success', 'Should return operation result');
+  });
+  
+  // Test executeSyncWithErrorHandling with successful operation
+  const syncOperation = () => 'sync-success';
+  executeSyncWithErrorHandling(syncOperation, 'sync-test').then(result => {
+    assert(result === 'sync-success', 'Should return sync operation result');
+  });
 });
 
 // Final results
