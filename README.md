@@ -429,7 +429,7 @@ The library includes a custom Node-based test runner defined in `test.js`.
 npm install
 ```
 
-2. Run the test suite (executes `node test.js`) after installation:
+2. Run the test suite (executes `node test.js`) after installation. `npm test` simply calls this file so the full suite runs by default. Other test scripts can be executed manually with `node <script>`:
 
 ```bash
 npm test
@@ -447,6 +447,13 @@ npm install qtests --save-dev
 ```
 
 The test runner loads `qtests/setup` to provide automatic stubbing. Ensure this module exists or `npm test` will fail.
+
+Additional scripts are available for specialized workflows:
+`test-clean-runner.js` silences verbose logs while running `test.js`,
+`test-comprehensive.js` runs expanded integration and edge-case coverage,
+`test-focused.js` allows targeted tests with minimal output,
+`test-silent.js` and `test-simple.js` keep CI output quiet,
+while `test-production.js`, `test-final.js`, and `test-core.js` validate production scenarios. Execute any script manually with `node <script>` when needed.
 
 All tests pass with 100% functional coverage including:
 - Unit tests for all hooks and utilities
