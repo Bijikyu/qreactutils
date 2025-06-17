@@ -309,7 +309,7 @@ All tests pass with 100% functional coverage including:
 
 ## Offline Development Mode
 
-The library includes infrastructure for offline development via the `codexRequest` wrapper. While currently implemented as a pass-through, this enables future enhancement for mock responses during development when backends are unavailable.
+The library includes infrastructure for offline development via the `codexRequest` wrapper. Set the environment variable `OFFLINE_MODE=true` to force `codexRequest` to return a mock response. Using `false` or leaving the variable unset runs real network requests. While currently implemented as a pass-through, this enables future enhancement for mock responses during development when backends are unavailable.
 
 ## License
 
