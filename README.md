@@ -382,7 +382,7 @@ Validates an error originated from Axios and matches a specific HTTP status, pre
 
 ```javascript
 const React = require('react');
-const { useAsyncAction, useToast, useIsMobile } = require('qreactutils');
+const { useAsyncAction, useToast, useIsMobile, apiRequest } = require('qreactutils');
 
 function MyComponent() {
   const { toast } = useToast();
