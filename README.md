@@ -208,7 +208,7 @@ Gracefully handles 401 errors returned from Axios requests. Use `'returnNull'` t
 **Returns:** boolean - `true` if the 401 was handled
 
 ### codexRequest(requestFn, mockResponse)
-Wrapper enabling offline mode by returning a mock response when `OFFLINE_MODE=true`.
+Wrapper enabling offline mode by returning a mock response when `OFFLINE_MODE=true`. When no `mockResponse` is supplied the wrapper resolves with `{status: 200, data: null}` so API code continues to function during local development.
 
 **Parameters:**
 - `requestFn` (Function): Function executing the real Axios request
@@ -236,7 +236,7 @@ const { handle401Error, codexRequest, executeAxiosRequest } =
 ```
 
 ### apiRequest(url, method, data)
-Standardized HTTP request wrapper using `axiosClient`. `GET` requests send `data` as query parameters while other methods send it as the body.
+Standardized HTTP request wrapper using `axiosClient`. The `method` argument is automatically uppercased. `GET` requests send `data` as query parameters while other methods send it as the body.
 
 **Parameters:**
 - `url` (string): The API endpoint URL
@@ -466,7 +466,9 @@ All tests pass with 100% functional coverage including:
 
 ## Offline Development Mode
 
-The library includes infrastructure for offline development via the `codexRequest` wrapper. When `OFFLINE_MODE=true`, `codexRequest` returns the `mockResponse` argument or a default `{status: 200, data: null}` so frontend code can proceed without a backend. With the variable unset or `false`, `requestFn` executes normally and the real response is returned.
+When `OFFLINE_MODE=true`, `codexRequest` returns the `mockResponse` argument or a default `{status: 200, data: null}` so frontend code can proceed without a backend. With the variable unset or `false`, `requestFn` executes normally and the real response is returned.
+The library includes infrastructure for offline development via the `codexRequest` wrapper. Set the environment variable `OFFLINE_MODE=true` to force `codexRequest` to return a mock response. When no custom mock is provided it resolves to `{status: 200, data: null}` so the API layer stays predictable. Using `false` or leaving the variable unset runs real network requests. While currently implemented as a pass-through, this enables future enhancement for mock responses during development when backends are unavailable.
+
 
 ## License
 
