@@ -164,44 +164,6 @@ React hook for handling authentication-based redirects.
 - The hook first attempts SPA-style navigation by calling `window.history.pushState` and dispatching a `PopStateEvent`
 - Falls back to `window.location.assign` when history APIs are missing
 
-### executeWithLoadingState(setIsLoading, asyncOperation)
-Runs an async operation while toggling a loading boolean.
-
-**Parameters:**
-- `setIsLoading` (Function): State setter for loading status
-- `asyncOperation` (Function): Async function to execute
-
-**Returns:** Promise resolving to the operation result
-
-### useStableCallbackWithHandlers(operation, callbacks, deps)
-Hook returning a memoized callback that triggers optional success and error handlers.
-
-**Parameters:**
-- `operation` (Function): Function invoked by the callback
-- `callbacks` (Object): Optional `onSuccess` and `onError` handlers
-- `deps` (Array): Dependency list for `useCallback`
-
-**Returns:** Function - Stable callback with error handling
-
-### useAsyncStateWithCallbacks(asyncFn, options)
-Hook for async operations with internal loading state and callbacks.
-
-**Parameters:**
-- `asyncFn` (Function): The async operation to run
-- `options` (Object): Optional `onSuccess` and `onError` callbacks
-
-**Returns:** Array - `[run, isLoading]`
-
-### useCallbackWithErrorHandling(operation, options, deps)
-Hook returning a memoized callback wrapped in try/catch.
-
-**Parameters:**
-- `operation` (Function): Function to execute
-- `options` (Object): `onSuccess` and `onError` handlers
-- `deps` (Array): Dependency list for `useCallback`
-
-**Returns:** Function - Memoized callback with error handling
-
 ## Utility Functions
 
 ### toast(props)
@@ -288,6 +250,8 @@ Pre-configured React Query client with optimized defaults for typical CRUD opera
 
 ### axiosClient
 Pre-configured Axios instance with authentication and JSON handling. It sets `withCredentials: true` and reads `window.location.origin` for the base URL with a fallback to `http://localhost:3000`, ensuring session cookies flow in any environment. Use this instance for all API calls so headers and cookies are applied consistently (see `lib/api.js` lines 39-58).
+Use this instance for all API calls so session cookies and JSON headers are applied consistently. Its `baseURL` defaults to `window.location.origin` and falls back to `http://localhost:3000` when no browser window exists. The client enforces `Content-Type: application/json` and `withCredentials: true` so cookies are sent with every request. Consumers may attach custom interceptors to this shared instance to extend behavior.
+
 
 **Returns:** Axios instance for performing HTTP requests
 
@@ -297,10 +261,10 @@ Pre-configured Axios instance with authentication and JSON handling. It sets `wi
 Framework-agnostic toast creation utility.
 
 ### executeWithErrorToast(operation, toast, errorTitle)
-Runs an async operation and shows a destructive toast when the operation throws. The original error is re-thrown for caller handling.
+Runs an async operation and shows a destructive toast when the operation throws, using "Error" as the default title. The original error is re-thrown for caller handling. See `lib/toastIntegration.js` lines 20-33 for details.
 
 ### executeWithToastFeedback(operation, toast, successMessage, errorTitle)
-Runs an async operation and displays a success toast when it resolves or an error toast on failure.
+Runs an async operation and displays a success toast titled "Success" when it resolves or an error toast on failure. The error toast defaults to the title "Error". See `lib/toastIntegration.js` lines 20-33 and 48-62 for these defaults.
 
 ### stopEvent(event)
 Combined preventDefault and stopPropagation utility for React events.
