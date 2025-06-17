@@ -9,11 +9,12 @@ A comprehensive React hooks library providing common functionality for async act
 ```bash
 npm install qreactutils
 ```
+This library targets Node.js 18+.
 
 ## Usage
 
 ```javascript
-const { useAsyncAction, useDropdownData, useToast } = require('qreactutils');
+const { useAsyncAction, useDropdownData, useToast, apiRequest } = require('qreactutils');
 ```
 
 ### Recent Updates
@@ -25,6 +26,9 @@ const { useAsyncAction, useDropdownData, useToast } = require('qreactutils');
 - Mobile detection with proper SSR support
 - Toast system with centralized state management
 - Addition of `withToastLogging` and `executeAsyncWithLogging` for standardized toast/error logging
+- Offline development mode enabled with `OFFLINE_MODE=true` uses `codexRequest`
+  to bypass live API calls
+
 
 ### Implementation Status
 The library provides production-ready React hooks with comprehensive error handling, loading states, and authentication patterns. All hooks follow React best practices with stable function references and proper dependency management.
@@ -88,11 +92,10 @@ React hook for handling async actions with loading state using React Query's mut
 
 **Example:**
 ```javascript
+const { useAsyncAction, apiRequest } = require('qreactutils'); // import hook and api utility
+
 const [fetchData, isLoading] = useAsyncAction(
-  async (id) => {
-    const response = await fetch(`/api/data/${id}`);
-    return response.json();
-  },
+  async (id) => apiRequest('/api/data/' + id, 'GET'), // use centralized request helper
   {
     onSuccess: (data) => console.log('Data loaded:', data),
     onError: (error) => console.error('Failed to load data:', error)
