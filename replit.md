@@ -7,7 +7,7 @@ QReactUtils is a comprehensive React hooks utility library designed to solve rec
 ## System Architecture
 
 ### Module Structure
-The library follows a hierarchical module organization:
+The library follows a hierarchical module organization with functions organized by purpose:
 - **index.js**: Main entry point that aggregates all functionality and provides the public API
 - **lib/hooks.js**: Central hooks aggregator that imports from specialized modules
 - **lib/api.js**: HTTP request management and React Query integration
@@ -15,6 +15,9 @@ The library follows a hierarchical module organization:
 - **lib/validation.js**: Data validation helpers and type guards
 - **lib/errorHandling.js**: Standardized error handling patterns
 - **lib/toastIntegration.js**: Toast notification integration utilities
+- **lib/socket.js**: WebSocket communication and Socket.IO integration
+- **lib/accessibility.js**: Accessibility and keyboard navigation utilities
+- **lib/dom.js**: DOM manipulation and event handling utilities
 
 ### Technology Stack
 - **React 19.1.0**: Core React library for hook functionality
@@ -113,6 +116,7 @@ The library follows a hierarchical module organization:
 - June 17, 2025: Initial setup
 - June 17, 2025: Added useSocket hook for real-time WebSocket communication with Socket.IO
 - June 17, 2025: Added usePageFocus hook for accessibility-focused keyboard navigation
+- June 17, 2025: Reorganized /lib directory by purpose - created specialized modules (socket.js, accessibility.js, dom.js) for better code organization
 
 ## User Preferences
 
