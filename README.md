@@ -34,6 +34,44 @@ All code must follow the "Comment Rationale, Not Just Functionality" rule from A
 
 ## Hooks API
 
+### executeWithLoadingState(setIsLoading, asyncOperation)
+Utility helper that toggles a loading boolean while an async operation runs and then clears it.
+
+**Parameters:**
+- `setIsLoading` (Function): State setter controlling the loading value
+- `asyncOperation` (Function): Async function to execute
+
+**Returns:** Promise resolving to the async operation result
+
+### useStableCallbackWithHandlers(operation, callbacks, deps)
+React hook returning a memoized callback that runs `operation` and invokes optional handlers.
+
+**Parameters:**
+- `operation` (Function): Operation to execute
+- `callbacks` (Object, optional): `{onSuccess, onError}` handlers
+- `deps` (Array): Dependency list for `useCallback`
+
+**Returns:** Function - Memoized callback
+
+### useAsyncStateWithCallbacks(asyncFn, options)
+Hook for running an async function with loading state and optional callbacks.
+
+**Parameters:**
+- `asyncFn` (Function): Async function to run
+- `options` (Object, optional): `{onSuccess, onError}` callbacks
+
+**Returns:** Array - `[run, isLoading]`
+
+### useCallbackWithErrorHandling(operation, options, deps)
+React hook that memoizes a callback, executes optional handlers, and rethrows errors.
+
+**Parameters:**
+- `operation` (Function): Operation to execute
+- `options` (Object, optional): `{onSuccess, onError}` callbacks
+- `deps` (Array): Dependency list for `useCallback`
+
+**Returns:** Function - Memoized callback
+
 ### useAsyncAction(asyncFn, options)
 React hook for handling async actions with loading state using React Query's mutation system.
 
