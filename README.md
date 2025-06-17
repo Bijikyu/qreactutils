@@ -373,13 +373,7 @@ function MyComponent() {
   const isMobile = useIsMobile();
   
   const [saveData, isSaving] = useAsyncAction(
-    async (data) => {
-      const response = await fetch('/api/save', {
-        method: 'POST',
-        body: JSON.stringify(data)
-      });
-      return response.json();
-    },
+    async (data) => apiRequest('/api/save', 'POST', data),
     {
       onSuccess: () => toast({ title: 'Success', description: 'Data saved!' }),
       onError: (error) => toast({ title: 'Error', description: error.message })
