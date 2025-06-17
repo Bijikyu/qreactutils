@@ -265,7 +265,9 @@ Standardized HTTP request wrapper using `axiosClient`. `GET` requests send `data
 **Parameters:**
 - `url` (string): The API endpoint URL
 - `method` (string, optional): HTTP method (defaults to 'POST')
-- `data` (any, optional): Request payload or query params
+
+- `data` (any, optional): Data to send with the request. For `GET` calls it becomes query parameters while other methods send it in the body.
+
 
 **Returns:** Promise resolving to response data
 
