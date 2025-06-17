@@ -9,6 +9,7 @@ A comprehensive React hooks library providing common functionality for async act
 ```bash
 npm install qreactutils
 ```
+This library targets Node.js 18+.
 
 ## Usage
 
