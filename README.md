@@ -87,11 +87,10 @@ React hook for handling async actions with loading state using React Query's mut
 
 **Example:**
 ```javascript
+const { useAsyncAction, apiRequest } = require('qreactutils'); // import hook and api utility
+
 const [fetchData, isLoading] = useAsyncAction(
-  async (id) => {
-    const response = await fetch(`/api/data/${id}`);
-    return response.json();
-  },
+  async (id) => apiRequest('/api/data/' + id, 'GET'), // use centralized request helper
   {
     onSuccess: (data) => console.log('Data loaded:', data),
     onError: (error) => console.error('Failed to load data:', error)
