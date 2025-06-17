@@ -13,7 +13,7 @@ npm install qreactutils
 ## Usage
 
 ```javascript
-const { useAsyncAction, useDropdownData, useToast } = require('qreactutils');
+const { useAsyncAction, useDropdownData, useToast, apiRequest } = require('qreactutils');
 ```
 
 ### Recent Updates
