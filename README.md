@@ -18,6 +18,7 @@ const { useAsyncAction, useDropdownData, useToast } = require('qreactutils');
 
 ### Recent Updates
 - Enhanced error handling patterns across all hooks
+- Dropdown data now caches by `['dropdown', fetcher.name || generatedId, user._id]` for predictable keys
 - Improved React Query integration with v5 features
 - Comprehensive test suite with over 100 tests passing
 - Advanced async state management with callback patterns
