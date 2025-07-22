@@ -23,7 +23,7 @@ const {
   useAsyncAction, useDropdownData, createDropdownListHook, useDropdownToggle, // aggregate hook utilities // gathered here to ensure stable references across modules
   useEditForm, useIsMobile, useToast, toast, useToastAction, useAuthRedirect, usePageFocus, useSocket, // UI-related helpers // centralizing UI hooks prevents scattered imports
   showToast, toastSuccess, toastError, executeWithErrorToast, executeWithToastFeedback, stopEvent, apiRequest, getQueryFn, queryClient, formatAxiosError, axiosClient, getToastListenerCount, resetToastSystem, dispatch, getToastTimeoutCount, // core API & toast utilities // exposes internal tools in one shot for clarity
-  isFunction, isObject, safeStringify, isAxiosErrorWithStatus, executeWithErrorHandling, executeSyncWithErrorHandling, cn, createSubTrigger, createContextMenuSubTrigger, createMenubarSubTrigger // validation, error handling, styling and component utilities // imported for external use
+  isFunction, isObject, safeStringify, isAxiosErrorWithStatus, executeWithErrorHandling, executeSyncWithErrorHandling, cn, createSubTrigger, createContextMenuSubTrigger, createMenubarSubTrigger, useForm, FormField, TextInputField, TextareaField, SelectField, CheckboxField // validation, error handling, styling, component and form utilities // imported for external use
 } = require('./lib/hooks'); // CommonJS import keeps broad Node compatibility // require chosen so Node apps of any version can consume this module
 
 /**
@@ -99,6 +99,14 @@ module.exports = { // CommonJS export consolidating public API
   createSubTrigger,      // Generic sub-trigger component factory // public for creating reusable UI components // generates components with chevron icons
   createContextMenuSubTrigger, // Context menu sub-trigger factory // exported for context menu components // specialized factory for context menus
   createMenubarSubTrigger, // Menubar sub-trigger factory // exported for menubar components // specialized factory for menubars
+  
+  // Form utilities and components
+  useForm,               // Form state management hook // public for controlled form inputs // handles change events and field updates
+  FormField,             // Base form field wrapper component // exported for custom field creation // provides consistent label and spacing
+  TextInputField,        // Styled text input field component // public for text inputs // includes label and consistent styling
+  TextareaField,         // Styled textarea field component // exported for multi-line inputs // maintains design consistency
+  SelectField,           // Styled select dropdown field component // public for dropdown inputs // handles options array rendering
+  CheckboxField,         // Styled checkbox field component // exported for boolean inputs // provides accessible checkbox patterns
   
   // API and HTTP functionality
   apiRequest,            // Standardized HTTP request wrapper with error handling // public so external code uses shared axios logic // centralizes axios with error conventions

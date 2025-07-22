@@ -25,7 +25,7 @@ const {
   useEditForm, useIsMobile, useToast, toast, useToastAction, useAuthRedirect, usePageFocus, useSocket,
   showToast, toastSuccess, toastError, stopEvent, apiRequest, getQueryFn, 
   queryClient, formatAxiosError, axiosClient, isFunction, isObject, safeStringify, 
-  isAxiosErrorWithStatus, executeWithErrorHandling, executeSyncWithErrorHandling, cn, createSubTrigger, createContextMenuSubTrigger, createMenubarSubTrigger
+  isAxiosErrorWithStatus, executeWithErrorHandling, executeSyncWithErrorHandling, cn, createSubTrigger, createContextMenuSubTrigger, createMenubarSubTrigger, useForm, FormField, TextInputField, TextareaField, SelectField, CheckboxField
 } = require('./index.js');
 
 // Restore console for test output only
@@ -369,6 +369,70 @@ runTest('createMenubarSubTrigger convenience function works', () => {
   // Verify it returns a component
   assert(typeof MenubarSubTrigger === 'object', 'Should return a React component');
   assert(MenubarSubTrigger.displayName === 'MenubarSubTrigger', 'Should have correct display name');
+});
+
+runTest('useForm hook manages form state correctly', () => {
+  const initialState = {
+    name: '',
+    email: 'test@example.com',
+    age: 25,
+    isActive: true
+  };
+  
+  const { result } = renderHook(() => useForm(initialState));
+  
+  // Test initial state
+  assert(typeof result.current === 'object', 'Should return form utilities object');
+  assert(result.current.form.name === '', 'Should initialize name correctly');
+  assert(result.current.form.email === 'test@example.com', 'Should initialize email correctly');
+  assert(result.current.form.age === 25, 'Should initialize age correctly');
+  assert(result.current.form.isActive === true, 'Should initialize boolean correctly');
+  
+  // Test form utilities are functions
+  assert(typeof result.current.setForm === 'function', 'Should provide setForm function');
+  assert(typeof result.current.handleChange === 'function', 'Should provide handleChange function');
+  assert(typeof result.current.setField === 'function', 'Should provide setField function');
+  assert(typeof result.current.resetForm === 'function', 'Should provide resetForm function');
+});
+
+runTest('form field components are created correctly', () => {
+  // Test FormField component
+  assert(typeof FormField === 'function', 'FormField should be a function component');
+  
+  // Test TextInputField component
+  assert(typeof TextInputField === 'function', 'TextInputField should be a function component');
+  
+  // Test TextareaField component
+  assert(typeof TextareaField === 'function', 'TextareaField should be a function component');
+  
+  // Test SelectField component
+  assert(typeof SelectField === 'function', 'SelectField should be a function component');
+  
+  // Test CheckboxField component  
+  assert(typeof CheckboxField === 'function', 'CheckboxField should be a function component');
+});
+
+runTest('SelectField handles options array correctly', () => {
+  const testOptions = [
+    { value: 'option1', label: 'Option 1' },
+    { value: 'option2', label: 'Option 2' },
+    { value: 'option3', label: 'Option 3' }
+  ];
+  
+  // Test that SelectField can be called with options prop
+  // We can't easily test the rendered output in Node.js without a full DOM
+  // but we can verify the component accepts the expected props
+  try {
+    const element = SelectField({
+      label: 'Test Select',
+      options: testOptions,
+      name: 'testSelect',
+      value: 'option1'
+    });
+    assert(typeof element === 'object', 'Should return a React element');
+  } catch (error) {
+    assert(false, `SelectField should handle options prop: ${error.message}`);
+  }
 });
 
 // Final results
