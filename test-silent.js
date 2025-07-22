@@ -25,7 +25,7 @@ const {
   useEditForm, useIsMobile, useToast, toast, useToastAction, useAuthRedirect, usePageFocus, useSocket,
   showToast, toastSuccess, toastError, stopEvent, apiRequest, getQueryFn, 
   queryClient, formatAxiosError, axiosClient, isFunction, isObject, safeStringify, 
-  isAxiosErrorWithStatus, executeWithErrorHandling, executeSyncWithErrorHandling, cn, createSubTrigger, createContextMenuSubTrigger, createMenubarSubTrigger, useForm, useFormSubmission, formValidation, FormField, TextInputField, TextareaField, SelectField, CheckboxField, useAdvancedToast, advancedToast, getAdvancedToastCount, clearAllAdvancedToasts, showSuccessToast, showErrorToast, showInfoToast, showWarningToast, showSuccess, showError, showInfo, showWarning
+  isAxiosErrorWithStatus, executeWithErrorHandling, executeSyncWithErrorHandling, cn, createSubTrigger, createContextMenuSubTrigger, createMenubarSubTrigger, useForm, useFormSubmission, formValidation, FormField, TextInputField, TextareaField, SelectField, CheckboxField, useAdvancedToast, advancedToast, getAdvancedToastCount, clearAllAdvancedToasts, showSuccessToast, showErrorToast, showInfoToast, showWarningToast, showSuccess, showError, showInfo, showWarning, useIsMobileTS
 } = require('./index.js');
 
 // Restore console for test output only
@@ -142,6 +142,13 @@ runTest('useEditForm manages state correctly', () => {
 runTest('useIsMobile detects screen size', () => {
   const { result } = renderHook(() => useIsMobile());
   assert(typeof result.current === 'boolean', 'Should return boolean');
+});
+
+runTest('useIsMobileTS detects screen size with usehooks-ts', () => {
+  const { result } = renderHook(() => useIsMobileTS());
+  assert(typeof result.current === 'boolean', 'Should return boolean');
+  // In our test environment with 1024px width, mobile should be false
+  assert(result.current === false, 'Should return false for desktop width in test environment');
 });
 
 runTest('advancedToast creates notification objects', () => {

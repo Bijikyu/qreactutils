@@ -21,7 +21,7 @@ const {
   useAsyncStateWithCallbacks, // async state hook // imported to expose low level helper
   useCallbackWithErrorHandling, // callback wrapper with errors // imported for completeness
   useAsyncAction, useDropdownData, createDropdownListHook, useDropdownToggle, // aggregate hook utilities // gathered here to ensure stable references across modules
-  useEditForm, useIsMobile, useToastAction, useAuthRedirect, usePageFocus, useSocket, // UI-related helpers // centralizing UI hooks prevents scattered imports
+  useEditForm, useIsMobile, useIsMobileTS, useToastAction, useAuthRedirect, usePageFocus, useSocket, // UI-related helpers // centralizing UI hooks prevents scattered imports
   stopEvent, apiRequest, getQueryFn, queryClient, formatAxiosError, axiosClient, // core API utilities // exposes internal tools in one shot for clarity
   isFunction, isObject, safeStringify, isAxiosErrorWithStatus, executeWithErrorHandling, executeSyncWithErrorHandling, cn, createSubTrigger, createContextMenuSubTrigger, createMenubarSubTrigger, useForm, useFormSubmission, formValidation, FormField, TextInputField, TextareaField, SelectField, CheckboxField, useAdvancedToast, advancedToast, getAdvancedToastCount, clearAllAdvancedToasts, getAdvancedToastTimeoutCount, toastReducer, toastActionTypes, toastDispatch, showSuccessToast, showErrorToast, showInfoToast, showWarningToast, showSuccess, showError, showInfo, showWarning // validation, error handling, styling, component, form, advanced toast and toast utility functions // imported for external use
 } = require('./lib/hooks'); // CommonJS import keeps broad Node compatibility // require chosen so Node apps of any version can consume this module
@@ -57,7 +57,8 @@ module.exports = { // CommonJS export consolidating public API
   useEditForm,           // Form editing state with field management // exported to share standardized form editing // centralizes form field logic
   
   // UI and responsive hooks
-  useIsMobile,           // Responsive design hook for mobile detection // public for consistent responsive checks // shares single breakpoint across library
+  useIsMobile,           // Responsive design hook for mobile detection using react-responsive // public for consistent responsive checks // shares single breakpoint across library
+  useIsMobileTS,         // Alternative mobile detection using usehooks-ts // exported for simpler media query approach // uses standard CSS media query syntax
   
   // Authentication and navigation
   useAuthRedirect,       // Authentication-based client-side routing // part of API to unify auth-based navigation // ensures unauthorized users are routed consistently
