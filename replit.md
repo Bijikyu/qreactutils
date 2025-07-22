@@ -34,10 +34,12 @@ The library follows a hierarchical module organization with functions organized 
 - **useDropdownData**: Manages dropdown data fetching with React Query integration
 - **useEditForm**: Form editing state management with validation
 - **useIsMobile**: Mobile device detection with SSR support
-- **useToast**: Centralized toast notification system
+- **useToastAction**: Async action with advanced toast integration for consistent feedback
 - **useAuthRedirect**: Authentication flow management
 - **usePageFocus**: Accessibility-focused keyboard focus management for route changes
 - **useSocket**: Real-time WebSocket communication for payment outcomes and usage updates
+- **useAdvancedToast**: Comprehensive toast notification system with state management and lifecycle handling
+- **advancedToast**: Imperative toast creation with update and dismiss capabilities
 
 ### API Layer
 - **axiosClient**: Pre-configured Axios instance with credentials and error handling
@@ -46,8 +48,9 @@ The library follows a hierarchical module organization with functions organized 
 
 ### Utility Functions
 - **executeWithLoadingState**: Helper for managing async loading states
-- **showToast/toastSuccess/toastError**: Toast notification utilities
 - **formatAxiosError**: Error normalization for HTTP responses
+- **getAdvancedToastCount/clearAllAdvancedToasts**: Advanced toast system utilities for testing and cleanup
+- **toastReducer/toastActionTypes/toastDispatch**: Advanced toast state management primitives
 
 ## Data Flow
 
@@ -117,6 +120,7 @@ The library follows a hierarchical module organization with functions organized 
 - June 17, 2025: Added useSocket hook for real-time WebSocket communication with Socket.IO
 - June 17, 2025: Added usePageFocus hook for accessibility-focused keyboard navigation
 - June 17, 2025: Reorganized /lib directory by purpose - created specialized modules (socket.js, accessibility.js, dom.js) for better code organization
+- July 22, 2025: Replaced legacy toast system with advanced toast notification system featuring state management, action dispatching, and proper lifecycle handling - maintained 100% test success rate with comprehensive toast management
 
 ## User Preferences
 

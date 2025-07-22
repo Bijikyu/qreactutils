@@ -21,9 +21,9 @@ const {
   useAsyncStateWithCallbacks, // async state hook // imported to expose low level helper
   useCallbackWithErrorHandling, // callback wrapper with errors // imported for completeness
   useAsyncAction, useDropdownData, createDropdownListHook, useDropdownToggle, // aggregate hook utilities // gathered here to ensure stable references across modules
-  useEditForm, useIsMobile, useToast, toast, useToastAction, useAuthRedirect, usePageFocus, useSocket, // UI-related helpers // centralizing UI hooks prevents scattered imports
-  showToast, toastSuccess, toastError, executeWithErrorToast, executeWithToastFeedback, stopEvent, apiRequest, getQueryFn, queryClient, formatAxiosError, axiosClient, getToastListenerCount, resetToastSystem, dispatch, getToastTimeoutCount, // core API & toast utilities // exposes internal tools in one shot for clarity
-  isFunction, isObject, safeStringify, isAxiosErrorWithStatus, executeWithErrorHandling, executeSyncWithErrorHandling, cn, createSubTrigger, createContextMenuSubTrigger, createMenubarSubTrigger, useForm, useFormSubmission, formValidation, FormField, TextInputField, TextareaField, SelectField, CheckboxField // validation, error handling, styling, component and form utilities // imported for external use
+  useEditForm, useIsMobile, useToastAction, useAuthRedirect, usePageFocus, useSocket, // UI-related helpers // centralizing UI hooks prevents scattered imports
+  stopEvent, apiRequest, getQueryFn, queryClient, formatAxiosError, axiosClient, // core API utilities // exposes internal tools in one shot for clarity
+  isFunction, isObject, safeStringify, isAxiosErrorWithStatus, executeWithErrorHandling, executeSyncWithErrorHandling, cn, createSubTrigger, createContextMenuSubTrigger, createMenubarSubTrigger, useForm, useFormSubmission, formValidation, FormField, TextInputField, TextareaField, SelectField, CheckboxField, useAdvancedToast, advancedToast, getAdvancedToastCount, clearAllAdvancedToasts, getAdvancedToastTimeoutCount, toastReducer, toastActionTypes, toastDispatch // validation, error handling, styling, component, form and advanced toast utilities // imported for external use
 } = require('./lib/hooks'); // CommonJS import keeps broad Node compatibility // require chosen so Node apps of any version can consume this module
 
 /**
@@ -58,8 +58,6 @@ module.exports = { // CommonJS export consolidating public API
   
   // UI and responsive hooks
   useIsMobile,           // Responsive design hook for mobile detection // public for consistent responsive checks // shares single breakpoint across library
-  useToast,              // Toast notification system with centralized state // exposed so components subscribe to toast updates // central hub for toast state
-  toast,                 // Standalone toast function for imperative usage // public so non-hook code triggers notifications // lets non-hook code trigger toasts
   
   // Authentication and navigation
   useAuthRedirect,       // Authentication-based client-side routing // part of API to unify auth-based navigation // ensures unauthorized users are routed consistently
@@ -71,16 +69,7 @@ module.exports = { // CommonJS export consolidating public API
   useSocket,             // WebSocket communication for payment outcomes and usage updates // public for real-time data integration // manages Socket.IO connections with automatic cleanup
   
   // Utility functions
-  showToast,             // Helper for displaying toast messages // public so notifications can be fired from any module // universal entry point for toast system
-  toastSuccess,          // Success toast utility // exported for simple success messages // keeps success formatting consistent
-  toastError,            // Error toast utility // public so error toasts share formatting // ensures error messages look the same
-  executeWithErrorToast, // Operation wrapper that shows error toast // public for consistency // surfaces failures to users automatically
-  executeWithToastFeedback, // Operation wrapper with success/error toasts // exposed to unify feedback // standardizes success and failure UX
   stopEvent,             // Event handling utility for preventing default behavior // kept public for generic DOM helpers // quick DOM helper for forms
-  getToastListenerCount, // Allows tests to inspect active toast listeners // exported to help verify toast state // ensures toasts clean up between tests
-  resetToastSystem,      // Clears toast listeners between tests // public to reset global state in tests // necessary for isolated test runs
-  dispatch,              // Expose dispatch for advanced control and tests // exported so consumers can trigger custom actions // allows custom toast actions externally
-  getToastTimeoutCount,  // Count pending toast timeouts // helps verify timers cleaned up // confirms timers clear properly
   
   // Validation and type checking utilities
   isFunction,            // Type guard for function validation // public for callback verification across apps // prevents runtime type errors
@@ -109,6 +98,16 @@ module.exports = { // CommonJS export consolidating public API
   TextareaField,         // Styled textarea field component // exported for multi-line inputs // maintains design consistency
   SelectField,           // Styled select dropdown field component // public for dropdown inputs // handles options array rendering
   CheckboxField,         // Styled checkbox field component // exported for boolean inputs // provides accessible checkbox patterns
+  
+  // Advanced toast notification system
+  useAdvancedToast,      // Advanced toast notification hook // public for comprehensive toast management // provides state management and lifecycle
+  advancedToast,         // Imperative advanced toast creation // exported for programmatic notifications // returns control methods for updates
+  getAdvancedToastCount, // Get active advanced toast count // public for testing and debugging // helps verify toast state
+  clearAllAdvancedToasts, // Clear all advanced toasts // exported for cleanup and testing // resets toast state completely
+  getAdvancedToastTimeoutCount, // Get advanced toast timeout count // public for testing timeout management // monitors pending removals
+  toastReducer,          // Toast state reducer function // exported for custom implementations // handles all toast state transitions
+  toastActionTypes,      // Toast action type constants // public for custom actions // defines all available action types
+  toastDispatch,         // Toast dispatch function // exported for advanced control // allows direct state manipulation
   
   // API and HTTP functionality
   apiRequest,            // Standardized HTTP request wrapper with error handling // public so external code uses shared axios logic // centralizes axios with error conventions

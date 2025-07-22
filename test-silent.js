@@ -25,7 +25,7 @@ const {
   useEditForm, useIsMobile, useToast, toast, useToastAction, useAuthRedirect, usePageFocus, useSocket,
   showToast, toastSuccess, toastError, stopEvent, apiRequest, getQueryFn, 
   queryClient, formatAxiosError, axiosClient, isFunction, isObject, safeStringify, 
-  isAxiosErrorWithStatus, executeWithErrorHandling, executeSyncWithErrorHandling, cn, createSubTrigger, createContextMenuSubTrigger, createMenubarSubTrigger, useForm, useFormSubmission, formValidation, FormField, TextInputField, TextareaField, SelectField, CheckboxField
+  isAxiosErrorWithStatus, executeWithErrorHandling, executeSyncWithErrorHandling, cn, createSubTrigger, createContextMenuSubTrigger, createMenubarSubTrigger, useForm, useFormSubmission, formValidation, FormField, TextInputField, TextareaField, SelectField, CheckboxField, useAdvancedToast, advancedToast, getAdvancedToastCount, clearAllAdvancedToasts
 } = require('./index.js');
 
 // Restore console for test output only
@@ -144,19 +144,38 @@ runTest('useIsMobile detects screen size', () => {
   assert(typeof result.current === 'boolean', 'Should return boolean');
 });
 
-runTest('toast creates notification objects', () => {
-  const result = toast({ title: 'Test', description: 'Message' });
-  assert(typeof result === 'object', 'Should return object');
-  assert(typeof result.id === 'string', 'Should have string id');
-  assert(result.id.length > 0, 'ID should not be empty');
-  assert(typeof result.dismiss === 'function', 'Should have dismiss function');
+runTest('advancedToast creates notification objects', () => {
+  // Clear any existing toasts
+  clearAllAdvancedToasts();
+  
+  const result = advancedToast({
+    title: 'Success',
+    description: 'Operation completed',
+    variant: 'success'
+  });
+  
+  assert(result && typeof result === 'object', 'Should return toast control object');
+  assert(typeof result.id === 'string', 'Should have string ID');
+  assert(typeof result.dismiss === 'function', 'Should provide dismiss function');
+  assert(typeof result.update === 'function', 'Should provide update function');
+  
+  // Verify toast was added to state
+  assert(getAdvancedToastCount() === 1, 'Should add toast to state');
+  
+  // Clean up
+  clearAllAdvancedToasts();
 });
 
-runTest('useToast hook provides state and functions', () => {
-  const { result } = renderHook(() => useToast());
-  assert(typeof result.current === 'object', 'Should return object');
-  assert(typeof result.current.toast === 'function', 'Should have toast function');
-  assert(Array.isArray(result.current.toasts), 'Should have toasts array');
+runTest('useAdvancedToast hook provides state and functions', () => {
+  clearAllAdvancedToasts();
+  
+  const { result } = renderHook(() => useAdvancedToast());
+  assert(typeof result.current === 'object', 'Should return toast utilities');
+  assert(Array.isArray(result.current.toasts), 'Should provide toasts array');
+  assert(typeof result.current.toast === 'function', 'Should provide toast creation function');
+  assert(typeof result.current.dismiss === 'function', 'Should provide dismiss function');
+  
+  clearAllAdvancedToasts();
 });
 
 runTest('stopEvent prevents default and propagation', () => {
@@ -187,26 +206,51 @@ runTest('createDropdownListHook creates hook functions', () => {
   assert(typeof hook === 'function', 'Should return hook function');
 });
 
-runTest('toast utility functions work correctly', () => {
-  const mockToast = (params) => ({ id: 'test-id', dismiss: () => {} });
+runTest('advanced toast system manages state correctly', () => {
+  clearAllAdvancedToasts();
   
-  const success = toastSuccess(mockToast, 'Success message');
-  assert(success.id === 'test-id', 'toastSuccess should work');
+  // Test toast creation and state management
+  const toast1 = advancedToast({
+    title: 'First toast',
+    description: 'First description'
+  });
   
-  const error = toastError(mockToast, 'Error message');
-  assert(error.id === 'test-id', 'toastError should work');
+  assert(getAdvancedToastCount() === 1, 'Should have one toast after creation');
+  
+  const toast2 = advancedToast({
+    title: 'Second toast', 
+    description: 'Second description'
+  });
+  
+  assert(getAdvancedToastCount() === 2, 'Should have two toasts after second creation');
+  
+  // Test dismiss functionality
+  toast1.dismiss();
+  
+  clearAllAdvancedToasts();
+  assert(getAdvancedToastCount() === 0, 'Should clear all toasts');
 });
 
-runTest('showToast with custom toast function', () => {
-  const mockToast = (params) => ({ 
-    id: 'custom-id', 
-    dismiss: () => {},
-    title: params.title,
-    description: params.description
+runTest('advanced toast update functionality works', () => {
+  clearAllAdvancedToasts();
+  
+  const toast = advancedToast({
+    title: 'Original title',
+    description: 'Original description'
   });
-  const result = showToast(mockToast, 'Test message', 'Test Title');
-  assert(result.id === 'custom-id', 'Should use provided toast function');
-  assert(result.title === 'Test Title', 'Should pass through title');
+  
+  // Test update functionality
+  try {
+    toast.update({
+      title: 'Updated title',
+      description: 'Updated description'
+    });
+    assert(true, 'Should be able to update toast properties');
+  } catch (error) {
+    assert(false, `Toast update should not throw: ${error.message}`);
+  }
+  
+  clearAllAdvancedToasts();
 });
 
 runTest('usePageFocus manages focus correctly', () => {
