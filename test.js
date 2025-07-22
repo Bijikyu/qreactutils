@@ -329,6 +329,7 @@ async function assertApiError(endpoint, expectedErrorPattern, testDescription) {
 const { isFunction, isObject, safeStringify, isAxiosErrorWithStatus } = require('./lib/validation.js');
 // Load internal helper tests so they run within this suite
 require('./tests/internal-helpers.test.js')({ runTest, renderHook, assert, assertEqual });
+require('./tests/logger.test.js')({ runTest, assert, assertEqual });
 
 console.log('🚀 Starting Enhanced Comprehensive Test Suite...\n');
 

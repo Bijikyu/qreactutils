@@ -16,15 +16,11 @@
 // Import all hooks, utilities, and API functions from the consolidated hooks module
 // The hooks module acts as an aggregator, pulling together functionality from multiple internal modules
 const {
-  executeWithLoadingState, // loading helper // imported for explicit export // toggles loading state around promises to unify async flows
-  useStableCallbackWithHandlers, // callback helper with handlers // imported for direct access
-  useAsyncStateWithCallbacks, // async state hook // imported to expose low level helper
-  useCallbackWithErrorHandling, // callback wrapper with errors // imported for completeness
-  useAsyncAction, useDropdownData, createDropdownListHook, useDropdownToggle, // aggregate hook utilities // gathered here to ensure stable references across modules
-  useEditForm, useIsMobile, useIsMobileTS, useToastAction, useAuthRedirect, usePageFocus, useSocket, // UI-related helpers // centralizing UI hooks prevents scattered imports
-  stopEvent, apiRequest, getQueryFn, queryClient, formatAxiosError, axiosClient, // core API utilities // exposes internal tools in one shot for clarity
-  isFunction, isObject, safeStringify, isAxiosErrorWithStatus, executeWithErrorHandling, executeSyncWithErrorHandling, cn, createSubTrigger, createContextMenuSubTrigger, createMenubarSubTrigger, useForm, useFormSubmission, formValidation, FormField, TextInputField, TextareaField, SelectField, CheckboxField, useAdvancedToast, advancedToast, getAdvancedToastCount, clearAllAdvancedToasts, getAdvancedToastTimeoutCount, toastReducer, toastActionTypes, toastDispatch, showSuccessToast, showErrorToast, showInfoToast, showWarningToast, showSuccess, showError, showInfo, showWarning // validation, error handling, styling, component, form, advanced toast and toast utility functions // imported for external use
-} = require('./lib/hooks'); // CommonJS import keeps broad Node compatibility // require chosen so Node apps of any version can consume this module
+  useAsyncAction, useDropdownData, useDropdownToggle, useEditForm,
+  useIsMobile, useIsMobileTS, useToast, useToastAction, useAdvancedToast, useAuthRedirect,
+  usePageFocus, useSocket, createDropdownListHook,
+  logger, log, logDebug, logError, logWarning, logHookEvent
+} = require('./lib/hooks.js');
 
 /**
  * Export all functions for use as a module
@@ -41,89 +37,24 @@ const {
  * Internal modules can move or reorganize without changing these exports, so existing imports keep working; ensures backward compatibility.
  */
 // Exports are grouped by hook type: async actions, UI helpers, utilities, API // clarifies structure for maintainers
-module.exports = { // CommonJS export consolidating public API
-  // Core async functionality hooks
-  executeWithLoadingState, // helper for toggling loading around promises // exposed for external composition // ensures consistent async flows
-  useStableCallbackWithHandlers, // callback with success/error handlers // exported for direct usage // keeps re-render count low across apps
-  useAsyncStateWithCallbacks, // async hook with callbacks // public to share low level pattern // unifies resolve/reject handling across hooks
-  useCallbackWithErrorHandling, // callback wrapper with error propagation // exported for consistency // ensures errors bubble similarly across hooks
-  useAsyncAction,        // Primary hook for async operations with loading states // public so apps share one async pattern // consolidates error handling logic
-  useToastAction,        // Combines async actions with toast updates // public so apps wire loading and toasts consistently // reduces toast boilerplate
-  
-  // Dropdown and form management hooks
-  useDropdownData,       // Generic dropdown state management with async data fetching // exported to avoid reimplementing dropdown logic // keeps data fetch pattern consistent
-  createDropdownListHook,// Factory for creating typed dropdown hooks // public so apps can create tailored dropdowns // fosters uniform dropdown implementations
-  useDropdownToggle,     // Simple open/close state management for dropdowns // public for consistent toggle behavior // ensures toggling UI behaves identically
-  useEditForm,           // Form editing state with field management // exported to share standardized form editing // centralizes form field logic
-  
-  // UI and responsive hooks
-  useIsMobile,           // Responsive design hook for mobile detection using react-responsive // public for consistent responsive checks // shares single breakpoint across library
-  useIsMobileTS,         // Alternative mobile detection using usehooks-ts // exported for simpler media query approach // uses standard CSS media query syntax
-  
-  // Authentication and navigation
-  useAuthRedirect,       // Authentication-based client-side routing // part of API to unify auth-based navigation // ensures unauthorized users are routed consistently
-  
-  // Accessibility and focus management
-  usePageFocus,          // Keyboard focus management for route changes // public for accessibility compliance // automatically focuses main content for screen readers
-  
-  // Real-time communication
-  useSocket,             // WebSocket communication for payment outcomes and usage updates // public for real-time data integration // manages Socket.IO connections with automatic cleanup
-  
-  // Utility functions
-  stopEvent,             // Event handling utility for preventing default behavior // kept public for generic DOM helpers // quick DOM helper for forms
-  
-  // Validation and type checking utilities
-  isFunction,            // Type guard for function validation // public for callback verification across apps // prevents runtime type errors
-  isObject,              // Type guard for object validation // exported for safe property access // avoids null reference errors
-  safeStringify,         // Safe JSON stringify with circular reference handling // public for consistent logging // prevents JSON.stringify errors
-  isAxiosErrorWithStatus,// Axios error status checker // exported for HTTP error handling // simplifies status code branching
-  
-  // Error handling utilities
-  executeWithErrorHandling, // Async error handling wrapper // public for consistent async error patterns // standardizes error logging and transformation
-  executeSyncWithErrorHandling, // Sync error handling wrapper // exported for consistent sync error patterns // unifies error handling across sync operations
-  
-  // Styling utilities
-  cn,                    // Class name merger with Tailwind conflict resolution // public for component styling // merges classes while resolving Tailwind conflicts
-  
-  // Component factories
-  createSubTrigger,      // Generic sub-trigger component factory // public for creating reusable UI components // generates components with chevron icons
-  createContextMenuSubTrigger, // Context menu sub-trigger factory // exported for context menu components // specialized factory for context menus
-  createMenubarSubTrigger, // Menubar sub-trigger factory // exported for menubar components // specialized factory for menubars
-  
-  // Form utilities and components
-  useForm,               // Form state management hook // public for controlled form inputs // handles change events and field updates
-  useFormSubmission,     // Form submission hook with loading and error states // exported for async form handling // manages submission lifecycle
-  formValidation,        // Form validation utility functions // public for field validation // provides common validation patterns
-  FormField,             // Base form field wrapper component // exported for custom field creation // provides consistent label and spacing
-  TextInputField,        // Styled text input field component // public for text inputs // includes label and consistent styling
-  TextareaField,         // Styled textarea field component // exported for multi-line inputs // maintains design consistency
-  SelectField,           // Styled select dropdown field component // public for dropdown inputs // handles options array rendering
-  CheckboxField,         // Styled checkbox field component // exported for boolean inputs // provides accessible checkbox patterns
-  
-  // Advanced toast notification system
-  useAdvancedToast,      // Advanced toast notification hook // public for comprehensive toast management // provides state management and lifecycle
-  advancedToast,         // Imperative advanced toast creation // exported for programmatic notifications // returns control methods for updates
-  getAdvancedToastCount, // Get active advanced toast count // public for testing and debugging // helps verify toast state
-  clearAllAdvancedToasts, // Clear all advanced toasts // exported for cleanup and testing // resets toast state completely
-  getAdvancedToastTimeoutCount, // Get advanced toast timeout count // public for testing timeout management // monitors pending removals
-  toastReducer,          // Toast state reducer function // exported for custom implementations // handles all toast state transitions
-  toastActionTypes,      // Toast action type constants // public for custom actions // defines all available action types
-  toastDispatch,         // Toast dispatch function // exported for advanced control // allows direct state manipulation
-  
-  // Toast utility functions
-  showSuccessToast,      // Explicit success toast utility // public for detailed success notifications // requires title and description
-  showErrorToast,        // Explicit error toast utility // exported for detailed error notifications // requires title and description
-  showInfoToast,         // Explicit info toast utility // public for detailed informational notifications // requires title and description
-  showWarningToast,      // Explicit warning toast utility // exported for detailed warning notifications // requires title and description
-  showSuccess,           // Convenience success toast utility // public for simple success notifications // single message parameter
-  showError,             // Convenience error toast utility // exported for simple error notifications // single message parameter
-  showInfo,              // Convenience info toast utility // public for simple informational notifications // single message parameter
-  showWarning,           // Convenience warning toast utility // exported for simple warning notifications // single message parameter
-  
-  // API and HTTP functionality
-  apiRequest,            // Standardized HTTP request wrapper with error handling // public so external code uses shared axios logic // centralizes axios with error conventions
-  getQueryFn,            // React Query integration for server state management // exported to build queries with 401 handling // ensures 401s handled the same way
-  queryClient,           // Pre-configured React Query client instance // public to reuse a single query client // avoids creating multiple clients per app
-  formatAxiosError,      // Error normalization for consistent error handling // exported to keep error objects uniform // simplifies logging and user messages
-  axiosClient            // Pre-configured axios instance with sensible defaults // public so consumers share axios configuration // shares same baseURL and credentials
-}; // end consolidated export object
+module.exports = {
+  // Hooks
+  useAsyncAction, useDropdownData, useDropdownToggle, useEditForm,
+  useIsMobile, useIsMobileTS, useToast, useToastAction, useAdvancedToast, useAuthRedirect,
+  usePageFocus, useSocket,
+
+  // Utilities
+  toast, advancedToast, showToast, showSuccessToast, showErrorToast, showInfoToast, showWarningToast,
+  executeWithErrorToast, executeWithToastFeedback, stopEvent, 
+  formatAxiosError, safeStringify, apiRequest, getQueryFn,
+  handleApiError, handle401Error, cn,
+  createDropdownListHook, formValidation, executeWithErrorHandling, executeWithLoadingState,
+   isFunction, isObject, isAxiosErrorWithStatus,
+
+  // Logging
+  logger, log, logDebug, logError, logWarning, logHookEvent,
+  axiosClient, queryClient, createSubTrigger, createContextMenuSubTrigger, createMenubarSubTrigger,
+  useForm, useFormSubmission, FormField, TextInputField, TextareaField, SelectField, CheckboxField,
+  getAdvancedToastCount, clearAllAdvancedToasts, getAdvancedToastTimeoutCount, toastReducer, toastActionTypes,
+  toastDispatch, showSuccess, showError, showInfo, showWarning
+};
