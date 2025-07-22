@@ -1,0 +1,99 @@
+import React from 'react';
+
+/**
+ * Custom hook for form state management
+ * @template T - Form state type
+ * @param {T} initialState - Initial form state
+ * @returns {Object} Form utilities
+ */
+export function useForm<T>(initialState: T) {
+  const [form, setForm] = React.useState<T>(initialState);
+  
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    setForm(prev => ({ ...prev, [name]: value }));
+  };
+  
+  const setField = (name: keyof T, value: any) => {
+    setForm(prev => ({ ...prev, [name]: value }));
+  };
+  
+  const resetForm = () => setForm(initialState);
+  
+  return {
+    form,
+    setForm,
+    handleChange,
+    setField,
+    resetForm
+  };
+}
+
+interface FormFieldProps {
+  label: string;
+  className?: string;
+  children: React.ReactNode;
+}
+
+export function FormField({ label, className, children }: FormFieldProps) {
+  return (
+    <div className={`space-y-2 ${className}`}>
+      <label className="block text-sm font-medium text-gray-300 mb-1">{label}</label>
+      {children}
+    </div>
+  );
+}
+
+interface TextInputFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
+  label: string;
+}
+
+export function TextInputField({ label, ...props }: TextInputFieldProps) {
+  return (
+    <FormField label={label}>
+      <input 
+        className="w-full bg-dark-quaternary border border-gray-600 rounded-md px-3 py-2 text-gray-100 focus:outline-none focus:ring-2 focus:ring-teal-500/50 focus:border-teal-500"
+        {...props}
+      />
+    </FormField>
+  );
+}
+
+interface TextareaFieldProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
+  label: string;
+}
+
+export function TextareaField({ label, ...props }: TextareaFieldProps) {
+  return (
+    <FormField label={label}>
+      <textarea
+        className="w-full bg-dark-quaternary border border-gray-600 rounded-md px-3 py-2 text-gray-100 focus:outline-none focus:ring-2 focus:ring-teal-500/50 focus:border-teal-500"
+        {...props}
+      />
+    </FormField>
+  );
+}
+
+interface SelectFieldProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
+  label: string;
+  options: { value: string; label: string }[];
+}
+
+export function SelectField({ label, options, ...props }: SelectFieldProps) {
+  return (
+    <FormField label={label}>
+      <select
+        className="w-full bg-dark-quaternary border border-gray-600 rounded-md px-3 py-2 text-gray-100 focus:outline-none focus:ring-2 focus:ring-teal-500/50 focus:border-teal-500"
+        {...props}
+      >
+        {options.map(option => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </select>
+    </FormField>
+  );
+}

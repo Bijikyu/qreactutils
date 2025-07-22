@@ -25,7 +25,7 @@ const {
   useEditForm, useIsMobile, useToast, toast, useToastAction, useAuthRedirect, usePageFocus, useSocket,
   showToast, toastSuccess, toastError, stopEvent, apiRequest, getQueryFn, 
   queryClient, formatAxiosError, axiosClient, isFunction, isObject, safeStringify, 
-  isAxiosErrorWithStatus, executeWithErrorHandling, executeSyncWithErrorHandling, cn, createSubTrigger, createContextMenuSubTrigger, createMenubarSubTrigger, useForm, FormField, TextInputField, TextareaField, SelectField, CheckboxField
+  isAxiosErrorWithStatus, executeWithErrorHandling, executeSyncWithErrorHandling, cn, createSubTrigger, createContextMenuSubTrigger, createMenubarSubTrigger, useForm, useFormSubmission, formValidation, FormField, TextInputField, TextareaField, SelectField, CheckboxField
 } = require('./index.js');
 
 // Restore console for test output only
@@ -433,6 +433,46 @@ runTest('SelectField handles options array correctly', () => {
   } catch (error) {
     assert(false, `SelectField should handle options prop: ${error.message}`);
   }
+});
+
+runTest('formValidation utilities work correctly', () => {
+  // Test email validation
+  assert(formValidation.isValidEmail('test@example.com'), 'Should validate correct email format');
+  assert(!formValidation.isValidEmail('invalid-email'), 'Should reject invalid email format');
+  assert(!formValidation.isValidEmail('test@'), 'Should reject incomplete email');
+  
+  // Test required field validation
+  assert(formValidation.isRequired('valid string'), 'Should validate non-empty string as required');
+  assert(!formValidation.isRequired(''), 'Should reject empty string');
+  assert(!formValidation.isRequired('   '), 'Should reject whitespace-only string');
+  assert(formValidation.isRequired(123), 'Should validate numbers as required');
+  assert(!formValidation.isRequired(null), 'Should reject null values');
+  
+  // Test length validations
+  assert(formValidation.minLength('hello', 3), 'Should validate minimum length');
+  assert(!formValidation.minLength('hi', 5), 'Should reject string shorter than minimum');
+  assert(formValidation.maxLength('hello', 10), 'Should validate maximum length');
+  assert(!formValidation.maxLength('very long string', 5), 'Should reject string longer than maximum');
+  
+  // Test range validation
+  assert(formValidation.inRange(25, 18, 65), 'Should validate number in range');
+  assert(!formValidation.inRange(70, 18, 65), 'Should reject number above range');
+  assert(!formValidation.inRange(15, 18, 65), 'Should reject number below range');
+});
+
+runTest('useFormSubmission hook manages submission state', () => {
+  const mockSubmitFn = async (data) => {
+    return { success: true, data };
+  };
+  
+  const { result } = renderHook(() => useFormSubmission(mockSubmitFn));
+  
+  // Test initial state
+  assert(typeof result.current === 'object', 'Should return submission utilities object');
+  assert(result.current.isSubmitting === false, 'Should initialize as not submitting');
+  assert(result.current.submitError === null, 'Should initialize with no error');
+  assert(typeof result.current.handleSubmit === 'function', 'Should provide handleSubmit function');
+  assert(typeof result.current.resetSubmission === 'function', 'Should provide resetSubmission function');
 });
 
 // Final results
