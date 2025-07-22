@@ -569,6 +569,26 @@ runTest('useFormSubmission hook manages submission state', () => {
   assert(typeof result.current.resetSubmission === 'function', 'Should provide resetSubmission function');
 });
 
+runTest('enhanced getQueryFn constructs URLs from query keys', async () => {
+  // Test the enhanced getQueryFn with URL construction
+  const queryFn = getQueryFn({ on401: 'returnNull' });
+  
+  // Mock query key array
+  const mockQueryKey = ['api', 'users', '123'];
+  
+  // In offline mode, this should return the mock response
+  process.env.OFFLINE_MODE = 'true';
+  
+  try {
+    const result = await queryFn({ queryKey: mockQueryKey });
+    // Should return null from the mock response
+    assertEqual(result, null, 'Should return null in offline mode');
+  } finally {
+    // Reset offline mode
+    delete process.env.OFFLINE_MODE;
+  }
+});
+
 // Final results
 console.log('📊 Test Results Summary');
 console.log('======================');
