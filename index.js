@@ -23,7 +23,7 @@ const {
   useAsyncAction, useDropdownData, createDropdownListHook, useDropdownToggle, // aggregate hook utilities // gathered here to ensure stable references across modules
   useEditForm, useIsMobile, useToast, toast, useToastAction, useAuthRedirect, usePageFocus, useSocket, // UI-related helpers // centralizing UI hooks prevents scattered imports
   showToast, toastSuccess, toastError, executeWithErrorToast, executeWithToastFeedback, stopEvent, apiRequest, getQueryFn, queryClient, formatAxiosError, axiosClient, getToastListenerCount, resetToastSystem, dispatch, getToastTimeoutCount, // core API & toast utilities // exposes internal tools in one shot for clarity
-  isFunction, isObject, safeStringify, isAxiosErrorWithStatus, executeWithErrorHandling, executeSyncWithErrorHandling, cn // validation, error handling, and styling utilities // imported for external use
+  isFunction, isObject, safeStringify, isAxiosErrorWithStatus, executeWithErrorHandling, executeSyncWithErrorHandling, cn, createSubTrigger, createContextMenuSubTrigger, createMenubarSubTrigger // validation, error handling, styling and component utilities // imported for external use
 } = require('./lib/hooks'); // CommonJS import keeps broad Node compatibility // require chosen so Node apps of any version can consume this module
 
 /**
@@ -94,6 +94,11 @@ module.exports = { // CommonJS export consolidating public API
   
   // Styling utilities
   cn,                    // Class name merger with Tailwind conflict resolution // public for component styling // merges classes while resolving Tailwind conflicts
+  
+  // Component factories
+  createSubTrigger,      // Generic sub-trigger component factory // public for creating reusable UI components // generates components with chevron icons
+  createContextMenuSubTrigger, // Context menu sub-trigger factory // exported for context menu components // specialized factory for context menus
+  createMenubarSubTrigger, // Menubar sub-trigger factory // exported for menubar components // specialized factory for menubars
   
   // API and HTTP functionality
   apiRequest,            // Standardized HTTP request wrapper with error handling // public so external code uses shared axios logic // centralizes axios with error conventions

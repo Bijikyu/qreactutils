@@ -25,7 +25,7 @@ const {
   useEditForm, useIsMobile, useToast, toast, useToastAction, useAuthRedirect, usePageFocus, useSocket,
   showToast, toastSuccess, toastError, stopEvent, apiRequest, getQueryFn, 
   queryClient, formatAxiosError, axiosClient, isFunction, isObject, safeStringify, 
-  isAxiosErrorWithStatus, executeWithErrorHandling, executeSyncWithErrorHandling, cn
+  isAxiosErrorWithStatus, executeWithErrorHandling, executeSyncWithErrorHandling, cn, createSubTrigger, createContextMenuSubTrigger, createMenubarSubTrigger
 } = require('./index.js');
 
 // Restore console for test output only
@@ -321,6 +321,54 @@ runTest('cn function merges classes correctly', () => {
   const withObjects = cn({ 'bg-green-500': true, 'text-white': false });
   assert(withObjects.includes('bg-green-500'), 'Should include truthy object properties');
   assert(!withObjects.includes('text-white'), 'Should exclude falsy object properties');
+});
+
+runTest('createSubTrigger factory works correctly', () => {
+  // Mock base component for testing
+  const MockBaseComponent = React.forwardRef((props, ref) => {
+    return React.createElement('button', { ref, ...props });
+  });
+  MockBaseComponent.displayName = 'MockBaseComponent';
+  
+  // Create sub-trigger component
+  const SubTrigger = createSubTrigger('TestSubTrigger', MockBaseComponent);
+  
+  // Test component creation
+  assert(typeof SubTrigger === 'object', 'Should return a React component');
+  assert(SubTrigger.displayName === 'TestSubTrigger', 'Should set correct display name');
+  
+  // Test that it's a forwardRef component
+  assert(SubTrigger.$$typeof.toString().includes('react.forward_ref'), 'Should be a forwardRef component');
+});
+
+runTest('createContextMenuSubTrigger convenience function works', () => {
+  // Mock ContextMenuSubTrigger component
+  const MockContextTrigger = React.forwardRef((props, ref) => {
+    return React.createElement('div', { ref, role: 'menuitem', ...props });
+  });
+  MockContextTrigger.displayName = 'ContextMenuSubTrigger';
+  
+  // Create context menu sub-trigger
+  const ContextSubTrigger = createContextMenuSubTrigger(MockContextTrigger);
+  
+  // Verify it returns a component
+  assert(typeof ContextSubTrigger === 'object', 'Should return a React component');
+  assert(ContextSubTrigger.displayName === 'ContextMenuSubTrigger', 'Should have correct display name');
+});
+
+runTest('createMenubarSubTrigger convenience function works', () => {
+  // Mock MenubarSubTrigger component
+  const MockMenubarTrigger = React.forwardRef((props, ref) => {
+    return React.createElement('div', { ref, role: 'menuitem', ...props });
+  });
+  MockMenubarTrigger.displayName = 'MenubarSubTrigger';
+  
+  // Create menubar sub-trigger
+  const MenubarSubTrigger = createMenubarSubTrigger(MockMenubarTrigger);
+  
+  // Verify it returns a component
+  assert(typeof MenubarSubTrigger === 'object', 'Should return a React component');
+  assert(MenubarSubTrigger.displayName === 'MenubarSubTrigger', 'Should have correct display name');
 });
 
 // Final results
