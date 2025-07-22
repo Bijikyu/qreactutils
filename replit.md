@@ -19,6 +19,7 @@ The library follows a hierarchical module organization with functions organized 
 - **lib/socket.js**: WebSocket communication and Socket.IO integration
 - **lib/accessibility.js**: Accessibility and keyboard navigation utilities
 - **lib/dom.js**: DOM manipulation and event handling utilities
+- **lib/components.js**: React UI components including sub-trigger factories and lazy image loading
 
 ### Technology Stack
 - **React 19.1.0**: Core React library for hook functionality
@@ -42,6 +43,12 @@ The library follows a hierarchical module organization with functions organized 
 - **useSocket**: Real-time WebSocket communication for payment outcomes and usage updates
 - **useAdvancedToast**: Comprehensive toast notification system with state management and lifecycle handling
 - **advancedToast**: Imperative toast creation with update and dismiss capabilities
+
+### UI Components
+- **LazyImagePreview**: Lazy loading image component with shimmer animation and smooth opacity transitions
+- **createSubTrigger**: Generic factory for creating sub-trigger components with chevron icons
+- **createContextMenuSubTrigger**: Context menu specific sub-trigger factory
+- **createMenubarSubTrigger**: Menubar specific sub-trigger factory
 
 ### API Layer
 - **axiosClient**: Pre-configured Axios instance with credentials, baseURL support via CLIENT_BASE_URL, and error handling
@@ -129,6 +136,7 @@ The library follows a hierarchical module organization with functions organized 
 - July 22, 2025: Added centralized toast utility functions (showSuccessToast, showErrorToast, showInfoToast, showWarningToast) with convenience variants for consistent notification patterns across applications
 - July 22, 2025: Enhanced mobile detection with dual approach - added useIsMobileTS hook using usehooks-ts library alongside existing useIsMobile (react-responsive) for flexible responsive design options
 - July 22, 2025: Augmented API layer with CLIENT_BASE_URL environment variable support and enhanced getQueryFn with automatic URL construction from query keys for RESTful patterns
+- July 22, 2025: Added LazyImagePreview component with shimmer loading animation and smooth opacity transitions - provides optimized image loading with preload tracking and native lazy loading support
 
 ## User Preferences
 
