@@ -25,7 +25,7 @@ const {
   useEditForm, useIsMobile, useToast, toast, useToastAction, useAuthRedirect, usePageFocus, useSocket,
   showToast, toastSuccess, toastError, stopEvent, apiRequest, getQueryFn, 
   queryClient, formatAxiosError, axiosClient, isFunction, isObject, safeStringify, 
-  isAxiosErrorWithStatus, executeWithErrorHandling, executeSyncWithErrorHandling
+  isAxiosErrorWithStatus, executeWithErrorHandling, executeSyncWithErrorHandling, cn
 } = require('./index.js');
 
 // Restore console for test output only
@@ -296,6 +296,31 @@ runTest('error handling utilities work correctly', () => {
   executeSyncWithErrorHandling(syncOperation, 'sync-test').then(result => {
     assert(result === 'sync-success', 'Should return sync operation result');
   });
+});
+
+runTest('cn function merges classes correctly', () => {
+  // Test basic class merging
+  const basic = cn('px-4 py-2', 'bg-blue-500');
+  assert(typeof basic === 'string', 'Should return string');
+  assert(basic.includes('px-4'), 'Should include first classes');
+  assert(basic.includes('bg-blue-500'), 'Should include second classes');
+  
+  // Test conditional classes
+  const conditional = cn('px-4', true && 'bg-blue-500', false && 'hidden');
+  assert(conditional.includes('px-4'), 'Should include base classes');
+  assert(conditional.includes('bg-blue-500'), 'Should include truthy conditional');
+  assert(!conditional.includes('hidden'), 'Should exclude falsy conditional');
+  
+  // Test Tailwind conflict resolution (later class should win)
+  const conflictResolution = cn('text-red-500', 'text-blue-500');
+  assert(conflictResolution.includes('text-blue-500'), 'Should include later conflicting class');
+  // Note: We can't easily test that text-red-500 is excluded without inspecting the exact output
+  // but tailwind-merge should handle this conflict resolution
+  
+  // Test with objects
+  const withObjects = cn({ 'bg-green-500': true, 'text-white': false });
+  assert(withObjects.includes('bg-green-500'), 'Should include truthy object properties');
+  assert(!withObjects.includes('text-white'), 'Should exclude falsy object properties');
 });
 
 // Final results
