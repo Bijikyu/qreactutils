@@ -23,7 +23,7 @@ const {
   useAsyncAction, useDropdownData, createDropdownListHook, useDropdownToggle, // aggregate hook utilities // gathered here to ensure stable references across modules
   useEditForm, useIsMobile, useToastAction, useAuthRedirect, usePageFocus, useSocket, // UI-related helpers // centralizing UI hooks prevents scattered imports
   stopEvent, apiRequest, getQueryFn, queryClient, formatAxiosError, axiosClient, // core API utilities // exposes internal tools in one shot for clarity
-  isFunction, isObject, safeStringify, isAxiosErrorWithStatus, executeWithErrorHandling, executeSyncWithErrorHandling, cn, createSubTrigger, createContextMenuSubTrigger, createMenubarSubTrigger, useForm, useFormSubmission, formValidation, FormField, TextInputField, TextareaField, SelectField, CheckboxField, useAdvancedToast, advancedToast, getAdvancedToastCount, clearAllAdvancedToasts, getAdvancedToastTimeoutCount, toastReducer, toastActionTypes, toastDispatch // validation, error handling, styling, component, form and advanced toast utilities // imported for external use
+  isFunction, isObject, safeStringify, isAxiosErrorWithStatus, executeWithErrorHandling, executeSyncWithErrorHandling, cn, createSubTrigger, createContextMenuSubTrigger, createMenubarSubTrigger, useForm, useFormSubmission, formValidation, FormField, TextInputField, TextareaField, SelectField, CheckboxField, useAdvancedToast, advancedToast, getAdvancedToastCount, clearAllAdvancedToasts, getAdvancedToastTimeoutCount, toastReducer, toastActionTypes, toastDispatch, showSuccessToast, showErrorToast, showInfoToast, showWarningToast, showSuccess, showError, showInfo, showWarning // validation, error handling, styling, component, form, advanced toast and toast utility functions // imported for external use
 } = require('./lib/hooks'); // CommonJS import keeps broad Node compatibility // require chosen so Node apps of any version can consume this module
 
 /**
@@ -108,6 +108,16 @@ module.exports = { // CommonJS export consolidating public API
   toastReducer,          // Toast state reducer function // exported for custom implementations // handles all toast state transitions
   toastActionTypes,      // Toast action type constants // public for custom actions // defines all available action types
   toastDispatch,         // Toast dispatch function // exported for advanced control // allows direct state manipulation
+  
+  // Toast utility functions
+  showSuccessToast,      // Explicit success toast utility // public for detailed success notifications // requires title and description
+  showErrorToast,        // Explicit error toast utility // exported for detailed error notifications // requires title and description
+  showInfoToast,         // Explicit info toast utility // public for detailed informational notifications // requires title and description
+  showWarningToast,      // Explicit warning toast utility // exported for detailed warning notifications // requires title and description
+  showSuccess,           // Convenience success toast utility // public for simple success notifications // single message parameter
+  showError,             // Convenience error toast utility // exported for simple error notifications // single message parameter
+  showInfo,              // Convenience info toast utility // public for simple informational notifications // single message parameter
+  showWarning,           // Convenience warning toast utility // exported for simple warning notifications // single message parameter
   
   // API and HTTP functionality
   apiRequest,            // Standardized HTTP request wrapper with error handling // public so external code uses shared axios logic // centralizes axios with error conventions

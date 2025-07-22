@@ -25,7 +25,7 @@ const {
   useEditForm, useIsMobile, useToast, toast, useToastAction, useAuthRedirect, usePageFocus, useSocket,
   showToast, toastSuccess, toastError, stopEvent, apiRequest, getQueryFn, 
   queryClient, formatAxiosError, axiosClient, isFunction, isObject, safeStringify, 
-  isAxiosErrorWithStatus, executeWithErrorHandling, executeSyncWithErrorHandling, cn, createSubTrigger, createContextMenuSubTrigger, createMenubarSubTrigger, useForm, useFormSubmission, formValidation, FormField, TextInputField, TextareaField, SelectField, CheckboxField, useAdvancedToast, advancedToast, getAdvancedToastCount, clearAllAdvancedToasts
+  isAxiosErrorWithStatus, executeWithErrorHandling, executeSyncWithErrorHandling, cn, createSubTrigger, createContextMenuSubTrigger, createMenubarSubTrigger, useForm, useFormSubmission, formValidation, FormField, TextInputField, TextareaField, SelectField, CheckboxField, useAdvancedToast, advancedToast, getAdvancedToastCount, clearAllAdvancedToasts, showSuccessToast, showErrorToast, showInfoToast, showWarningToast, showSuccess, showError, showInfo, showWarning
 } = require('./index.js');
 
 // Restore console for test output only
@@ -249,6 +249,49 @@ runTest('advanced toast update functionality works', () => {
   } catch (error) {
     assert(false, `Toast update should not throw: ${error.message}`);
   }
+  
+  clearAllAdvancedToasts();
+});
+
+runTest('toast utility functions work correctly', () => {
+  clearAllAdvancedToasts();
+  
+  // Mock toast function to capture calls
+  const mockToastCalls = [];
+  const mockToast = (params) => {
+    mockToastCalls.push(params);
+    return { id: 'test-id', dismiss: () => {}, update: () => {} };
+  };
+  
+  // Test explicit toast functions
+  showSuccessToast(mockToast, 'Success Title', 'Success description');
+  assert(mockToastCalls.length === 1, 'Should call toast function once');
+  assert(mockToastCalls[0].title === 'Success Title', 'Should pass correct title');
+  assert(mockToastCalls[0].description === 'Success description', 'Should pass correct description');
+  assert(mockToastCalls[0].variant === 'success', 'Should use success variant');
+  
+  showErrorToast(mockToast, 'Error Title', 'Error description');
+  assert(mockToastCalls.length === 2, 'Should call toast function twice');
+  assert(mockToastCalls[1].variant === 'destructive', 'Should use destructive variant for errors');
+  
+  showInfoToast(mockToast, 'Info Title', 'Info description');
+  assert(mockToastCalls.length === 3, 'Should call toast function three times');
+  assert(mockToastCalls[2].variant === 'default', 'Should use default variant for info');
+  
+  showWarningToast(mockToast, 'Warning Title', 'Warning description');
+  assert(mockToastCalls.length === 4, 'Should call toast function four times');
+  assert(mockToastCalls[3].variant === 'warning', 'Should use warning variant');
+  
+  // Test convenience functions
+  mockToastCalls.length = 0; // reset
+  showSuccess(mockToast, 'Success message');
+  assert(mockToastCalls.length === 1, 'Convenience function should call toast');
+  assert(mockToastCalls[0].title === 'Success', 'Should use default success title');
+  assert(mockToastCalls[0].description === 'Success message', 'Should use message as description');
+  
+  showError(mockToast, 'Error message');
+  assert(mockToastCalls.length === 2, 'Should call toast function twice');
+  assert(mockToastCalls[1].title === 'Error', 'Should use default error title');
   
   clearAllAdvancedToasts();
 });

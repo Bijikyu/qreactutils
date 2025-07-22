@@ -14,7 +14,8 @@ The library follows a hierarchical module organization with functions organized 
 - **lib/utils.js**: Toast utilities and common utility functions
 - **lib/validation.js**: Data validation helpers and type guards
 - **lib/errorHandling.js**: Standardized error handling patterns
-- **lib/toastIntegration.js**: Toast notification integration utilities
+- **lib/advancedToast.js**: Advanced toast notification system with state management
+- **lib/toastUtils.js**: Centralized toast utility functions for consistent notification patterns
 - **lib/socket.js**: WebSocket communication and Socket.IO integration
 - **lib/accessibility.js**: Accessibility and keyboard navigation utilities
 - **lib/dom.js**: DOM manipulation and event handling utilities
@@ -51,6 +52,8 @@ The library follows a hierarchical module organization with functions organized 
 - **formatAxiosError**: Error normalization for HTTP responses
 - **getAdvancedToastCount/clearAllAdvancedToasts**: Advanced toast system utilities for testing and cleanup
 - **toastReducer/toastActionTypes/toastDispatch**: Advanced toast state management primitives
+- **showSuccessToast/showErrorToast/showInfoToast/showWarningToast**: Explicit toast utilities with title and description
+- **showSuccess/showError/showInfo/showWarning**: Convenience toast utilities with single message parameter
 
 ## Data Flow
 
@@ -121,6 +124,7 @@ The library follows a hierarchical module organization with functions organized 
 - June 17, 2025: Added usePageFocus hook for accessibility-focused keyboard navigation
 - June 17, 2025: Reorganized /lib directory by purpose - created specialized modules (socket.js, accessibility.js, dom.js) for better code organization
 - July 22, 2025: Replaced legacy toast system with advanced toast notification system featuring state management, action dispatching, and proper lifecycle handling - maintained 100% test success rate with comprehensive toast management
+- July 22, 2025: Added centralized toast utility functions (showSuccessToast, showErrorToast, showInfoToast, showWarningToast) with convenience variants for consistent notification patterns across applications
 
 ## User Preferences
 
