@@ -34,7 +34,8 @@ The library follows a hierarchical module organization with functions organized 
 - **useAsyncAction**: Primary hook for async operations with loading states and error handling
 - **useDropdownData**: Manages dropdown data fetching with React Query integration
 - **useEditForm**: Form editing state management with validation
-- **useIsMobile**: Mobile device detection with SSR support
+- **useIsMobile**: Mobile device detection using react-responsive with SSR support
+- **useIsMobileTS**: Alternative mobile detection using usehooks-ts with CSS media queries
 - **useToastAction**: Async action with advanced toast integration for consistent feedback
 - **useAuthRedirect**: Authentication flow management
 - **usePageFocus**: Accessibility-focused keyboard focus management for route changes
@@ -43,9 +44,10 @@ The library follows a hierarchical module organization with functions organized 
 - **advancedToast**: Imperative toast creation with update and dismiss capabilities
 
 ### API Layer
-- **axiosClient**: Pre-configured Axios instance with credentials and error handling
+- **axiosClient**: Pre-configured Axios instance with credentials, baseURL support via CLIENT_BASE_URL, and error handling
 - **apiRequest**: Standardized API request wrapper with consistent error handling
-- **queryClient**: React Query client with sensible defaults
+- **getQueryFn**: Enhanced query function factory with automatic URL construction from query keys and configurable 401 handling
+- **queryClient**: React Query client with enhanced defaults and automatic query function integration
 
 ### Utility Functions
 - **executeWithLoadingState**: Helper for managing async loading states
@@ -125,6 +127,8 @@ The library follows a hierarchical module organization with functions organized 
 - June 17, 2025: Reorganized /lib directory by purpose - created specialized modules (socket.js, accessibility.js, dom.js) for better code organization
 - July 22, 2025: Replaced legacy toast system with advanced toast notification system featuring state management, action dispatching, and proper lifecycle handling - maintained 100% test success rate with comprehensive toast management
 - July 22, 2025: Added centralized toast utility functions (showSuccessToast, showErrorToast, showInfoToast, showWarningToast) with convenience variants for consistent notification patterns across applications
+- July 22, 2025: Enhanced mobile detection with dual approach - added useIsMobileTS hook using usehooks-ts library alongside existing useIsMobile (react-responsive) for flexible responsive design options
+- July 22, 2025: Augmented API layer with CLIENT_BASE_URL environment variable support and enhanced getQueryFn with automatic URL construction from query keys for RESTful patterns
 
 ## User Preferences
 
