@@ -20,6 +20,7 @@ The library follows a hierarchical module organization with functions organized 
 - **lib/accessibility.js**: Accessibility and keyboard navigation utilities
 - **lib/dom.js**: DOM manipulation and event handling utilities
 - **lib/components.js**: React UI components including sub-trigger factories and lazy image loading
+- **lib/testUtils.js**: Test framework utilities including Vitest result parsing
 
 ### Technology Stack
 - **React 19.1.0**: Core React library for hook functionality
@@ -62,6 +63,7 @@ The library follows a hierarchical module organization with functions organized 
 - **toastReducer/toastActionTypes/toastDispatch**: Advanced toast state management primitives
 - **showSuccessToast/showErrorToast/showInfoToast/showWarningToast**: Explicit toast utilities with title and description
 - **showSuccess/showError/showInfo/showWarning**: Convenience toast utilities with single message parameter
+- **parseVitestResults**: Test result parsing utility for Vitest output processing and CI/CD integration
 
 ## Data Flow
 
@@ -134,6 +136,7 @@ The library follows a hierarchical module organization with functions organized 
 - July 22, 2025: Replaced legacy toast system with advanced toast notification system featuring state management, action dispatching, and proper lifecycle handling - maintained 100% test success rate with comprehensive toast management
 - July 22, 2025: Added centralized toast utility functions (showSuccessToast, showErrorToast, showInfoToast, showWarningToast) with convenience variants for consistent notification patterns across applications
 - August 8, 2025: Simplified mobile detection - merged duplicate mobile detection hooks into single useIsMobile implementation using react-responsive for consistent responsive design approach
+- August 8, 2025: Added parseVitestResults utility function for parsing Vitest test output and extracting test statistics - enables CI/CD integration and test result processing with support for multiple Vitest output formats
 - July 22, 2025: Augmented API layer with CLIENT_BASE_URL environment variable support and enhanced getQueryFn with automatic URL construction from query keys for RESTful patterns
 - July 22, 2025: Added LazyImagePreview component with shimmer loading animation and smooth opacity transitions - provides optimized image loading with preload tracking and native lazy loading support
 

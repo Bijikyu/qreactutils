@@ -29,7 +29,8 @@ const {
   useForm, useFormSubmission, FormField, TextInputField, TextareaField, SelectField, CheckboxField,
   getAdvancedToastCount, clearAllAdvancedToasts, getAdvancedToastTimeoutCount, clearToastTimeout, toastSubscribe, toastGetState, toastReducer, toastActionTypes,
   toastDispatch, showSuccess, showError, showInfo, showWarning,
-  logger, log, logDebug, logError, logWarning, logHookEvent
+  logger, log, logDebug, logError, logWarning, logHookEvent,
+  parseVitestResults
 } = require('./lib/hooks.js');
 
 /**
@@ -75,5 +76,8 @@ module.exports = {
   safeStringify, cn, isFunction, isObject, isAxiosErrorWithStatus,
 
   // Logging
-  logger, log, logDebug, logError, logWarning, logHookEvent
+  logger, log, logDebug, logError, logWarning, logHookEvent,
+
+  // Test Utilities
+  parseVitestResults
 };
