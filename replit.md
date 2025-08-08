@@ -36,7 +36,6 @@ The library follows a hierarchical module organization with functions organized 
 - **useDropdownData**: Manages dropdown data fetching with React Query integration
 - **useEditForm**: Form editing state management with validation
 - **useIsMobile**: Mobile device detection using react-responsive with SSR support
-- **useIsMobileTS**: Alternative mobile detection using usehooks-ts with CSS media queries
 - **useToastAction**: Async action with advanced toast integration for consistent feedback
 - **useAuthRedirect**: Authentication flow management
 - **usePageFocus**: Accessibility-focused keyboard focus management for route changes
@@ -134,7 +133,7 @@ The library follows a hierarchical module organization with functions organized 
 - June 17, 2025: Reorganized /lib directory by purpose - created specialized modules (socket.js, accessibility.js, dom.js) for better code organization
 - July 22, 2025: Replaced legacy toast system with advanced toast notification system featuring state management, action dispatching, and proper lifecycle handling - maintained 100% test success rate with comprehensive toast management
 - July 22, 2025: Added centralized toast utility functions (showSuccessToast, showErrorToast, showInfoToast, showWarningToast) with convenience variants for consistent notification patterns across applications
-- July 22, 2025: Enhanced mobile detection with dual approach - added useIsMobileTS hook using usehooks-ts library alongside existing useIsMobile (react-responsive) for flexible responsive design options
+- August 8, 2025: Simplified mobile detection - merged duplicate mobile detection hooks into single useIsMobile implementation using react-responsive for consistent responsive design approach
 - July 22, 2025: Augmented API layer with CLIENT_BASE_URL environment variable support and enhanced getQueryFn with automatic URL construction from query keys for RESTful patterns
 - July 22, 2025: Added LazyImagePreview component with shimmer loading animation and smooth opacity transitions - provides optimized image loading with preload tracking and native lazy loading support
 

@@ -17,7 +17,7 @@
 // The hooks module acts as an aggregator, pulling together functionality from multiple internal modules
 const {
   useAsyncAction, useDropdownData, useDropdownToggle, useEditForm,
-  useIsMobile, useIsMobileTS, useToast, useToastAction, useAdvancedToast, useAuthRedirect,
+  useIsMobile, useToast, useToastAction, useAdvancedToast, useAuthRedirect,
   usePageFocus, useSocket, createDropdownListHook, LazyImagePreview,
   showToast, toastSuccess, toastError, advancedToast, showSuccessToast, showErrorToast, showInfoToast, showWarningToast,
   executeWithErrorToast, executeWithToastFeedback, stopEvent, 
@@ -50,7 +50,7 @@ const {
 module.exports = {
   // Hooks
   useAsyncAction, useDropdownData, useDropdownToggle, useEditForm,
-  useIsMobile, useIsMobileTS, useToast, useToastAction, useAdvancedToast, useAuthRedirect,
+  useIsMobile, useToast, useToastAction, useAdvancedToast, useAuthRedirect,
   usePageFocus, useSocket, createDropdownListHook,
 
   // Components
