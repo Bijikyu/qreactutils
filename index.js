@@ -27,7 +27,7 @@ const {
   isFunction, isObject, isAxiosErrorWithStatus,
   axiosClient, queryClient, createSubTrigger, createContextMenuSubTrigger, createMenubarSubTrigger,
   useForm, useFormSubmission, FormField, TextInputField, TextareaField, SelectField, CheckboxField,
-  getAdvancedToastCount, clearAllAdvancedToasts, getAdvancedToastTimeoutCount, clearToastTimeout, toastReducer, toastActionTypes,
+  getAdvancedToastCount, clearAllAdvancedToasts, getAdvancedToastTimeoutCount, clearToastTimeout, toastSubscribe, toastGetState, toastReducer, toastActionTypes,
   toastDispatch, showSuccess, showError, showInfo, showWarning,
   logger, log, logDebug, logError, logWarning, logHookEvent
 } = require('./lib/hooks.js');
@@ -63,7 +63,7 @@ module.exports = {
   // Toast Utilities
   showToast, toastSuccess, toastError, advancedToast, showSuccessToast, showErrorToast, showInfoToast, showWarningToast,
   executeWithErrorToast, executeWithToastFeedback, 
-  getAdvancedToastCount, clearAllAdvancedToasts, getAdvancedToastTimeoutCount, clearToastTimeout, toastReducer, toastActionTypes,
+  getAdvancedToastCount, clearAllAdvancedToasts, getAdvancedToastTimeoutCount, clearToastTimeout, toastSubscribe, toastGetState, toastReducer, toastActionTypes,
   toastDispatch, showSuccess, showError, showInfo, showWarning,
 
   // API and Network Utilities
