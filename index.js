@@ -30,7 +30,7 @@ const {
   getAdvancedToastCount, clearAllAdvancedToasts, getAdvancedToastTimeoutCount, clearToastTimeout, toastSubscribe, toastGetState, toastReducer, toastActionTypes,
   toastDispatch, showSuccess, showError, showInfo, showWarning,
   logger, log, logDebug, logError, logWarning, logHookEvent,
-  parseVitestResults
+  parseVitestResults, useClipboard, useClipboardWithCallbacks, makeCopyFn, copyToClipboard
 } = require('./lib/hooks.js');
 
 /**
@@ -52,7 +52,7 @@ module.exports = {
   // Hooks
   useAsyncAction, useDropdownData, useDropdownToggle, useEditForm,
   useIsMobile, useToast, useToastAction, useAdvancedToast, useAuthRedirect,
-  usePageFocus, useSocket, createDropdownListHook,
+  usePageFocus, useSocket, createDropdownListHook, useClipboard, useClipboardWithCallbacks,
 
   // Components
   LazyImagePreview, createSubTrigger, createContextMenuSubTrigger, createMenubarSubTrigger,
@@ -74,6 +74,9 @@ module.exports = {
   // General Utilities
   executeWithErrorHandling, executeWithLoadingState, stopEvent, 
   safeStringify, cn, isFunction, isObject, isAxiosErrorWithStatus,
+  
+  // Clipboard Utilities
+  makeCopyFn, copyToClipboard,
 
   // Logging
   logger, log, logDebug, logError, logWarning, logHookEvent,

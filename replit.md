@@ -21,6 +21,7 @@ The library follows a hierarchical module organization with functions organized 
 - **lib/dom.js**: DOM manipulation and event handling utilities
 - **lib/components.js**: React UI components including sub-trigger factories and lazy image loading
 - **lib/testUtils.js**: Test framework utilities including Vitest result parsing
+- **lib/clipboard.js**: Comprehensive clipboard utilities with modern API support and legacy fallback
 
 ### Technology Stack
 - **React 19.1.0**: Core React library for hook functionality
@@ -43,6 +44,8 @@ The library follows a hierarchical module organization with functions organized 
 - **useSocket**: Real-time WebSocket communication for payment outcomes and usage updates
 - **useAdvancedToast**: Comprehensive toast notification system with state management and lifecycle handling
 - **advancedToast**: Imperative toast creation with update and dismiss capabilities
+- **useClipboard**: Copy-to-clipboard hook with integrated toast notifications and loading states
+- **useClipboardWithCallbacks**: Copy-to-clipboard hook with custom success/error callbacks
 
 ### UI Components
 - **LazyImagePreview**: Lazy loading image component with shimmer animation and smooth opacity transitions
@@ -64,6 +67,8 @@ The library follows a hierarchical module organization with functions organized 
 - **showSuccessToast/showErrorToast/showInfoToast/showWarningToast**: Explicit toast utilities with title and description
 - **showSuccess/showError/showInfo/showWarning**: Convenience toast utilities with single message parameter
 - **parseVitestResults**: Test result parsing utility for Vitest output processing and CI/CD integration
+- **makeCopyFn**: Factory function for creating copy-to-clipboard functions with customizable callbacks
+- **copyToClipboard**: Simple utility for copying text to clipboard with promise-based API
 
 ## Data Flow
 
@@ -139,6 +144,7 @@ The library follows a hierarchical module organization with functions organized 
 - August 8, 2025: Added parseVitestResults utility function for parsing Vitest test output and extracting test statistics - enables CI/CD integration and test result processing with support for multiple Vitest output formats
 - July 22, 2025: Augmented API layer with CLIENT_BASE_URL environment variable support and enhanced getQueryFn with automatic URL construction from query keys for RESTful patterns
 - July 22, 2025: Added LazyImagePreview component with shimmer loading animation and smooth opacity transitions - provides optimized image loading with preload tracking and native lazy loading support
+- August 19, 2025: Added comprehensive clipboard functionality with useClipboard and useClipboardWithCallbacks hooks, makeCopyFn factory function, and copyToClipboard utility - features modern Clipboard API with legacy fallback, toast integration, server-side rendering support, and robust error handling
 
 ## User Preferences
 
