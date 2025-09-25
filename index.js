@@ -19,7 +19,7 @@ const {
   useAsyncAction, useDropdownData, useDropdownToggle, useEditForm,
   useIsMobile, useToast, useToastAction, useAdvancedToast, useAuthRedirect,
   usePageFocus, useSocket, createDropdownListHook, LazyImagePreview,
-  showToast, toastSuccess, toastError, advancedToast, showSuccessToast, showErrorToast, showInfoToast, showWarningToast,
+  showToast, toastSuccess, toastError, toast, advancedToast, showSuccessToast, showErrorToast, showInfoToast, showWarningToast,
   executeWithErrorToast, executeWithToastFeedback, stopEvent, 
   formatAxiosError, safeStringify, apiRequest, getQueryFn,
   handleApiError, handle401Error, cn,
@@ -62,7 +62,7 @@ module.exports = {
   formValidation,
 
   // Toast Utilities
-  showToast, toastSuccess, toastError, advancedToast, showSuccessToast, showErrorToast, showInfoToast, showWarningToast,
+  toast, showToast, toastSuccess, toastError, advancedToast, showSuccessToast, showErrorToast, showInfoToast, showWarningToast,
   executeWithErrorToast, executeWithToastFeedback, 
   getAdvancedToastCount, clearAllAdvancedToasts, getAdvancedToastTimeoutCount, clearToastTimeout, toastSubscribe, toastGetState, toastReducer, toastActionTypes,
   toastDispatch, showSuccess, showError, showInfo, showWarning,
