@@ -19,6 +19,7 @@ const {
   useAsyncAction, useDropdownData, useDropdownToggle, useEditForm,
   useIsMobile, useToast, useToastAction, useAdvancedToast, useAuthRedirect,
   usePageFocus, useSocket, createDropdownListHook, LazyImagePreview,
+  useApiKeyPref,
   showToast, toastSuccess, toastError, toast, advancedToast, showSuccessToast, showErrorToast, showInfoToast, showWarningToast,
   executeWithErrorToast, executeWithToastFeedback, stopEvent, 
   formatAxiosError, safeStringify, apiRequest, getQueryFn,
@@ -53,6 +54,7 @@ module.exports = {
   useAsyncAction, useDropdownData, useDropdownToggle, useEditForm,
   useIsMobile, useToast, useToastAction, useAdvancedToast, useAuthRedirect,
   usePageFocus, useSocket, createDropdownListHook, useClipboard, useClipboardWithCallbacks,
+  useApiKeyPref,
 
   // Components
   LazyImagePreview, createSubTrigger, createContextMenuSubTrigger, createMenubarSubTrigger,
