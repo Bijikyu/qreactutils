@@ -27,7 +27,6 @@ The library follows a hierarchical module organization with functions organized 
 - **React 19.1.0**: Core React library for hook functionality
 - **@tanstack/react-query 5.80.7**: Server state management and caching
 - **axios 1.10.0**: HTTP client for API requests
-- **react-responsive 10.0.1**: Responsive design utilities
 - **nanoid 3.3.11**: Unique ID generation
 - **Node.js 20**: Runtime environment
 
@@ -37,7 +36,7 @@ The library follows a hierarchical module organization with functions organized 
 - **useAsyncAction**: Primary hook for async operations with loading states and error handling
 - **useDropdownData**: Manages dropdown data fetching with React Query integration
 - **useEditForm**: Form editing state management with validation
-- **useIsMobile**: Mobile device detection using react-responsive with SSR support
+- **useIsMobile**: Mobile device detection using native window.matchMedia API for better performance
 - **useToastAction**: Async action with advanced toast integration for consistent feedback
 - **useAuthRedirect**: Authentication flow management
 - **usePageFocus**: Accessibility-focused keyboard focus management for route changes
@@ -145,6 +144,7 @@ The library follows a hierarchical module organization with functions organized 
 - July 22, 2025: Augmented API layer with CLIENT_BASE_URL environment variable support and enhanced getQueryFn with automatic URL construction from query keys for RESTful patterns
 - July 22, 2025: Added LazyImagePreview component with shimmer loading animation and smooth opacity transitions - provides optimized image loading with preload tracking and native lazy loading support
 - August 19, 2025: Added comprehensive clipboard functionality with useClipboard and useClipboardWithCallbacks hooks, makeCopyFn factory function, and copyToClipboard utility - features modern Clipboard API with legacy fallback, toast integration, server-side rendering support, and robust error handling
+- September 25, 2025: Updated useIsMobile hook to use native window.matchMedia API instead of react-responsive dependency - provides better performance, fewer dependencies, and more direct viewport detection while maintaining the same 768px mobile breakpoint
 
 ## User Preferences
 
