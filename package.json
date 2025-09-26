@@ -47,7 +47,11 @@
     "winston": "^3.17.0"
   },
   "scripts": {
-    "test": "node test.js"
+    "test": "node tests/runner.js",
+    "test:main": "node tests/main.spec.js",
+    "test:clipboard": "node tests/clipboard/clipboard.spec.js",
+    "test:components": "node tests/components/lazy-image.spec.js",
+    "test:utils": "node tests/utils/vitest-parser.spec.js"
   },
   "keywords": [],
   "author": "",
