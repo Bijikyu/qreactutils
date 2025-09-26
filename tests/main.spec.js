@@ -1,4 +1,4 @@
-require('./test-setup'); // ensure qtests or fallback stubs before other imports so axios/winston mocks load first
+require('./setup/test-helpers'); // ensure qtests or fallback stubs before other imports so axios/winston mocks load first
 // Tests execute using a small promise queue so async cases never overlap; this mimics Jest's sequential behavior without the dependency
 // Hooks run via react-test-renderer so we can execute them in Node without a DOM; this keeps the test harness lightweight
 
@@ -109,13 +109,13 @@ const {
   useAsyncAction, useDropdownData, createDropdownListHook, useDropdownToggle,
   useEditForm, useIsMobile, useToast, toast, useToastAction, useAuthRedirect,
   showToast, stopEvent, apiRequest, getQueryFn, queryClient, formatAxiosError, axiosClient, getToastListenerCount, resetToastSystem, dispatch, getToastTimeoutCount
-} = require('./index.js'); // import library after axios stub so axiosClient can be overridden
-const { handle401Error, codexRequest, executeAxiosRequest } = require('./lib/api.js'); // internal API helpers without config helpers
+} = require('../index.js'); // import library after axios stub so axiosClient can be overridden
+const { handle401Error, codexRequest, executeAxiosRequest } = require('../lib/api.js'); // internal API helpers without config helpers
 
 // Direct imports for internal utilities under test
-const { executeAsyncWithLogging, logFunction, withToastLogging } = require('./lib/utils.js'); // test logging helpers
-const { executeWithErrorHandling, executeSyncWithErrorHandling } = require('./lib/errorHandling.js'); // test error wrappers
-const { executeWithErrorToast, executeWithToastFeedback } = require('./index.js'); // verify toast wrappers exported from main module
+const { executeAsyncWithLogging, logFunction, withToastLogging } = require('../lib/utils.js'); // test logging helpers
+const { executeWithErrorHandling, executeSyncWithErrorHandling } = require('../lib/errorHandling.js'); // test error wrappers
+const { executeWithErrorToast, executeWithToastFeedback } = require('../index.js'); // verify toast wrappers exported from main module
 
 const mockedAxiosClient = mockAxios.create(); // Create axios stub instance for API calls
 axiosClient.request = mockedAxiosClient.request; // override request so api layer uses mock
@@ -326,10 +326,10 @@ async function assertApiError(endpoint, expectedErrorPattern, testDescription) {
 }
 
 // Import validation utilities after axios mock is in place so axios.isAxiosError uses the stub
-const { isFunction, isObject, safeStringify, isAxiosErrorWithStatus } = require('./lib/validation.js');
+const { isFunction, isObject, safeStringify, isAxiosErrorWithStatus } = require('../lib/validation.js');
 // Load internal helper tests so they run within this suite
-require('./tests/internal-helpers.test.js')({ runTest, renderHook, assert, assertEqual });
-require('./tests/logger.test.js')({ runTest, assert, assertEqual });
+require('./internal-helpers.test.js')({ runTest, renderHook, assert, assertEqual });
+require('./logger.test.js')({ runTest, assert, assertEqual });
 
 console.log('🚀 Starting Enhanced Comprehensive Test Suite...\n');
 

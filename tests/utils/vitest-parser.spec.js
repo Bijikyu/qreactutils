@@ -5,7 +5,7 @@
  * parses various Vitest output formats and extracts test statistics.
  */
 
-const { parseVitestResults } = require('./index.js');
+const { parseVitestResults } = require('../../index.js');
 
 // Test cases with different Vitest output formats
 const testCases = [

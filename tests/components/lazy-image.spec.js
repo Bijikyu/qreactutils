@@ -6,7 +6,7 @@
  * a DOM, we can only test the component construction and basic functionality.
  */
 
-const { LazyImagePreview } = require('./index.js');
+const { LazyImagePreview } = require('../../index.js');
 const React = require('react');
 
 console.log('Testing LazyImagePreview component...');

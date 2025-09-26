@@ -5,7 +5,7 @@
  * proper functionality across different environments and scenarios.
  */
 
-const { makeCopyFn, copyToClipboard, useClipboard, useClipboardWithCallbacks } = require('./index.js');
+const { makeCopyFn, copyToClipboard, useClipboard, useClipboardWithCallbacks } = require('../../index.js');
 
 // Try to import React testing utilities, fallback if not available
 let renderHook, act;
