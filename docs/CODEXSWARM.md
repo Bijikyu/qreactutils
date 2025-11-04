@@ -17,10 +17,10 @@ Add this to `replit.nix`:
 ```nix
 { pkgs }:
 {
-	deps = [
-		pkgs.tmux
-		pkgs.nodejs_20
-	];
+        deps = [
+                pkgs.tmux
+                pkgs.nodejs_20
+        ];
 }
 ```
 
@@ -30,7 +30,23 @@ In Shell:
 tmux -V  # should output something like "tmux 3.4"
 ```
 
-### 2. **Ensure you have the following scripts under `./scripts/`**:
+### 2. **Install Codex CLI (NixOS-specific)**
+
+On NixOS/Replit environments, newer versions of Codex CLI (0.47.0+) have compatibility issues with musl binaries. Use version 0.40.0 instead:
+
+```bash
+npm install -g @openai/codex@0.40.0
+```
+
+Verify installation:
+
+```bash
+codex --version  # should output "codex-cli 0.40.0"
+```
+
+> **Note:** If you're on a non-NixOS system, you can use the latest version: `npm install -g @openai/codex`
+
+### 3. **Ensure you have the following scripts under `./scripts/`**:
 
 * `./scripts/spawn-agent.sh` ← spawns a new Codex CLI agent in its own tmux window
 * `./scripts/send-to-agent.sh` ← sends messages to an agent using `tmux send-keys`
@@ -166,9 +182,9 @@ Append `--purge-logs` if you also want to remove the generated `logs/*.log` file
 * **Name conflicts are not resolved** — rerunning with the same agent name will overwrite
 * Agents are encouraged to:
 
-	* Log meaningful output
-	* Check directory validity before launching
-	* Avoid runaway loops that spam the Codex CLI
+        * Log meaningful output
+        * Check directory validity before launching
+        * Avoid runaway loops that spam the Codex CLI
 
 ---
 
@@ -192,14 +208,14 @@ Append `--purge-logs` if you also want to remove the generated `logs/*.log` file
 
 * If an agent doesn't respond, check:
 
-	* `tmux list-windows -t codex-swarm`
-	* `tail -n 20 logs/<agent>.log`
+        * `tmux list-windows -t codex-swarm`
+        * `tail -n 20 logs/<agent>.log`
 * To restart a broken agent:
 
-	```bash
-	tmux kill-window -t codex-swarm:<agent>
-	./scripts/spawn-agent.sh <agent> <dir>
-	```
+        ```bash
+        tmux kill-window -t codex-swarm:<agent>
+        ./scripts/spawn-agent.sh <agent> <dir>
+        ```
 
 ### Instrumenting long-running work
 
