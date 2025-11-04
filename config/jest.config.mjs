@@ -38,26 +38,40 @@ export default {
   watchPathIgnorePatterns: ['<rootDir>/dist/', '<rootDir>/build/'],
   moduleFileExtensions: ["ts","tsx","js","jsx","json"],
   transform: {
-  "^.+\\.(ts|tsx)$": [
-    "ts-jest",
-    {
-      "useESM": true,
-      "tsconfig": {
-        "jsx": "react-jsx"
+    "^.+\\.(ts|tsx)$": [
+      "ts-jest",
+      {
+        useESM: true,
+        // Rationale: ts-jest raises TS2307 for '@testing-library/react' because
+        // moduleNameMapper affects runtime resolution only. We add a TypeScript
+        // paths alias so the compiler can resolve to our lightweight shim
+        // (config/rtl-shim.ts) without pulling heavy DOM dependencies.
+        tsconfig: {
+          jsx: "react-jsx",
+          baseUrl: PROJECT_ROOT,
+          paths: {
+            "@testing-library/react": ["config/rtl-shim.ts"]
+          }
+        }
       }
-    }
-  ],
-  "^.+\\.(js|jsx)$": [
-    "ts-jest",
-    {
-      "useESM": true,
-      "tsconfig": {
-        "jsx": "react-jsx",
-        "allowJs": true
+    ],
+    "^.+\\.(js|jsx)$": [
+      "ts-jest",
+      {
+        useESM: true,
+        // Keep allowJs for JS/JSX while mirroring the same paths mapping so
+        // mixed TS/JS tests resolve consistently in this Node-only environment.
+        tsconfig: {
+          jsx: "react-jsx",
+          allowJs: true,
+          baseUrl: PROJECT_ROOT,
+          paths: {
+            "@testing-library/react": ["config/rtl-shim.ts"]
+          }
+        }
       }
-    }
-  ]
-},
+    ]
+  },
   extensionsToTreatAsEsm: [".ts",".tsx"],
   transformIgnorePatterns: ['node_modules/(?!(?:qtests|@tanstack|@radix-ui|lucide-react|react-resizable-panels|cmdk|vaul)/)'],
   moduleNameMapper: {
